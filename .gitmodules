@@ -4,3 +4,6 @@
 [submodule "projects/RayMQ"]
 	path = projects/RayMQ
 	url = git@github.com:maxiee/RayMQ.git
+[submodule "projects/RayCommonPy"]
+	path = projects/RayCommonPy
+	url = git@github.com:maxiee/RayCommonPy.git
