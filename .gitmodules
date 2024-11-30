@@ -7,3 +7,6 @@
 [submodule "projects/RayCommonPy"]
 	path = projects/RayCommonPy
 	url = git@github.com:maxiee/RayCommonPy.git
+[submodule "projects/RaySearchEngine"]
+	path = projects/RaySearchEngine
+	url = git@github.com:maxiee/RaySearchEngine.git
