@@ -2,7 +2,7 @@ import yaml
 import os.path
 
 
-def load_config() -> dict:
+def load_config_file() -> dict:
     """Load configuration from ~/.RaySystemConfig.yaml"""
     config_path = os.path.expanduser("~/.RaySystemConfig.yaml")
     try:
