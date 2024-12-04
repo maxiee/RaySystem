@@ -1,3 +1,4 @@
+from module.info.info import init_info_module
 from utils.config import load_config_file
 from module.data.data import init_data_module, set_data_path
 
@@ -7,6 +8,7 @@ def main():
     init_config()
     # module initialization
     init_data_module()
+    init_info_module()
 
 
 def init_config():

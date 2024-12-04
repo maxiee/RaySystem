@@ -2,6 +2,12 @@ version = 1
 requires-python = ">=3.12"
 
 [[package]]
+name = "peewee"
+version = "3.17.8"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b4/dc/832bcf4ea5ee2ebc4ea42ef36e44a451de5d80f8b9858bf2066e30738c67/peewee-3.17.8.tar.gz", hash = "sha256:ce1d05db3438830b989a1b9d0d0aa4e7f6134d5f6fd57686eeaa26a3e6485a8c", size = 948249 }
+
+[[package]]
 name = "pyyaml"
 version = "6.0.2"
 source = { registry = "https://pypi.org/simple" }
@@ -32,8 +38,12 @@ name = "raysystem"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "peewee" },
     { name = "pyyaml" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "pyyaml", specifier = ">=6.0.2" }]
+requires-dist = [
+    { name = "peewee", specifier = ">=3.17.8" },
+    { name = "pyyaml", specifier = ">=6.0.2" },
+]
