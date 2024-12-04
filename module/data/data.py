@@ -2,12 +2,12 @@ from pathlib import Path
 
 # Where the data of RaySystem is stored
 # Default data path
-data_path = Path("~/RaySystem")
+data_path = Path.home() / "RaySystem"
 
 
 def set_data_path(path: str):
     global data_path
-    data_path = Path(path)
+    data_path = Path(path).expanduser()
 
 
 def get_data_path() -> Path:
