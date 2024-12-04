@@ -1,0 +1,1 @@
+INFO_MODULE_NAME = "info"
