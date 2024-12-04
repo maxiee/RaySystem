@@ -1,0 +1,3 @@
+# Specify the location where RaySystem will store its data
+# Default: ~/.ray-system
+data_path: ~/RaySystem
