@@ -2,3 +2,5 @@
 - [ ] 创建 Feed 模块（资讯订阅，不限于 RSS）
 - [ ] Feed 模块，自动将 google 保存到 Info，实现模块间的数据交互
 - [ ] Info 模块实现相关 CRUD 操作
+- [ ] 【Info】Info 的 Image 不要用 BlobField，改成对象存储路径
+- [ ] 开发本地的对象存储模块，名称为 Storage
