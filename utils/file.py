@@ -25,3 +25,13 @@ def compute_sha256_from_bytes(data: bytes) -> str:
     sha256 = hashlib.sha256()
     sha256.update(data)
     return sha256.hexdigest()
+
+
+def get_file_extension_from_path(file_path: str) -> str:
+    """
+    Get the file extension from a file path.
+
+    :param file_path: Path to the file.
+    :return: File extension.
+    """
+    return file_path.split(".")[-1]
