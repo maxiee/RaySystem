@@ -6,3 +6,4 @@
 - [x] 开发本地的对象存储模块，名称为 Storage
 - [ ] 创建 Crawler 模块，创建用于登记 Site 网站的 API：输入 URL 拉取标题和图标。
 - [ ] 完成第一个 Site 入库
+- [ ] fastAPI 弃用了 peewee，建议用 SQLAlchemy，考虑替换 https://fastapi.org.cn/how-to/sql-databases-peewee/
