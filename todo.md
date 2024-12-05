@@ -3,4 +3,6 @@
 - [ ] Feed 模块，自动将 google 保存到 Info，实现模块间的数据交互
 - [ ] Info 模块实现相关 CRUD 操作
 - [ ] 【Info】Info 的 Image 不要用 BlobField，改成对象存储路径
-- [ ] 开发本地的对象存储模块，名称为 Storage
+- [x] 开发本地的对象存储模块，名称为 Storage
+- [ ] 创建 Crawler 模块，创建用于登记 Site 网站的 API：输入 URL 拉取标题和图标。
+- [ ] 完成第一个 Site 入库
