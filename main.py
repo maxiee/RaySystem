@@ -1,6 +1,7 @@
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import sys
+from module.db.db import init_db
 from module.info.info import init_info_module
 from module.storage.storage import init_storage_module
 from module.task_queue.task_queue import init_task_queue
@@ -40,6 +41,7 @@ async def repl():
 
 
 async def main():
+    await init_db()
     await init_task_queue()
     await repl()
 

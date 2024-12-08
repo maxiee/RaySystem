@@ -5,6 +5,8 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "aiosqlite>=0.20.0",
     "peewee>=3.17.8",
     "pyyaml>=6.0.2",
+    "sqlmodel>=0.0.22",
 ]
