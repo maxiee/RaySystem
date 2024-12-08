@@ -3,24 +3,6 @@ from typing import Optional
 
 from sqlmodel import Field, SQLModel, Relationship
 
-# from peewee import *
-
-from module.base.constants import INFO_MODULE_NAME
-from module.fs.fs import fs_get_module_data_path
-
-# info_db = SqliteDatabase(None)
-
-
-# class BaseModel(Model):
-#     class Meta:
-#         database = info_db
-
-
-# class Site(BaseModel):
-#     name = CharField()
-#     url = CharField()
-#     favicon = BlobField(null=True)
-
 
 class Site(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -48,7 +30,3 @@ class Info(SQLModel, table=True):
 
 def init_info_model():
     pass
-    # global info_db
-    # info_db.init(fs_get_module_data_path(INFO_MODULE_NAME) / "info.db")
-    # info_db.connect()
-    # info_db.create_tables([Site, Info])
