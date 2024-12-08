@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import AsyncGenerator, Union
 
-from sqlalchemy import Engine
+from sqlmodel import SQLModel
 from module.base.constants import DB_MODULE_NAME
 from module.fs.fs import fs_get_module_data_path, fs_make_sure_module_data_path_exists
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -28,4 +28,6 @@ async def init_db():
     # Create the data directory if it doesn't exist
     fs_make_sure_module_data_path_exists(DB_MODULE_NAME)
     DB_ENGINE = create_async_engine(f"sqlite+aiosqlite:///{db_get_db_path()}")
+    async with DB_ENGINE.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)
     print("DB module initialized")
