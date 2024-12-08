@@ -3,6 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 import sys
 from module.info.info import init_info_module
 from module.storage.storage import init_storage_module
+from module.task_queue.task_queue import init_task_queue
 from utils.config import load_config_file
 from module.data.data import init_data_module, set_data_path
 
@@ -39,6 +40,7 @@ async def repl():
 
 
 async def main():
+    await init_task_queue()
     await repl()
 
 
