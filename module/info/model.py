@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Relationship
 
 # from peewee import *
 
@@ -28,19 +28,22 @@ class Site(SQLModel, table=True):
     url: str
     favicon: Optional[str] = None
 
+    infos: list["Info"] = Relationship(back_populates="site")
 
-# class Info(BaseModel):
-#     title = CharField()
-#     url = CharField()
-#     published = DateTimeField(null=True)
-#     created_at = DateTimeField(default=datetime.now)
-#     description = TextField(null=True)
-#     image = BlobField(null=True)
-#     site = ForeignKeyField(Site, backref="infos")
-#     # is_new: True if the info is new
-#     is_new = BooleanField(default=True)
-#     # is_mark: True if the info is marked
-#     is_mark = BooleanField(default=False)
+
+class Info(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    title: str
+    url: str
+    published: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=datetime.now)
+    description: Optional[str] = None
+    image: Optional[bytes] = None
+    site_id: Optional[int] = Field(default=None, foreign_key="site.id")
+    is_new: bool = Field(default=True)
+    is_mark: bool = Field(default=False)
+
+    site: Optional["Site"] = Relationship(back_populates="infos")
 
 
 def init_info_model():
