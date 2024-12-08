@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 from urllib.parse import urlparse
 from module.base.constants import STORAGE_MODULE_NAME
-from module.data.data import get_module_data_path, make_sure_module_data_path_exists
+from module.fs.fs import fs_get_module_data_path, fs_make_sure_module_data_path_exists
 from utils.file import (
     compute_sha256_from_bytes,
     compute_sha256_from_file,
@@ -18,7 +18,7 @@ def _get_root_path() -> Path:
     """
     Get the root path for the storage module.
     """
-    return get_module_data_path(STORAGE_MODULE_NAME)
+    return fs_get_module_data_path(STORAGE_MODULE_NAME)
 
 
 def _get_storage_path(bucket: str, sha256: str):
@@ -170,5 +170,5 @@ def storgae_delete_file_by_protocol(uri: str):
 
 
 def init_storage_module():
-    make_sure_module_data_path_exists(STORAGE_MODULE_NAME)
+    fs_make_sure_module_data_path_exists(STORAGE_MODULE_NAME)
     print("Storage module initialized")

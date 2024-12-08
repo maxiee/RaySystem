@@ -5,7 +5,7 @@ from module.info.info import init_info_module
 from module.storage.storage import init_storage_module
 from module.task_queue.task_queue import init_task_queue
 from utils.config import load_config_file
-from module.data.data import init_data_module, set_data_path
+from module.fs.fs import init_fs_module, fs_set_data_path
 
 # 后台任务队列
 task_queue = asyncio.Queue()

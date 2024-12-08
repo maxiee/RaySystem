@@ -2,7 +2,7 @@ from datetime import datetime
 from peewee import *
 
 from module.base.constants import INFO_MODULE_NAME
-from module.data.data import get_module_data_path
+from module.fs.fs import fs_get_module_data_path
 
 info_db = SqliteDatabase(None)
 
@@ -34,6 +34,6 @@ class Info(BaseModel):
 
 def init_info_model():
     global info_db
-    info_db.init(get_module_data_path(INFO_MODULE_NAME) / "info.db")
+    info_db.init(fs_get_module_data_path(INFO_MODULE_NAME) / "info.db")
     info_db.connect()
     info_db.create_tables([Site, Info])
