@@ -23,11 +23,11 @@ executor = ThreadPoolExecutor(max_workers=10)
 #     init_info_module()
 
 
-# def init_config():
-#     config_file = load_config_file()
-#     print(config_file)
-#     if "data_path" in config_file:
-#         set_data_path(config_file["data_path"])
+def init_config():
+    config_file = load_config_file()
+    print(config_file)
+    if "data_path" in config_file:
+        fs_set_data_path(config_file["data_path"])
 
 
 async def repl():
@@ -47,4 +47,5 @@ async def main():
 
 
 if __name__ == "__main__":
+    init_config()
     asyncio.run(main())
