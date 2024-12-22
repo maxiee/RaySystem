@@ -9,6 +9,7 @@ class Site(SQLModel, table=True):
     name: str
     url: str
     favicon: Optional[str] = None
+    rss: Optional[str] = None
 
     infos: list["Info"] = Relationship(back_populates="site")
 
