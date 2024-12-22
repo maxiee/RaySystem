@@ -103,6 +103,6 @@ async def init_task_queue():
     # 自省状态
     task_queue_print_status()
 
-    # 等待队列处理完成
-    await TASK_QUEUE.join()
-    worker_task.cancel()
+    # # 等待队列处理完成
+    # await TASK_QUEUE.join()
+    # worker_task.cancel()
