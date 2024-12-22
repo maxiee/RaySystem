@@ -7,6 +7,7 @@ from sqlmodel import Field, SQLModel, Relationship
 class Site(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
+    description: Optional[str] = None
     url: str
     favicon: Optional[str] = None
     rss: Optional[str] = None
