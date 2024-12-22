@@ -24,3 +24,7 @@ RaySystem 本身是一个 Python 项目，使用 `uv` 进行管理。RaySystem �
 - [RaySystem Vol.007：从 Peewee 到 SQLModel、aiosqlite 异步数据库](https://mp.weixin.qq.com/s/gllyvqRoIHRMUkrPm_cmsw)
 - [RaySystem Vol.008：调研 Emacs Elfeed RSS 阅读器](https://mp.weixin.qq.com/s/fNKBIIj_fAC3kTlwi74xiw)
 - [RaySystem Vol.009：Emacs Elfeed RSS 阅读器源码阅读](https://mp.weixin.qq.com/s/sJ3QlquzgyU_7fuUZBtoMA)
+- [RaySystem Vol.010：Emacs Elfeed RSS 阅读器源码阅读（2）](https://mp.weixin.qq.com/s/B7EDGOBkYvsu8prHe1audQ)
+- [RaySystem Vol.011：Emacs Elfeed RSS 阅读器源码阅读（3）](https://mp.weixin.qq.com/s/Mi_6nkKX58imIWeMWDzNhQ)
+- [RaySystem Vol.012：创建自己的 Emacs Major Mode](https://mp.weixin.qq.com/s/_zXZOlYtcA0BaQ82rUQIXQ)
+- [RaySystem Vol.013：引入 FastAPI 后端服务](https://mp.weixin.qq.com/s/NYNaUoNTxyJqEPoU8DYCYg)
