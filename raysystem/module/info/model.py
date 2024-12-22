@@ -28,5 +28,3 @@ class Info(SQLModel, table=True):
     site: Optional["Site"] = Relationship(back_populates="infos")
 
 
-def init_info_model():
-    pass
