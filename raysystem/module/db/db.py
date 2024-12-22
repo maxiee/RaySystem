@@ -7,8 +7,6 @@ from module.fs.fs import fs_get_module_data_path, fs_make_sure_module_data_path_
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine, async_sessionmaker
 
-from module.info.model import Site
-
 
 DB_ENGINE: Union[AsyncEngine, None] = None
 
@@ -16,6 +14,12 @@ DB_ENGINE: Union[AsyncEngine, None] = None
 def db_get_db_path() -> Path:
     return fs_get_module_data_path(DB_MODULE_NAME) / "db.sqlite3"
 
+async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
+    session = db_async_session()
+    try:
+        yield session
+    finally:
+        await session.close()
 
 def db_async_session() -> AsyncSession:
     return async_sessionmaker(DB_ENGINE, class_=AsyncSession, expire_on_commit=False)()
