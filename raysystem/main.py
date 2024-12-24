@@ -2,6 +2,7 @@ import asyncio
 
 import uvicorn
 from module.db.db import init_db
+from module.early_sleeping.early_sleeping import early_sleeping_gen_diary
 from module.http.http import APP
 from module.info.info import init_info_module
 from module.storage.storage import init_storage_module
@@ -36,6 +37,8 @@ def handle_repl_command(command: str):
         exit(0)
     elif command == "help":
         print("help")
+    elif command == 'early-sleeping':
+        print(early_sleeping_gen_diary())
     elif command == 'task-queue-status':
         task_queue_print_status()
     
