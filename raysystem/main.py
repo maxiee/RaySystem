@@ -34,7 +34,12 @@ async def run_repl():
 def handle_repl_command(command: str):
     print(f"处理REPL命令: {command}")
     if command == "exit":
-        exit(0)
+        # Signal the application to shut down gracefully
+        import signal
+        import os
+        # Send SIGTERM to own process
+        os.kill(os.getpid(), signal.SIGTERM)
+        return "Shutting down..."
     elif command == "help":
         print("help")
     elif command == 'early-sleeping':
