@@ -49,7 +49,7 @@ async def task_queue_worker():
         # 执行所有回调
         for cb in callbacks:
             try:
-                result = cb(*args, **kwargs)
+                result = await cb(*args, **kwargs)
                 # 根据需要处理回调结果，这里只是打印
                 print(
                     f"[回调执行] 任务: {task_name}, 回调: {cb.__name__}, 返回: {result}"

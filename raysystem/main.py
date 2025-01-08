@@ -1,6 +1,7 @@
 import asyncio
 
 import uvicorn
+from module.browser.browser import open_browser
 from module.db.db import init_db
 from module.early_sleeping.early_sleeping import early_sleeping_gen_diary
 from module.http.http import APP
@@ -31,7 +32,7 @@ async def run_repl():
         except EOFError:
             break
 
-def handle_repl_command(command: str):
+async def handle_repl_command(command: str):
     print(f"处理REPL命令: {command}")
     if command == "exit":
         # Signal the application to shut down gracefully
@@ -46,6 +47,8 @@ def handle_repl_command(command: str):
         print(early_sleeping_gen_diary())
     elif command == 'task-queue-status':
         task_queue_print_status()
+    elif command == 'open-browser':
+        await open_browser()
     
 def init_repl():
     task_queue_register_callback("repl_command", handle_repl_command)
