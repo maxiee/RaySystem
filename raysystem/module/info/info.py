@@ -1,5 +1,4 @@
 from fastapi import HTTPException, Depends
-from sqlmodel import select
 from typing import List
 
 from module.base.constants import INFO_MODULE_NAME
@@ -7,13 +6,13 @@ from module.fs.fs import fs_make_sure_module_data_path_exists
 from module.http.http import APP
 from module.info.model import Site
 from module.db.db import get_db_session
-from sqlmodel.ext.asyncio.session import AsyncSession
-
+from sqlalchemy.ext.asyncio import AsyncSession
+import module.info.schemas as schemas
 
 # Site CRUD operations
-@APP.post("/sites/", response_model=Site)
+@APP.post("/sites/", response_model=schemas.Site)
 async def create_site(
-    site: Site, async_session: AsyncSession = Depends(get_db_session)
+    site: schemas.SiteCreate, async_session: AsyncSession = Depends(get_db_session)
 ):
     async with async_session as session:
         db_site = Site.from_orm(site)
@@ -23,7 +22,7 @@ async def create_site(
         return db_site
 
 
-@APP.get("/sites/", response_model=List[Site])
+@APP.get("/sites/", response_model=List[schemas.Site])
 async def read_sites(
     skip: int = 0,
     limit: int = 100,
@@ -35,7 +34,7 @@ async def read_sites(
         return sites
 
 
-@APP.get("/sites/{site_id}", response_model=Site)
+@APP.get("/sites/{site_id}", response_model=schemas.Site)
 async def read_site(
     site_id: int, async_session: AsyncSession = Depends(get_db_session)
 ):
@@ -46,9 +45,9 @@ async def read_site(
         return site
 
 
-@APP.put("/sites/{site_id}", response_model=Site)
+@APP.put("/sites/{site_id}", response_model=schemas.Site)
 async def update_site(
-    site_id: int, site: Site, async_session: AsyncSession = Depends(get_db_session)
+    site: schemas.SiteUpdate, async_session: AsyncSession = Depends(get_db_session)
 ):
     async with async_session as session:
         db_site = session.get(Site, site_id)
