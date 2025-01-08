@@ -62,3 +62,7 @@ RaySystem 是我个人对工具和工作流探索的精心结晶，如果你对�
 - [RaySystem Vol.011：Emacs Elfeed RSS 阅读器源码阅读（3）](https://mp.weixin.qq.com/s/Mi_6nkKX58imIWeMWDzNhQ)
 - [RaySystem Vol.012：创建自己的 Emacs Major Mode](https://mp.weixin.qq.com/s/_zXZOlYtcA0BaQ82rUQIXQ)
 - [RaySystem Vol.013：引入 FastAPI 后端服务](https://mp.weixin.qq.com/s/NYNaUoNTxyJqEPoU8DYCYg)
+- [RaySystem Vol.014：站点管理功能设计](https://mp.weixin.qq.com/s/SCNbIGJkw-nSm7tsfN0RXQ)
+- [RaySystem Vol.015：AI晚间日记助我早睡](https://mp.weixin.qq.com/s/vrjed8pXBlkZv1GcM-gTeQ)
+- [RaySystem Vol.016：由 SQLModel 切换至 SQLAlchemy](https://mp.weixin.qq.com/s/U0mV1OvVrbbokl4k1nlvbQ)
+- [RaySystem Vol.017：引入 PlayWright 浏览器访问能力](https://mp.weixin.qq.com/s/86LDFRbYrQAuFbIrww19eA)
