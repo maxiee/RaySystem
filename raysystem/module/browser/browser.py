@@ -7,4 +7,4 @@ async def open_browser():
         headless=False,
         )
     page = await browser.new_page()
-    await page.goto("https://weibo.com/")
+    await page.goto("https://maxieewong.com/")
