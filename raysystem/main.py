@@ -6,6 +6,7 @@ from module.db.db import init_db
 from module.early_sleeping.early_sleeping import early_sleeping_gen_diary
 from module.http.http import APP
 from module.info.info import init_info_module
+from module.people.people import init_people_module
 from module.storage.storage import init_storage_module
 from module.task_queue.task_queue import init_task_queue, task_queue_print_status, task_queue_register_callback, task_queue_submit_task
 from utils.config import load_config_file
@@ -66,6 +67,7 @@ def main():
     init_fs_module()
     init_storage_module()
     init_info_module()
+    init_people_module()
     uvicorn.run(APP, host="0.0.0.0", port=8000)
 
 if __name__ == "__main__":
