@@ -8,8 +8,6 @@ void main() {
       create: (_) => CardManager(maxCards: 20), child: const MyApp()));
 }
 
-enum InteractionLevel { level1, level2 }
-
 Map<String, dynamic> commands = {
   'commands': [
     {
@@ -142,15 +140,11 @@ class _MyAppState extends State<MyApp> {
     }
 
     final currentCommands = _commandStack.last;
-    if (currentCommands == null || currentCommands is! List) {
-      return const SizedBox.shrink();
-    }
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         ...currentCommands.map((cmd) {
-          if (cmd is! Map<String, dynamic>) return const SizedBox.shrink();
           return ElevatedButton(
             onPressed: () {
               if (cmd.containsKey('commands')) {
@@ -166,7 +160,7 @@ class _MyAppState extends State<MyApp> {
             },
             child: Text(cmd['title']?.toString() ?? '无标题'),
           );
-        }).toList(),
+        }),
         if (_commandStack.length > 1)
           ElevatedButton(
             onPressed: () {
