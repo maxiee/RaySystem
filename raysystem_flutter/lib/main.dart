@@ -76,7 +76,7 @@ Map<String, dynamic> commands = {
           'command': 'todo-more',
           'title': '更多操作',
           'icon': Icons.more_horiz,
-          commands: [
+          'commands': [
             {
               'command': 'todo-more-1',
               'title': '更多操作1',
@@ -108,8 +108,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  InteractionLevel _currentLevel = InteractionLevel.level1;
-  String _selectedApp = '';
+  final List<List<Map<String, dynamic>>> _commandStack = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _commandStack.add(commands['commands']);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,47 +137,47 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget _buildBottomPanel(BuildContext context) {
-    if (_currentLevel == InteractionLevel.level1) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: commands.keys.map((appKey) {
+    if (_commandStack.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final currentCommands = _commandStack.last;
+    if (currentCommands == null || currentCommands is! List) {
+      return const SizedBox.shrink();
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        ...currentCommands.map((cmd) {
+          if (cmd is! Map<String, dynamic>) return const SizedBox.shrink();
           return ElevatedButton(
             onPressed: () {
-              setState(() {
-                _selectedApp = appKey;
-                _currentLevel = InteractionLevel.level2;
-              });
+              if (cmd.containsKey('commands')) {
+                final List<dynamic>? subCmds = cmd['commands'];
+                if (subCmds != null) {
+                  setState(() {
+                    _commandStack.add(List<Map<String, dynamic>>.from(subCmds));
+                  });
+                }
+              } else if (cmd['callback'] != null) {
+                cmd['callback']();
+              }
             },
-            child:
-                Text(appKey), // Use the appKey (e.g. 'notes', 'todos', 'news')
+            child: Text(cmd['title']?.toString() ?? '无标题'),
           );
         }).toList(),
-      );
-    } else {
-      final appCommands = commands[_selectedApp] ?? {};
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Text('当前应用: $_selectedApp'),
-          ...appCommands.entries.map((entry) {
-            final cmdTitle = entry.value['title'];
-            final cmdCallback = entry.value['callback'];
-            return ElevatedButton(
-              onPressed: () => cmdCallback(),
-              child: Text(cmdTitle),
-            );
-          }).toList(),
+        if (_commandStack.length > 1)
           ElevatedButton(
             onPressed: () {
               setState(() {
-                _currentLevel = InteractionLevel.level1;
+                _commandStack.removeLast();
               });
             },
             child: const Text('返回'),
           ),
-        ],
-      );
-    }
+      ],
+    );
   }
 }
 
