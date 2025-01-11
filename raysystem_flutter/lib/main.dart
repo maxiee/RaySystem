@@ -19,27 +19,48 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(
           title: const Text('流式卡片 Demo'),
         ),
-        body: Column(
+        body: const Column(
           children: [
             Expanded(
-              child: const CardListView(),
+              child: CardListView(),
             ),
-            // 底部添加按钮，测试插入新卡片
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
+          ],
+        ),
+        bottomNavigationBar: Container(
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: const Offset(0, -2),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
                 onPressed: () {
-                  // 从全局 CardManager 获取并添加新卡片
                   final cardManager =
                       Provider.of<CardManager>(context, listen: false);
-
                   cardManager.addCard(
                       MySampleCard(uniqueId: DateTime.now().toString()));
                 },
-                child: const Text('添加一个新卡片'),
+                child: const Text('添加卡片'),
               ),
-            ),
-          ],
+              ElevatedButton(
+                onPressed: () {
+                  // final cardManager =
+                  //     Provider.of<CardManager>(context, listen: false);
+                  // cardManager.clearCards();
+                },
+                child: const Text('清空列表'),
+              ),
+            ],
+          ),
         ),
       ),
     );
