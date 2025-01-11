@@ -17,6 +17,23 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      title: 'Stream-like Card Demo',
+      home: HomePage(),
+    );
+  }
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final List<List<Map<String, dynamic>>> _commandStack = [];
 
   @override
@@ -27,21 +44,18 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Stream-like Card Demo',
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('流式卡片 Demo'),
-        ),
-        body: const Column(
-          children: [
-            Expanded(
-              child: CardListView(),
-            ),
-          ],
-        ),
-        bottomNavigationBar: _buildBottomPanel(context),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('流式卡片 Demo'),
       ),
+      body: const Column(
+        children: [
+          Expanded(
+            child: CardListView(),
+          ),
+        ],
+      ),
+      bottomNavigationBar: _buildBottomPanel(context), // 这里的 context 有问题，需要修复
     );
   }
 
