@@ -87,5 +87,20 @@ Map<String, dynamic> commands = {
         }
       ]
     },
+    {
+      'command': 'playground-app',
+      'title': '游乐场',
+      'icon': Icons.play_arrow,
+      'commands': [
+        {
+          'command': 'led-clock',
+          'title': 'LED 时钟',
+          'icon': Icons.watch_later,
+          'callback': () {
+            print('LED 时钟');
+          }
+        }
+      ]
+    }
   ]
 };
