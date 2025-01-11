@@ -8,8 +8,18 @@ void main() {
       create: (_) => CardManager(maxCards: 20), child: const MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+enum InteractionLevel { level1, level2 }
+
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  InteractionLevel _currentLevel = InteractionLevel.level1;
+  String _selectedApp = '';
 
   @override
   Widget build(BuildContext context) {
@@ -26,44 +36,71 @@ class MyApp extends StatelessWidget {
             ),
           ],
         ),
-        bottomNavigationBar: Container(
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                spreadRadius: 1,
-                blurRadius: 5,
-                offset: const Offset(0, -2),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  final cardManager =
-                      Provider.of<CardManager>(context, listen: false);
-                  cardManager.addCard(
-                      MySampleCard(uniqueId: DateTime.now().toString()));
-                },
-                child: const Text('添加卡片'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  // final cardManager =
-                  //     Provider.of<CardManager>(context, listen: false);
-                  // cardManager.clearCards();
-                },
-                child: const Text('清空列表'),
-              ),
-            ],
-          ),
-        ),
+        bottomNavigationBar: _buildBottomPanel(context),
       ),
     );
+  }
+
+  Widget _buildBottomPanel(BuildContext context) {
+    switch (_currentLevel) {
+      case InteractionLevel.level1:
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _selectedApp = 'notes';
+                  _currentLevel = InteractionLevel.level2;
+                });
+              },
+              child: const Text('笔记'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _selectedApp = 'todos';
+                  _currentLevel = InteractionLevel.level2;
+                });
+              },
+              child: const Text('待办事项'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _selectedApp = 'news';
+                  _currentLevel = InteractionLevel.level2;
+                });
+              },
+              child: const Text('资讯'),
+            ),
+          ],
+        );
+      case InteractionLevel.level2:
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text('当前应用: $_selectedApp'),
+            ElevatedButton(
+              onPressed: () {
+                final cardManager =
+                    Provider.of<CardManager>(context, listen: false);
+                cardManager
+                    .addCard(MySampleCard(uniqueId: DateTime.now().toString()));
+              },
+              child: const Text('添加卡片'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _currentLevel = InteractionLevel.level1;
+                });
+              },
+              child: const Text('返回'),
+            ),
+          ],
+        );
+    }
   }
 }
 
