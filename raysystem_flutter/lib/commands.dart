@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:one_clock/one_clock.dart';
+import 'package:raysystem_flutter/api/api.dart';
 import 'package:raysystem_flutter/card/card_manager.dart';
 import 'package:raysystem_flutter/form/form_field.dart';
 import 'package:raysystem_flutter/form/form_manager.dart';
@@ -159,6 +160,21 @@ Map<String, dynamic> commands = {
                   Text('性别: ${result['gender']}')
                 ],
               ),
+            ));
+          }
+        },
+        {
+          'command': 'backend-hello-world',
+          'title': 'API Hello World',
+          'icon': Icons.cloud,
+          'callback': (BuildContext context, CardManager cardManager) async {
+            print('API Hello World');
+
+            final result = await api.heeloWorldHelloGet();
+
+            cardManager.addCard(Container(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(result.data.toString()),
             ));
           }
         }

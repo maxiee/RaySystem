@@ -45,23 +45,23 @@ async def read_site(
         return site
 
 
-@APP.put("/sites/{site_id}", response_model=schemas.Site)
-async def update_site(
-    site: schemas.SiteUpdate, async_session: AsyncSession = Depends(get_db_session)
-):
-    async with async_session as session:
-        db_site = session.get(Site, site_id)
-        if not db_site:
-            raise HTTPException(status_code=404, detail="Site not found")
+# @APP.put("/sites/{site_id}", response_model=schemas.Site)
+# async def update_site(
+#     site: schemas.SiteUpdate, async_session: AsyncSession = Depends(get_db_session)
+# ):
+#     async with async_session as session:
+#         db_site = session.get(Site, site_id)
+#         if not db_site:
+#             raise HTTPException(status_code=404, detail="Site not found")
 
-        site_data = site.dict(exclude_unset=True)
-        for key, value in site_data.items():
-            setattr(db_site, key, value)
+#         site_data = site.dict(exclude_unset=True)ﬁ
+#         for key, value in site_data.items():
+#             setattr(db_site, key, value)
 
-        session.add(db_site)
-        await session.commit()
-        await session.refresh(db_site)
-        return db_site
+#         session.add(db_site)
+#         await session.commit()
+#         await session.refresh(db_site)
+#         return db_site
 
 
 @APP.delete("/sites/{site_id}")
