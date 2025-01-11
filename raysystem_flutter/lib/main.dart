@@ -10,6 +10,78 @@ void main() {
 
 enum InteractionLevel { level1, level2 }
 
+Map<String, dynamic> commands = {
+  'notes': {
+    'note-add': {
+      'title': '添加笔记',
+      'icon': Icons.add,
+      'callback': () {
+        print('添加笔记');
+      }
+    },
+    'note-list': {
+      'title': '查看笔记',
+      'icon': Icons.list,
+      'callback': () {
+        print('查看笔记');
+      }
+    },
+    'note-delete': {
+      'title': '删除笔记',
+      'icon': Icons.delete,
+      'callback': () {
+        print('删除笔记');
+      }
+    }
+  },
+  'todos': {
+    'todo-add': {
+      'title': '添加待办事项',
+      'icon': Icons.add,
+      'callback': () {
+        print('添加待办事项');
+      }
+    },
+    'todo-list': {
+      'title': '查看待办事项',
+      'icon': Icons.list,
+      'callback': () {
+        print('查看待办事项');
+      }
+    },
+    'todo-delete': {
+      'title': '删除待办事项',
+      'icon': Icons.delete,
+      'callback': () {
+        print('删除待办事项');
+      }
+    }
+  },
+  'news': {
+    'news-add': {
+      'title': '添加资讯',
+      'icon': Icons.add,
+      'callback': () {
+        print('添加资讯');
+      }
+    },
+    'news-list': {
+      'title': '查看资讯',
+      'icon': Icons.list,
+      'callback': () {
+        print('查看资讯');
+      }
+    },
+    'news-delete': {
+      'title': '删除资讯',
+      'icon': Icons.delete,
+      'callback': () {
+        print('删除资讯');
+      }
+    }
+  }
+};
+
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -42,64 +114,46 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget _buildBottomPanel(BuildContext context) {
-    switch (_currentLevel) {
-      case InteractionLevel.level1:
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _selectedApp = 'notes';
-                  _currentLevel = InteractionLevel.level2;
-                });
-              },
-              child: const Text('笔记'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _selectedApp = 'todos';
-                  _currentLevel = InteractionLevel.level2;
-                });
-              },
-              child: const Text('待办事项'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _selectedApp = 'news';
-                  _currentLevel = InteractionLevel.level2;
-                });
-              },
-              child: const Text('资讯'),
-            ),
-          ],
-        );
-      case InteractionLevel.level2:
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text('当前应用: $_selectedApp'),
-            ElevatedButton(
-              onPressed: () {
-                final cardManager =
-                    Provider.of<CardManager>(context, listen: false);
-                cardManager
-                    .addCard(MySampleCard(uniqueId: DateTime.now().toString()));
-              },
-              child: const Text('添加卡片'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _currentLevel = InteractionLevel.level1;
-                });
-              },
-              child: const Text('返回'),
-            ),
-          ],
-        );
+    if (_currentLevel == InteractionLevel.level1) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: commands.keys.map((appKey) {
+          return ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _selectedApp = appKey;
+                _currentLevel = InteractionLevel.level2;
+              });
+            },
+            child:
+                Text(appKey), // Use the appKey (e.g. 'notes', 'todos', 'news')
+          );
+        }).toList(),
+      );
+    } else {
+      final appCommands = commands[_selectedApp] ?? {};
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Text('当前应用: $_selectedApp'),
+          ...appCommands.entries.map((entry) {
+            final cmdTitle = entry.value['title'];
+            final cmdCallback = entry.value['callback'];
+            return ElevatedButton(
+              onPressed: () => cmdCallback(),
+              child: Text(cmdTitle),
+            );
+          }).toList(),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _currentLevel = InteractionLevel.level1;
+              });
+            },
+            child: const Text('返回'),
+          ),
+        ],
+      );
     }
   }
 }
