@@ -16,7 +16,10 @@ class CardManager with ChangeNotifier {
     }
     _cards.add(Card(
       key: UniqueKey(),
-      child: cardWidget,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SizedBox(width: double.infinity, child: cardWidget),
+      ),
     ));
     notifyListeners();
   }

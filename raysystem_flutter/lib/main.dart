@@ -66,7 +66,10 @@ class _MyAppState extends State<MyApp> {
                   });
                 }
               } else if (cmd['callback'] != null) {
-                cmd['callback']();
+                cmd['callback'](
+                  context,
+                  Provider.of<CardManager>(context, listen: false),
+                );
               }
             },
             icon: Icon(cmd['icon'] as IconData?),

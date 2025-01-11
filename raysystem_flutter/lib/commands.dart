@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:one_clock/one_clock.dart';
+import 'package:raysystem_flutter/card/card_manager.dart';
 
 Map<String, dynamic> commands = {
   'commands': [
@@ -11,7 +13,7 @@ Map<String, dynamic> commands = {
           'command': 'note-add',
           'title': '添加笔记',
           'icon': Icons.add,
-          'callback': () {
+          'callback': (BuildContext context, CardManager cardManager) {
             print('添加笔记');
           }
         },
@@ -19,7 +21,7 @@ Map<String, dynamic> commands = {
           'command': 'note-list',
           'title': '查看笔记',
           'icon': Icons.list,
-          'callback': () {
+          'callback': (BuildContext context, CardManager cardManager) {
             print('查看笔记');
           }
         },
@@ -27,7 +29,7 @@ Map<String, dynamic> commands = {
           'command': 'note-delete',
           'title': '删除笔记',
           'icon': Icons.delete,
-          'callback': () {
+          'callback': (BuildContext context, CardManager cardManager) {
             print('删除笔记');
           }
         }
@@ -42,7 +44,7 @@ Map<String, dynamic> commands = {
           'command': 'todo-add',
           'title': '添加待办事项',
           'icon': Icons.add,
-          'callback': () {
+          'callback': (BuildContext context, CardManager cardManager) {
             print('添加待办事项');
           }
         },
@@ -50,7 +52,7 @@ Map<String, dynamic> commands = {
           'command': 'todo-list',
           'title': '查看待办事项',
           'icon': Icons.list,
-          'callback': () {
+          'callback': (BuildContext context, CardManager cardManager) {
             print('查看待办事项');
           }
         },
@@ -58,7 +60,7 @@ Map<String, dynamic> commands = {
           'command': 'todo-delete',
           'title': '删除待办事项',
           'icon': Icons.delete,
-          'callback': () {
+          'callback': (BuildContext context, CardManager cardManager) {
             print('删除待办事项');
           }
         },
@@ -71,7 +73,7 @@ Map<String, dynamic> commands = {
               'command': 'todo-more-1',
               'title': '更多操作1',
               'icon': Icons.more_horiz,
-              'callback': () {
+              'callback': (BuildContext context, CardManager cardManager) {
                 print('更多操作1');
               }
             },
@@ -79,7 +81,7 @@ Map<String, dynamic> commands = {
               'command': 'todo-more-2',
               'title': '更多操作2',
               'icon': Icons.more_horiz,
-              'callback': () {
+              'callback': (BuildContext context, CardManager cardManager) {
                 print('更多操作2');
               }
             }
@@ -93,11 +95,27 @@ Map<String, dynamic> commands = {
       'icon': Icons.play_arrow,
       'commands': [
         {
-          'command': 'led-clock',
-          'title': 'LED 时钟',
+          'command': 'digital-clock',
+          'title': '数字时钟',
           'icon': Icons.watch_later,
-          'callback': () {
-            print('LED 时钟');
+          'callback': (BuildContext context, CardManager cardManager) {
+            print('数字时钟');
+            cardManager.addCard(DigitalClock(
+              isLive: true,
+            ));
+          }
+        },
+        {
+          'command': 'analog-clock',
+          'title': '模拟时钟',
+          'icon': Icons.watch,
+          'callback': (BuildContext context, CardManager cardManager) {
+            print('模拟时钟');
+            cardManager.addCard(AnalogClock(
+              width: 200,
+              height: 200,
+              isLive: true,
+            ));
           }
         }
       ]

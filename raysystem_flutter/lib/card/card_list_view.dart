@@ -12,6 +12,7 @@ class CardListView extends StatelessWidget {
 
     return SingleChildScrollView(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: cardManager.cards,
       ),
     );
