@@ -33,8 +33,8 @@ class MyApp extends StatelessWidget {
                   final cardManager =
                       Provider.of<CardManager>(context, listen: false);
 
-                  cardManager.addCard(MySampleCard(
-                      key: UniqueKey(), uniqueId: DateTime.now().toString()));
+                  cardManager.addCard(
+                      MySampleCard(uniqueId: DateTime.now().toString()));
                 },
                 child: const Text('添加一个新卡片'),
               ),

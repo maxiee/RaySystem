@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 class CardManager with ChangeNotifier {
   final List<Widget> _cards = [];
@@ -14,7 +14,10 @@ class CardManager with ChangeNotifier {
       // 移除最早的一条
       _cards.removeAt(0);
     }
-    _cards.add(cardWidget);
+    _cards.add(Card(
+      key: UniqueKey(),
+      child: cardWidget,
+    ));
     notifyListeners();
   }
 }
