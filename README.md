@@ -1,51 +1,51 @@
 ## RaySystem
 
-RaySystem 是我（Maeiee）为自己量身打造的个人系统项目。这不是一个通用工具，而是围绕我的个人工作流设计的独特系统。它整合了我对工具哲学的深入思考，体现了强大的功能性和极高的定制化。
+RaySystem 是 Maeiee 为自己量身打造的个人系统项目。这不是一个通用工具，而是围绕我的个人工作流设计的独特系统。它整合了我对工具哲学的深入思考，体现了强大的功能性和极高的定制化。
 
-### 为什么选择关注 RaySystem？
+### 特色
 
-1. **个人化的实践与哲学：**
+1. **个人化的实践与哲学：** RaySystem 的核心价值在于，它是我探索技术、优化个人效率的实验场。
 
-   - RaySystem 的核心价值在于，它是我探索技术、优化个人效率的实验场。
-   - 系统设计中渗透了对工具哲学的深刻理解，以及如何通过技术提升个人工作流的效率。
+2. **强大的整合能力：** 使用强大的技术栈（Python、FastAPI、Emacs……）构建，极简而强大。
 
-2. **强大的整合能力：**
+3. **深思熟虑的开发方式：** 每个模块都经过深思熟虑，确保系统的长期可维护性。
 
-   - 使用现代化技术栈（如 FastAPI、Python 异步编程）构建高效的后台服务。
-   - 结合 Emacs 前端，通过自定义 Major Modes 提供极简而强大的文本交互能力。
-
-3. **深思熟虑的开发方式：**
-
-   - 我坚持逐步推进的开发理念，每个模块都经过深思熟虑，确保系统的长期可维护性。
-   - 系统的每一步构建都记录在公众号中，既是开发日志，也是对工具设计的反思。
-
-4. **极简与功能的平衡：**
-
-   - 数据全部本地存储，避免引入不必要的复杂性。
-   - 坚持 KISS（Keep It Simple, Stupid）原则，让系统足够简洁且灵活。
-
-### 核心模块
-
-- **任务队列模块（task_queue）：**
-  管理任务队列，支持任务的添加、删除、查询和异步执行。
-- **存储模块（storage）：**
-  基于本地文件系统的对象存储，支持文件的增删查改操作。
-- **数据库模块：**
-  使用 SQLModel 和 aiosqlite 实现轻量级异步数据库管理。
-- **前端交互模块：**
-  Emacs 前端结合 Major Modes，支持站点管理和资讯管理等功能。
-- **后台服务：**
-  基于 FastAPI 提供 HTTP API，支持扩展到更多客户端。
-
-### 立即支持！
-
-RaySystem 是我个人对工具和工作流探索的精心结晶，如果你对系统设计、个人效率提升或者工具哲学感兴趣，欢迎 Star 这个项目。
-
-也欢迎关注我的公众号，点赞支持！
+4. **极简与功能的平衡：** 坚持 KISS 原则，数据本地存储，尽可能减少对外部服务的依赖。
 
 ---
 
-## 公众号文章
+### 子项目
+
+目前 RaySystem 采用 Client-Server 架构，主要包含以下子项目：
+
+- `raysystem`：RaySystem Server 部分，包含所有核心功能实现。
+
+- `raysystem_flutter`：RaySystem Client 部分，使用 Flutter 开发，支持桌面端及移动端。
+
+- `emacs`：RaySystem Emacs Client，使用 Elisp 开发，未来计划与 Emacs 深度融合。
+
+---
+
+### 核心模块
+
+RaySystem 由多个核心模块组成，实现位于 `raysystem` 的 `modules` 目录下：
+
+| 模块名称 | 功能描述 |
+| --- | --- |
+|`browser`|基于 PlayWright 的浏览器访问模块。|
+|`db`|数据库模块，使用 SQLAlchemy 进行 SQLite 数据库管理。|
+|`early_sleeping`|AI 晚间日记助我早睡。|
+|`fs`|文件系统模块，提供模块数据目录的管理。|
+|`http`|基于 FastAPI 的 HTTP 服务模块。|
+|`info`|资讯模块，基于站点、文章、标签等实现资讯管理。|
+|`people`|人物模块，基于人物、关系等实现人物管理。|
+|`storage`|存储模块，基于本地文件系统的对象存储。|
+|`task_queue`|任务队列模块，支持任务的添加、删除、查询和异步执行。|
+|`repl`|REPL 模块，支持异步 REPL 功能。|
+
+---
+
+### 公众号文章
 
 我开通了一个公众号，来记录 RaySystem 的搭建过程，欢迎关注！目前已经发布的文章如下：
 
@@ -66,3 +66,12 @@ RaySystem 是我个人对工具和工作流探索的精心结晶，如果你对�
 - [RaySystem Vol.015：AI晚间日记助我早睡](https://mp.weixin.qq.com/s/vrjed8pXBlkZv1GcM-gTeQ)
 - [RaySystem Vol.016：由 SQLModel 切换至 SQLAlchemy](https://mp.weixin.qq.com/s/U0mV1OvVrbbokl4k1nlvbQ)
 - [RaySystem Vol.017：引入 PlayWright 浏览器访问能力](https://mp.weixin.qq.com/s/86LDFRbYrQAuFbIrww19eA)
+- [RaySystem Vol.018：People 模块及 Alembic SQLAlchemy 数据表迁移](https://mp.weixin.qq.com/s/mEZZ5SPqL-5PsgyzlShS4w)
+
+---
+
+### 立即支持！
+
+RaySystem 是我个人对工具和工作流探索的精心结晶，如果你对系统设计、个人效率提升或者工具哲学感兴趣，欢迎 Star 这个项目。
+
+也欢迎关注我的公众号，点赞支持！
