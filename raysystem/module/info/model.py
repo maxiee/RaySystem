@@ -18,7 +18,7 @@ class Site(Base):
     # 站点描述
     description: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     # 站点 host
-    host: Mapped[str] = mapped_column(String, index=True)
+    host: Mapped[str] = mapped_column(String, index=True, unique=True)
     # 站点图标
     favicon: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     # 站点 rss
@@ -91,7 +91,7 @@ class Info(Base):
     # 资讯标题
     title: Mapped[str] = mapped_column(String, index=True)
     # 资讯 url
-    url: Mapped[str] = mapped_column(String, index=True)
+    url: Mapped[str] = mapped_column(String, index=True, unique=True)
     # 资讯发布时间
     published: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     # 资讯创建时间
