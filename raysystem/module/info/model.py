@@ -116,4 +116,5 @@ class Info(Base):
     subchannel_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("subchannel.id"), nullable=True)
     # 资讯对应子频道
     subchannel: Mapped[Optional["SubChannel"]] = relationship(back_populates="infos")
-
+    # storage 模块存储路径，协议 `"storage://" + bucket + ":" + sha256_filename`
+    storage_html: Mapped[Optional[str]] = mapped_column(String, nullable=True)
