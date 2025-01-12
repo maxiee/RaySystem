@@ -12,6 +12,24 @@ async def info_is_site_exists_by_host(host: str) -> bool:
         db_site = await session.get(Site, host)
         return db_site is not None    
 
+async def info_get_site_by_host(host: str) -> Site:
+    """
+    Get a site by its host
+    
+    Args:
+        host: The hostname to look up
+        
+    Returns:
+        Site: The found site object
+        
+    Raises:
+        ValueError: If no site found for the given host
+    """
+    async with db_async_session() as session:
+        db_site = await session.get(Site, host)
+        if db_site is None:
+            raise ValueError(f"No site found for host: {host}")
+        return db_site
 
 def init_info_module():
     # fs_make_sure_module_data_path_exists(INFO_MODULE_NAME)
