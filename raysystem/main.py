@@ -1,7 +1,7 @@
 import asyncio
 
 import uvicorn
-from module.browser.browser import open_browser
+from module.browser.browser import browser_pagesnap, open_browser
 from module.db.db import init_db
 from module.early_sleeping.early_sleeping import early_sleeping_gen_diary
 from module.http.http import APP
@@ -70,6 +70,14 @@ async def handle_repl_command(command: str, *args):
         print(f"Checking if site exists: {url}")
         ret = await info_is_site_exists_by_host(url)
         print(f"Site exists: {ret}")
+    elif command == 'browser-pagesnap':
+        if not args:
+            print("Error: URL argument is required")
+            return
+        url = args[0]
+        print(f"Checking if site exists: {url}")
+        ret = await browser_pagesnap(url)
+        print(f"page saved path: {ret}")
     
 def init_repl():
     task_queue_register_callback("repl_command", handle_repl_command)
