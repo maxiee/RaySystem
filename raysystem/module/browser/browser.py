@@ -37,8 +37,9 @@ async def browser_pagesnap(url: str) -> str:
     )
     
     if await info_is_info_exists_by_url(url):
-        raise ValueError(f"Info already exists for URL: {url}")
-
+        print(f"Info already exists for url: {url}")
+        return ''
+        
     async with async_playwright() as p:
         browser = await p.chromium.connect_over_cdp(
             "http://localhost:9222",
@@ -51,8 +52,10 @@ async def browser_pagesnap(url: str) -> str:
 
         host = info_extract_host_from_url(url)
         if await info_is_site_exists_by_host(host):
+            print(f"Site already exists for host: {host}")
             site = await info_get_site_by_host(host)
         else:
+            print(f"Creating site for host: {host}")
             site = await info_create_site_by_host(host)
 
         offline_html = await page_snap(page)

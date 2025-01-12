@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from module.base.constants import INFO_MODULE_NAME
 from module.db.db import db_async_session
 from module.fs.fs import fs_make_sure_module_data_path_exists
@@ -9,8 +10,10 @@ async def info_is_site_exists_by_host(host: str) -> bool:
     Check if a site exists by its host
     """
     async with db_async_session() as session:
-        db_site = await session.get(Site, host)
-        return db_site is not None    
+        result = await session.execute(
+            select(Site).where(Site.host == host)
+        )
+        return result.scalar() is not None    
 
 async def info_get_site_by_host(host: str) -> Site:
     """
@@ -26,10 +29,13 @@ async def info_get_site_by_host(host: str) -> Site:
         ValueError: If no site found for the given host
     """
     async with db_async_session() as session:
-        db_site = await session.get(Site, host)
-        if db_site is None:
+        result = await session.execute(
+            select(Site).where(Site.host == host)
+        )
+        site = result.scalar()
+        if site is None:
             raise ValueError(f"No site found for host: {host}")
-        return db_site
+        return site
 
 async def info_create_site_by_host(host: str) -> Site:
     """
@@ -54,8 +60,10 @@ async def info_is_info_exists_by_url(url: str) -> bool:
     Check if an info exists by its URL
     """
     async with db_async_session() as session:
-        db_info = await session.get(Info, url)
-        return db_info is not None
+        result = await session.execute(
+            select(Info).where(Info.url == url)
+        )
+        return result.scalar() is not None
 
 async def info_create_info(info: Info):
     async with db_async_session() as session:
