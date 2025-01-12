@@ -68,6 +68,7 @@ RaySystem 由多个核心模块组成，实现位于 `raysystem` 的 `modules` �
 - [RaySystem Vol.017：引入 PlayWright 浏览器访问能力](https://mp.weixin.qq.com/s/86LDFRbYrQAuFbIrww19eA)
 - [RaySystem Vol.018：People 模块及 Alembic SQLAlchemy 数据表迁移](https://mp.weixin.qq.com/s/mEZZ5SPqL-5PsgyzlShS4w)
 - [RaySystem Vol.019：FastAPI 基于 OpenAPI 自动创建 Dart 调用](https://mp.weixin.qq.com/s/JBFfJ1qRkObR-0r3TrMLsQ)
+- [RaySystem Vol.020：使用 Playwright + PageSnap 实现网页离线剪藏功能](https://mp.weixin.qq.com/s/DgIACDjd2opjET58k9W7GQ)
 
 ---
 
