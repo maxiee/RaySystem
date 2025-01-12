@@ -17,8 +17,8 @@ class Site(Base):
     name: Mapped[str] = mapped_column(String, index=True)
     # 站点描述
     description: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    # 站点 url
-    url: Mapped[str] = mapped_column(String, index=True)
+    # 站点 host
+    host: Mapped[str] = mapped_column(String, index=True)
     # 站点图标
     favicon: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     # 站点 rss
