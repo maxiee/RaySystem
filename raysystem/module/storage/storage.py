@@ -98,7 +98,9 @@ def storage_add_file_from_bytes_protocol(
     return "storage://" + bucket + ":" + sha256_filename
 
 
-def storage_get_file_by_sha256ed_filename(sha256ed_filename: str, bucket="default"):
+def storage_get_file_by_sha256ed_filename(
+    sha256ed_filename: str, bucket="default"
+) -> str | None:
     """
     Retrieve a file from storage.
 
@@ -108,12 +110,12 @@ def storage_get_file_by_sha256ed_filename(sha256ed_filename: str, bucket="defaul
     """
     storage_path = _get_storage_path(bucket, sha256ed_filename)
     if os.path.exists(storage_path):
-        return storage_path
+        return os.path.join(storage_path, sha256ed_filename)
     else:
         return None
 
 
-def storage_get_file_by_protocol(self, uri: str):
+def storage_get_file_by_protocol(uri: str) -> str | None:
     """
     Retrieve a file using the 'storage://bucket:sha256.extension' protocol.
 
@@ -133,7 +135,7 @@ def storage_get_file_by_protocol(self, uri: str):
     else:
         sha256ed_filename = parsed.netloc
 
-    return self.get_file(sha256ed_filename, bucket)
+    return storage_get_file_by_sha256ed_filename(sha256ed_filename, bucket)
 
 
 def storage_delete_file_by_sha256ed_filename(sha256ed_filename: str, bucket="default"):

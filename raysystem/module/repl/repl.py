@@ -1,4 +1,5 @@
 import asyncio
+from module.storage.storage import storage_get_file_by_protocol
 from module.task_queue.task_queue import (
     task_queue_submit_task,
     task_queue_print_status,
@@ -6,7 +7,11 @@ from module.task_queue.task_queue import (
 )
 from module.early_sleeping.early_sleeping import early_sleeping_gen_diary
 from module.browser.browser import browser_pagesnap, open_browser
-from module.info.info import info_is_site_exists_by_host, init_info_module
+from module.info.info import (
+    info_get_by_id,
+    info_is_site_exists_by_host,
+    init_info_module,
+)
 import subprocess
 
 
@@ -77,6 +82,23 @@ async def handle_repl_command(command: str, *args):
             print(f"Chrome launched with remote debugging port {port}")
         except Exception as e:
             print(f"Failed to launch Chrome: {e}")
+    elif command == "convert_info_snap_to_markdown":
+        info_id = args[0]
+        info = await info_get_by_id(info_id)
+        if not info.storage_html:
+            print("Error: Info does not have a storage_html field")
+            return
+        html_path = storage_get_file_by_protocol(info.storage_html)
+        if not html_path:
+            print("Error: Failed to get HTML file")
+            return
+        with open(html_path) as f:
+            html_content = f.read()
+            from markdownify import markdownify as md
+
+            markdown = md(html_content)
+            with open("info.md", "w") as f:
+                f.write(markdown)
 
 
 def init_repl():
