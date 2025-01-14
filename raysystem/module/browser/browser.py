@@ -1,4 +1,4 @@
-from playwright.async_api import async_playwright
+from playwright.async_api import async_playwright, TimeoutError
 from pagesnap.pagesnap import hook_page, page_snap
 
 from module.info.model import Info
@@ -15,7 +15,10 @@ async def open_browser():
         print("ready to open page")
         await page.goto("https://maxieewong.com/")
         print("page opened")
-        await page.wait_for_load_state("domcontentloaded")
+        try:
+            await page.wait_for_load_state("domcontentloaded", timeout=30000)
+        except TimeoutError:
+            print("Timeout while waiting for load state")
         print(await page.title())
         # sleep 10 seconds, then close the browser
         await page.wait_for_timeout(10000)
@@ -48,7 +51,10 @@ async def browser_pagesnap(url: str) -> str:
         # pagesanp hook page
         await hook_page(page)
         await page.goto(url, wait_until="domcontentloaded")
-        await page.wait_for_load_state("networkidle")
+        try:
+            await page.wait_for_load_state("networkidle", timeout=30000)
+        except TimeoutError:
+            print("Timeout while waiting for load state")
 
         host = info_extract_host_from_url(url)
         if await info_is_site_exists_by_host(host):
