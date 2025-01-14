@@ -10,7 +10,6 @@ dependencies = [
     "fastapi>=0.115.6",
     "greenlet>=3.1.1",
     "pagesnap>=0.0.2",
-    "peewee>=3.17.8",
     "playwright>=1.49.1",
     "pytest>=8.3.4",
     "pyyaml>=6.0.2",
