@@ -160,6 +160,19 @@ wheels = [
 ]
 
 [[package]]
+name = "markdownify"
+version = "0.14.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "beautifulsoup4" },
+    { name = "six" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1b/75/483a4bcca436fe88d02dc7686c372631d833848951b368700bdc0c770bb7/markdownify-0.14.1.tar.gz", hash = "sha256:a62a7a216947ed0b8dafb95b99b2ef4a0edd1e18d5653c656f68f03db2bfb2f1", size = 14332 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/65/0b/74cec93a7b05edf4fc3ea1c899fe8a37f041d7b9d303c75abf7a162924e0/markdownify-0.14.1-py3-none-any.whl", hash = "sha256:4c46a6c0c12c6005ddcd49b45a5a890398b002ef51380cd319db62df5e09bc2a", size = 11530 },
+]
+
+[[package]]
 name = "markupsafe"
 version = "3.0.2"
 source = { registry = "https://pypi.org/simple" }
@@ -328,6 +341,7 @@ dependencies = [
     { name = "alembic" },
     { name = "fastapi" },
     { name = "greenlet" },
+    { name = "markdownify" },
     { name = "pagesnap" },
     { name = "playwright" },
     { name = "pytest" },
@@ -342,12 +356,22 @@ requires-dist = [
     { name = "alembic", specifier = ">=1.14.0" },
     { name = "fastapi", specifier = ">=0.115.6" },
     { name = "greenlet", specifier = ">=3.1.1" },
+    { name = "markdownify", specifier = ">=0.14.1" },
     { name = "pagesnap", specifier = ">=0.0.2" },
     { name = "playwright", specifier = ">=1.49.1" },
     { name = "pytest", specifier = ">=8.3.4" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "sqlalchemy", specifier = ">=2.0.36" },
     { name = "uvicorn", specifier = ">=0.34.0" },
+]
+
+[[package]]
+name = "six"
+version = "1.17.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81", size = 34031 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050 },
 ]
 
 [[package]]
