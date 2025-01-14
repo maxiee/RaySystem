@@ -33,13 +33,13 @@ async def browser_pagesnap(url: str) -> str:
         info_get_site_by_host,
         info_create_site_by_host,
         info_create_info,
-        info_is_info_exists_by_url
+        info_is_info_exists_by_url,
     )
-    
+
     if await info_is_info_exists_by_url(url):
         print(f"Info already exists for url: {url}")
-        return ''
-        
+        return ""
+
     async with async_playwright() as p:
         browser = await p.chromium.connect_over_cdp(
             "http://localhost:9222",
@@ -47,7 +47,7 @@ async def browser_pagesnap(url: str) -> str:
         page = await browser.new_page()
         # pagesanp hook page
         await hook_page(page)
-        await page.goto(url)
+        await page.goto(url, wait_until="domcontentloaded")
         await page.wait_for_load_state("networkidle")
 
         host = info_extract_host_from_url(url)
@@ -59,21 +59,20 @@ async def browser_pagesnap(url: str) -> str:
             site = await info_create_site_by_host(host)
 
         offline_html = await page_snap(page)
-        
+
         storage_html = storage_add_file_from_bytes_protocol(
-            offline_html.encode(),
-            bucket="offline_html",
-            extension=".html")
-        
+            offline_html.encode(), bucket="offline_html", extension=".html"
+        )
+
         title = await page.title()
-        
+
         info = Info(
             site_id=site.id,
             title=title,
             url=url,
             storage_html=storage_html,
         )
-        
+
         await info_create_info(info)
-        
-        return storage_html 
+
+        return storage_html

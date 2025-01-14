@@ -7,6 +7,7 @@ from module.task_queue.task_queue import (
 from module.early_sleeping.early_sleeping import early_sleeping_gen_diary
 from module.browser.browser import browser_pagesnap, open_browser
 from module.info.info import info_is_site_exists_by_host, init_info_module
+import subprocess
 
 
 async def run_repl():
@@ -66,6 +67,16 @@ async def handle_repl_command(command: str, *args):
         print(f"Checking if site exists: {url}")
         ret = await browser_pagesnap(url)
         print(f"page saved path: {ret}")
+    elif command == "launch-chrome":
+        port = args[0] if args else "9222"
+        try:
+            # Arch Linux
+            subprocess.Popen(
+                ["google-chrome-stable", f"--remote-debugging-port={port}"]
+            )
+            print(f"Chrome launched with remote debugging port {port}")
+        except Exception as e:
+            print(f"Failed to launch Chrome: {e}")
 
 
 def init_repl():
