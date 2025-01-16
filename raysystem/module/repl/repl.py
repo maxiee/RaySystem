@@ -1,4 +1,5 @@
 import asyncio
+from module.ocr.ocr import ocr_text_from_image_path
 from module.storage.storage import storage_get_file_by_protocol
 from module.task_queue.task_queue import (
     task_queue_submit_task,
@@ -99,6 +100,12 @@ async def handle_repl_command(command: str, *args):
             markdown = md(html_content)
             with open("info.md", "w") as f:
                 f.write(markdown)
+    elif command == "ocr-text-from-image-path":
+        image_path = args[0]
+        ret = ocr_text_from_image_path(image_path)
+        # set to clipboard for macOS
+        subprocess.run("pbcopy", text=True, input=ret, check=True)
+        print(f"OCR text: \n{ret}")
 
 
 def init_repl():

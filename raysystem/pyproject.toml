@@ -10,6 +10,7 @@ dependencies = [
     "fastapi>=0.115.6",
     "greenlet>=3.1.1",
     "markdownify>=0.14.1",
+    "ocrmac>=1.0.0",
     "pagesnap>=0.0.2",
     "playwright>=1.49.1",
     "pytest>=8.3.4",
