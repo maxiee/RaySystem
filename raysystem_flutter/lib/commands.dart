@@ -4,9 +4,26 @@ import 'package:raysystem_flutter/api/api.dart';
 import 'package:raysystem_flutter/card/card_manager.dart';
 import 'package:raysystem_flutter/form/form_field.dart';
 import 'package:raysystem_flutter/form/form_manager.dart';
+import 'package:screen_capturer/screen_capturer.dart';
 
 Map<String, dynamic> commands = {
   'commands': [
+    {
+      'command': 'text-app',
+      'title': '文本处理',
+      'commands': [
+        {
+          'command': 'ocr-region',
+          'title': 'OCR 识别区域',
+          'icon': Icons.crop,
+          'callback': (BuildContext context, CardManager cardManager) async {
+            print('OCR 识别区域');
+            CapturedData? captureData =
+                await ScreenCapturer.instance.capture(mode: CaptureMode.region);
+          }
+        }
+      ]
+    },
     {
       'command': 'note-app',
       'title': '笔记应用',
