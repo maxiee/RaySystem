@@ -6,11 +6,9 @@
 		<true />
 		<key>com.apple.security.cs.allow-jit</key>
 		<true />
-		<key> com.apple.security.network.client</key>
+		<key>com.apple.security.network.client</key>
 		<true />
 		<key>com.apple.security.network.server</key>
 		<true />
-		<key> com.apple.security.temporary-exception.mach-register.global-name</key>
-		<string> com.apple.screencapture.interactive</string>
 	</dict>
 </plist>
