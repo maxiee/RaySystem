@@ -10,6 +10,7 @@ Map<String, dynamic> commands = {
   'commands': [
     {
       'command': 'text-app',
+      'icon': Icons.text_fields,
       'title': '文本处理',
       'commands': [
         {
@@ -20,8 +21,37 @@ Map<String, dynamic> commands = {
             print('OCR 识别区域');
             CapturedData? captureData =
                 await ScreenCapturer.instance.capture(mode: CaptureMode.region);
-          }
-        }
+            if (captureData != null) {
+              cardManager.addCard(Image.memory(captureData.imageBytes!));
+            }
+          },
+        },
+        {
+          'command': 'ocr-full',
+          'title': 'OCR 识别全屏',
+          'icon': Icons.fullscreen,
+          'callback': (BuildContext context, CardManager cardManager) async {
+            print('OCR 识别全屏');
+            CapturedData? captureData =
+                await ScreenCapturer.instance.capture(mode: CaptureMode.screen);
+            if (captureData != null) {
+              cardManager.addCard(Image.memory(captureData.imageBytes!));
+            }
+          },
+        },
+        {
+          'command': 'ocr-window',
+          'title': 'OCR 识别窗口',
+          'icon': Icons.desktop_windows,
+          'callback': (BuildContext context, CardManager cardManager) async {
+            print('OCR 识别窗口');
+            CapturedData? captureData =
+                await ScreenCapturer.instance.capture(mode: CaptureMode.window);
+            if (captureData != null) {
+              cardManager.addCard(Image.memory(captureData.imageBytes!));
+            }
+          },
+        },
       ]
     },
     {
