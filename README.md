@@ -69,6 +69,14 @@ RaySystem 由多个核心模块组成，实现位于 `raysystem` 的 `modules` �
 - [RaySystem Vol.018：People 模块及 Alembic SQLAlchemy 数据表迁移](https://mp.weixin.qq.com/s/mEZZ5SPqL-5PsgyzlShS4w)
 - [RaySystem Vol.019：FastAPI 基于 OpenAPI 自动创建 Dart 调用](https://mp.weixin.qq.com/s/JBFfJ1qRkObR-0r3TrMLsQ)
 - [RaySystem Vol.020：使用 Playwright + PageSnap 实现网页离线剪藏功能](https://mp.weixin.qq.com/s/DgIACDjd2opjET58k9W7GQ)
+- [RaySystem Vol.021：MarkItDown 如何将 HTML 转 Markdown](https://mp.weixin.qq.com/s/Yaii8PEDt2pOm5PxwuDGzA)
+- [RaySystem Vol.022：使用 ocrmac 集成 OCR 能力](https://mp.weixin.qq.com/s/i39vzNrEIcnpA-xE3Fvr4g)
+- [RaySystem Vol.023：试用 Obsidian Clipper 网页剪藏插件](https://mp.weixin.qq.com/s/LcemfRsEvz01Ix4kAszaBw)
+- [RaySystem Vol.024：Obsidian Database Folder + DataView 搭建网页剪藏大盘](https://mp.weixin.qq.com/s/O4_oLqpZAWZZpr4dBWWG6Q)
+- [RaySystem Vol.025：Flutter 屏幕截图打通 OCR 能力](https://mp.weixin.qq.com/s/8VzHAsnKRaTttS13ZwXYcA)
+- [RaySystem Vol.026：修理挂掉的 Arch Linux](https://mp.weixin.qq.com/s/e9a-qwc5hu2XVltbZg0skQ)
+- [RaySystem Vol.027：本地运行 DeepSeek R1 Distill Qwen 32B 模型](https://mp.weixin.qq.com/s/ZGq4M31eb8_sUgZN8iW9Dg)
+- [RaySystem Vol.028：我是这样借助 AI 学 Rust 与算法的](https://mp.weixin.qq.com/s/HwkQfH9bAHBMNJKZtaHEEA)
 
 ---
 
