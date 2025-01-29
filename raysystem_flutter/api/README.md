@@ -70,6 +70,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**heeloWorldHelloGet**](doc/DefaultApi.md#heeloworldhelloget) | **GET** /hello | Heelo World
 [*DefaultApi*](doc/DefaultApi.md) | [**readSiteSitesSiteIdGet**](doc/DefaultApi.md#readsitesitessiteidget) | **GET** /sites/{site_id} | Read Site
 [*DefaultApi*](doc/DefaultApi.md) | [**readSitesSitesGet**](doc/DefaultApi.md#readsitessitesget) | **GET** /sites/ | Read Sites
+[*DefaultApi*](doc/DefaultApi.md) | [**recognizeTextOcrRecognizePost**](doc/DefaultApi.md#recognizetextocrrecognizepost) | **POST** /ocr/recognize | Recognize Text
 [*DefaultApi*](doc/DefaultApi.md) | [**rootGet**](doc/DefaultApi.md#rootget) | **GET** / | Root
 
 

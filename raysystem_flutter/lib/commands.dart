@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:one_clock/one_clock.dart';
 import 'package:raysystem_flutter/api/api.dart';
@@ -5,6 +6,7 @@ import 'package:raysystem_flutter/card/card_manager.dart';
 import 'package:raysystem_flutter/form/form_field.dart';
 import 'package:raysystem_flutter/form/form_manager.dart';
 import 'package:screen_capturer/screen_capturer.dart';
+import 'package:raysystem_flutter/component/ocr_card.dart';
 
 Map<String, dynamic> commands = {
   'commands': [
@@ -22,7 +24,17 @@ Map<String, dynamic> commands = {
             CapturedData? captureData =
                 await ScreenCapturer.instance.capture(mode: CaptureMode.region);
             if (captureData != null) {
-              cardManager.addCard(Image.memory(captureData.imageBytes!));
+              final result = await api.recognizeTextOcrRecognizePost(
+                file: MultipartFile.fromBytes(
+                  captureData.imageBytes!,
+                  filename: 'capture.png',
+                ),
+              );
+
+              cardManager.addCard(OcrCard(
+                imageBytes: captureData.imageBytes!,
+                ocrText: result.data?.asMap['text'] ?? '',
+              ));
             }
           },
         },
@@ -35,7 +47,17 @@ Map<String, dynamic> commands = {
             CapturedData? captureData =
                 await ScreenCapturer.instance.capture(mode: CaptureMode.screen);
             if (captureData != null) {
-              cardManager.addCard(Image.memory(captureData.imageBytes!));
+              final result = await api.recognizeTextOcrRecognizePost(
+                file: MultipartFile.fromBytes(
+                  captureData.imageBytes!,
+                  filename: 'capture.png',
+                ),
+              );
+
+              cardManager.addCard(OcrCard(
+                imageBytes: captureData.imageBytes!,
+                ocrText: result.data?.asMap['text'] ?? '',
+              ));
             }
           },
         },
@@ -48,7 +70,17 @@ Map<String, dynamic> commands = {
             CapturedData? captureData =
                 await ScreenCapturer.instance.capture(mode: CaptureMode.window);
             if (captureData != null) {
-              cardManager.addCard(Image.memory(captureData.imageBytes!));
+              final result = await api.recognizeTextOcrRecognizePost(
+                file: MultipartFile.fromBytes(
+                  captureData.imageBytes!,
+                  filename: 'capture.png',
+                ),
+              );
+
+              cardManager.addCard(OcrCard(
+                imageBytes: captureData.imageBytes!,
+                ocrText: result.data?.asMap['text'] ?? '',
+              ));
             }
           },
         },

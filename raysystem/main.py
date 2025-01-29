@@ -2,6 +2,7 @@ import uvicorn
 from module.db.db import init_db
 from module.http.http import APP
 from module.info.info import init_info_module
+from module.ocr.api import init_ocr_api
 from module.people.people import init_people_module
 from module.repl.repl import init_repl
 from module.storage.storage import init_storage_module
@@ -38,6 +39,7 @@ def main():
     init_storage_module()
     init_info_module()
     init_people_module()
+    init_ocr_api()
     uvicorn.run(APP, host="0.0.0.0", port=8000)
 
 

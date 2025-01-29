@@ -14,6 +14,7 @@ Method | HTTP request | Description
 [**heeloWorldHelloGet**](DefaultApi.md#heeloworldhelloget) | **GET** /hello | Heelo World
 [**readSiteSitesSiteIdGet**](DefaultApi.md#readsitesitessiteidget) | **GET** /sites/{site_id} | Read Site
 [**readSitesSitesGet**](DefaultApi.md#readsitessitesget) | **GET** /sites/ | Read Sites
+[**recognizeTextOcrRecognizePost**](DefaultApi.md#recognizetextocrrecognizepost) | **POST** /ocr/recognize | Recognize Text
 [**rootGet**](DefaultApi.md#rootget) | **GET** / | Root
 
 
@@ -216,6 +217,49 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **recognizeTextOcrRecognizePost**
+> JsonObject recognizeTextOcrRecognizePost(file)
+
+Recognize Text
+
+接收图片文件并进行 OCR 文字识别  :param file: 上传的图片文件 :return: 识别出的文字内容
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+
+final api = Openapi().getDefaultApi();
+final MultipartFile file = BINARY_DATA_HERE; // MultipartFile | 
+
+try {
+    final response = api.recognizeTextOcrRecognizePost(file);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->recognizeTextOcrRecognizePost: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **file** | **MultipartFile**|  | 
+
+### Return type
+
+[**JsonObject**](JsonObject.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: multipart/form-data
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

@@ -37,6 +37,7 @@ dependencies:
   provider: ^6.1.2
   one_clock: ^2.0.1
   screen_capturer: ^0.2.3
+  dio: ^5.2.0
   openapi_generator_annotations: ^6.1.0
   openapi:
     path: ./api

@@ -14,6 +14,7 @@ dependencies = [
     "pagesnap>=0.0.2",
     "playwright>=1.49.1",
     "pytest>=8.3.4",
+    "python-multipart>=0.0.20",
     "pyyaml>=6.0.2",
     "sqlalchemy>=2.0.36",
     "uvicorn>=0.34.0",
