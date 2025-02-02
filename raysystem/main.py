@@ -9,6 +9,10 @@ from module.storage.storage import init_storage_module
 from module.task_queue.task_queue import (
     init_task_queue,
 )
+from module.task_scheduler.task_scheduler import (
+    dispose_task_scheduler,
+    init_task_scheduler,
+)
 from utils.config import load_config_file
 from module.fs.fs import init_fs_module, fs_set_data_path
 
@@ -31,6 +35,13 @@ async def startup_event():
     await init_task_queue()
     await init_db()
     init_repl()
+    init_task_scheduler()
+
+
+@APP.on_event("shutdown")
+async def shutdown_event():
+    print("RaySystem shutting down...")
+    dispose_task_scheduler()
 
 
 def main():
