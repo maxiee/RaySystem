@@ -3,7 +3,9 @@ from collections import defaultdict
 import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+from module.crawler.rss.rss_collector import create_rss_job
 from module.crawler.test.test_crawler import test_crawler_task
+from module.info.info import info_create_site_if_not_exists_by_host
 
 
 class TaskScheduler:
@@ -75,7 +77,7 @@ class TaskScheduler:
 kTaskScheduler = TaskScheduler()
 
 
-def init_task_scheduler():
+async def init_task_scheduler():
     kTaskScheduler.start()
 
     kTaskScheduler.add_job(
@@ -94,6 +96,11 @@ def init_task_scheduler():
         seconds=10,
         args=("test", "args"),
         id="test_crawler_job_2",
+    )
+
+    site_36Kr = await info_create_site_if_not_exists_by_host("https://36kr.com/feed")
+    await create_rss_job(
+        kTaskScheduler, "https://36kr.com/feed", site_36Kr, interval=3600
     )
 
     print("Task scheduler initialized")

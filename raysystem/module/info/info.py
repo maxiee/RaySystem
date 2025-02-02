@@ -16,6 +16,20 @@ async def info_is_site_exists_by_host(host: str) -> bool:
         return result.scalar() is not None
 
 
+async def info_create_site_if_not_exists_by_host(host: str) -> Site:
+    """
+    Create a site if not exists by its host
+    """
+    async with db_async_session() as session:
+        result = await session.execute(select(Site).where(Site.host == host))
+        site = result.scalar()
+        if site is None:
+            site = Site(name=host, host=host)
+            session.add(site)
+            await session.commit()
+        return site
+
+
 async def info_get_site_by_host(host: str) -> Site:
     """
     Get a site by its host

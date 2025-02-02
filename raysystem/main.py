@@ -35,7 +35,7 @@ async def startup_event():
     await init_task_queue()
     await init_db()
     init_repl()
-    init_task_scheduler()
+    await init_task_scheduler()
 
 
 @APP.on_event("shutdown")
