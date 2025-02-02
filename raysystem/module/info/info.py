@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy import select
 from module.base.constants import INFO_MODULE_NAME
 from module.db.db import db_async_session
@@ -68,6 +69,16 @@ async def info_create_info(info: Info):
         await session.commit()
         await session.refresh(info)
         return info
+
+
+async def info_create_info_buck(info_list: List[Info]):
+    """
+    Create multiple info objects in a single transaction
+    """
+    async with db_async_session() as session:
+        session.add_all(info_list)
+        await session.commit()
+        return info_list
 
 
 async def info_get_by_id(info_id: int) -> Info:
