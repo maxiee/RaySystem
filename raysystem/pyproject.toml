@@ -9,6 +9,7 @@ dependencies = [
     "alembic>=1.14.0",
     "apscheduler>=3.11.0",
     "fastapi>=0.115.6",
+    "feedparser>=6.0.11",
     "greenlet>=3.1.1",
     "markdownify>=0.14.1",
     "ocrmac>=1.0.0",
