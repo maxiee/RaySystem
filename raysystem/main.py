@@ -40,8 +40,8 @@ async def startup_event():
 
 @APP.on_event("shutdown")
 async def shutdown_event():
+    await dispose_task_scheduler()
     print("RaySystem shutting down...")
-    dispose_task_scheduler()
 
 
 def main():

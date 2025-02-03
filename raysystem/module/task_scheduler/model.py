@@ -9,7 +9,7 @@ class ScheduledTask(Base):
 
     __tablename__ = "scheduled_task"
     # 任务 id
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    id: Mapped[str] = mapped_column(String, primary_key=True, index=True)
     # 任务类型
     task_type: Mapped[str] = mapped_column(String, index=True)
     # 执行间隔（秒）
@@ -26,9 +26,7 @@ class TaskTagSate(Base):
     """任务标签状态表"""
 
     __tablename__ = "task_tag_state"
-    # 任务 id
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     # 限流标记
-    tag: Mapped[str] = mapped_column(String, index=True)
+    tag: Mapped[str] = mapped_column(String, primary_key=True, index=True)
     # 上次执行时间戳
     last_run: Mapped[datetime] = mapped_column(DateTime)
