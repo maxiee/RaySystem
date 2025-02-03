@@ -20,3 +20,15 @@ class ScheduledTask(Base):
     tag: Mapped[str] = mapped_column(String, index=True)
     # 任务参数，json 格式
     parameters: Mapped[dict] = mapped_column(JSON, nullable=True)
+
+
+class TaskTagSate(Base):
+    """任务标签状态表"""
+
+    __tablename__ = "task_tag_state"
+    # 任务 id
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    # 限流标记
+    tag: Mapped[str] = mapped_column(String, index=True)
+    # 上次执行时间戳
+    last_run: Mapped[datetime] = mapped_column(DateTime)
