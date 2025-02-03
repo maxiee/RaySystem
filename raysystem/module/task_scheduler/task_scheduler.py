@@ -101,7 +101,7 @@ class RaySchedular:
             id=task_id,
             task_type=task_type,
             interval=interval,
-            next_run=time.time() + interval,
+            next_run=datetime.now() + timedelta(seconds=interval),
             tag=tag,
             parameters=parameters,
         )
@@ -172,21 +172,10 @@ class RaySchedular:
                     f"[调度器] 执行最早的任务: {selected.id}，类型: {selected.task_type}"
                 )
                 await self._execute_task(selected)
-                sleep_time = 0.1  # 执行后立即检查新任务
             else:
-                next_wake = min(
-                    (t.next_run for t in self.tasks.values()),
-                    default=now + timedelta(seconds=1),
-                )
-                sleep_time = max(next_wake - now, 0)
-                sleep_time = min(sleep_time, 1)  # 最长睡眠1秒
+                print(f"[调度器] 无可执行任务")
 
-                if isinstance(sleep_time, timedelta):
-                    sleep_time = sleep_time.total_seconds()
-
-                print(f"[调度器] 无可执行任务，休眠 {sleep_time:.1f} 秒")
-
-            await asyncio.sleep(sleep_time)
+            await asyncio.sleep(1)
 
     async def start(self):
         """启动调度器"""
