@@ -66,7 +66,7 @@ class RaySchedular:
         """初始化数据库和内存状态"""
         # 加载任务
         self.tasks = {
-            task.tag: task for task in await task_scheduler_load_scheduled_tasks()
+            task.id: task for task in await task_scheduler_load_scheduled_tasks()
         }
         # 加载标签状态
         self.tag_states = {
