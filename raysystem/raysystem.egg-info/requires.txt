@@ -1,0 +1,16 @@
+aiohttp>=3.11.11
+aiosqlite>=0.20.0
+alembic>=1.14.0
+fastapi>=0.115.6
+feedparser>=6.0.11
+greenlet>=3.1.1
+markdownify>=0.14.1
+ocrmac>=1.0.0
+pagesnap>=0.0.2
+playwright>=1.49.1
+psutil>=5.9.8
+pytest>=8.3.4
+python-multipart>=0.0.20
+pyyaml>=6.0.2
+sqlalchemy>=2.0.36
+uvicorn>=0.34.0

@@ -1,7 +1,7 @@
 [project]
 name = "raysystem"
 version = "0.1.0"
-description = "Add your description here"
+description = "A Python system monitoring and management tool"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -15,9 +15,13 @@ dependencies = [
     "ocrmac>=1.0.0",
     "pagesnap>=0.0.2",
     "playwright>=1.49.1",
+    "psutil>=5.9.8",
     "pytest>=8.3.4",
     "python-multipart>=0.0.20",
     "pyyaml>=6.0.2",
     "sqlalchemy>=2.0.36",
     "uvicorn>=0.34.0",
 ]
+
+[tool.setuptools]
+packages = ["module", "migrations"]

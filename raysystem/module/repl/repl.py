@@ -13,6 +13,7 @@ from module.info.info import (
     info_is_site_exists_by_host,
     init_info_module,
 )
+from module.system.system import get_system_metrics
 import subprocess
 
 
@@ -51,8 +52,44 @@ async def handle_repl_command(command: str, *args):
         print("  task-queue-status - Show task queue status")
         print("  open-browser - Open browser")
         print("  is-site-exists <url> - Check if site exists")
+        print("  system-metrics - Show system metrics")
+        print("  scheduler-debug <on/off> - Enable/disable scheduler debug mode")
     elif command == "early-sleeping":
         print(early_sleeping_gen_diary())
+    elif command == "system-metrics":
+        metrics = get_system_metrics()
+        print("\n=== System Metrics ===")
+        print(f"CPU Usage: {metrics.cpu_percent:.1f}%")
+        
+        print(f"\nMemory:")
+        mem = metrics.memory
+        print(f"  Physical Memory:")
+        print(f"    Total:     {mem.total_gb:.1f} GB")
+        print(f"    Used:      {mem.used_gb:.1f} GB")
+        print(f"    Available: {mem.available_gb:.1f} GB")
+        print(f"    Cached:    {mem.cached_gb:.1f} GB")
+        print(f"    Usage:     {mem.percent:.1f}%")
+        
+        print(f"  Virtual Memory (Swap):")
+        print(f"    Total:     {mem.swap_total_gb:.1f} GB")
+        print(f"    Used:      {mem.swap_used_gb:.1f} GB")
+        print(f"    Free:      {mem.swap_free_gb:.1f} GB")
+        print(f"    Usage:     {mem.swap_percent:.1f}%")
+        
+        print("\nDisks:")
+        for disk in metrics.disks:
+            print(f"\n  {disk.volume_name} ({disk.mount_point}):")
+            print(f"    Device:      {disk.device}")
+            print(f"    Total:       {disk.total_gb:.1f} GB")
+            print(f"    Used:        {disk.used_gb:.1f} GB")
+            print(f"    Free:        {disk.free_gb:.1f} GB")
+            print(f"    Usage:       {disk.usage_percent:.1f}%")
+            print(f"    Read Speed:  {disk.read_speed_mb:.1f} MB/s")
+            print(f"    Write Speed: {disk.write_speed_mb:.1f} MB/s")
+        
+        print("\nNetwork:")
+        print(f"  Upload:   {metrics.network.upload_speed_mb:.1f} MB/s")
+        print(f"  Download: {metrics.network.download_speed_mb:.1f} MB/s")
     elif command == "task-queue-status":
         task_queue_print_status()
     elif command == "open-browser":
@@ -106,6 +143,13 @@ async def handle_repl_command(command: str, *args):
         # set to clipboard for macOS
         subprocess.run("pbcopy", text=True, input=ret, check=True)
         print(f"OCR text: \n{ret}")
+    elif command == "scheduler-debug":
+        if not args or args[0] not in ["on", "off"]:
+            print("Usage: scheduler-debug <on/off>")
+            return
+        from module.task_scheduler.task_scheduler import kTaskScheduler
+        kTaskScheduler.debug = args[0] == "on"
+        print(f"Scheduler debug mode: {'enabled' if kTaskScheduler.debug else 'disabled'}")
 
 
 def init_repl():

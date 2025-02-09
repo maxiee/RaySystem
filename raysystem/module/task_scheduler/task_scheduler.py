@@ -58,6 +58,7 @@ class RaySchedular:
         self.tag_states: Dict[str, TaskTagSate] = {}
         self.running = False
         self.task_cooldown = 300  # 默认5分钟冷却时间
+        self.debug = False  # 添加调试模式标志
 
         # 任务注册表（类型到处理函数的映射）
         self.task_registry: Dict[str, Callable] = {}
@@ -109,6 +110,11 @@ class RaySchedular:
         await task_scheduler_add_scheduled_task(new_task)
         self.tasks[tag] = new_task
 
+    def _debug_print(self, message: str):
+        """调试模式下打印信息"""
+        if self.debug:
+            print(message)
+
     async def _execute_task(self, task: ScheduledTask):
         """执行单个任务"""
         current_time = datetime.now()
@@ -116,10 +122,10 @@ class RaySchedular:
         parameters = task.parameters
 
         try:
-            print(f"Executing task {task.id} ({task.task_type})")
+            self._debug_print(f"Executing task {task.id} ({task.task_type})")
             await handler(**parameters)  # 执行注册的处理函数
         except Exception as e:
-            print(f"Task {task.id} failed: {str(e)}")
+            self._debug_print(f"Task {task.id} failed: {str(e)}")
         finally:
             # 更新任务状态
             task.next_run = current_time + timedelta(seconds=task.interval)
@@ -140,11 +146,11 @@ class RaySchedular:
             candidates = []
 
             # 第一阶段：收集候选任务
-            print(f"[调度器] 开始检查待执行任务 - {now}")
+            self._debug_print(f"[调度器] 开始检查待执行任务 - {now}")
             for task in self.tasks.values():
                 if task.next_run <= now:
                     candidates.append(task)
-            print(f"[调度器] 发现 {len(candidates)} 个到期任务")
+            self._debug_print(f"[调度器] 发现 {len(candidates)} 个到期任务")
 
             # 第二阶段：筛选可执行任务
             executable = []
@@ -159,21 +165,21 @@ class RaySchedular:
                     cooldown_remaining = (
                         self.task_cooldown - (now - tag_state.last_run).total_seconds()
                     )
-                    print(
+                    self._debug_print(
                         f"[调度器] 任务 {task.id} 仍在冷却中，剩余 {cooldown_remaining:.1f} 秒"
                     )
-            print(f"[调度器] 筛选出 {len(executable)} 个可执行任务")
+            self._debug_print(f"[调度器] 筛选出 {len(executable)} 个可执行任务")
 
             # 第三阶段：选择最老的任务
             if executable:
                 executable.sort(key=lambda x: x.next_run)
                 selected = executable[0]
-                print(
+                self._debug_print(
                     f"[调度器] 执行最早的任务: {selected.id}，类型: {selected.task_type}"
                 )
                 await self._execute_task(selected)
             else:
-                print(f"[调度器] 无可执行任务")
+                self._debug_print(f"[调度器] 无可执行任务")
 
             await asyncio.sleep(1)
 
@@ -193,7 +199,8 @@ kTaskScheduler = RaySchedular()
 
 async def init_task_scheduler():
     await kTaskScheduler.initialize()
-
+    kTaskScheduler.debug = False  # 确保调度器以非调试模式启动
+    
     # 注册任务处理程序
     kTaskScheduler.register_task_type("test_crawler", test_crawler_task)
 
@@ -209,7 +216,7 @@ async def init_task_scheduler():
     # )
 
     await kTaskScheduler.start()
-    print("Task scheduler initialized")
+    print("Task scheduler initialized")  # 这个初始化消息保留，因为它只会打印一次
 
 
 async def dispose_task_scheduler():
