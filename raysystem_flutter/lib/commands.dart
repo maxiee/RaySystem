@@ -1,15 +1,34 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:one_clock/one_clock.dart';
+import 'package:provider/provider.dart';
 import 'package:raysystem_flutter/api/api.dart';
 import 'package:raysystem_flutter/card/card_manager.dart';
 import 'package:raysystem_flutter/form/form_field.dart';
 import 'package:raysystem_flutter/form/form_manager.dart';
 import 'package:screen_capturer/screen_capturer.dart';
 import 'package:raysystem_flutter/component/ocr_card.dart';
+import 'package:raysystem_flutter/main.dart';
 
 Map<String, dynamic> commands = {
   'commands': [
+    {
+      'command': 'settings-app',
+      'title': '设置',
+      'icon': Icons.settings,
+      'commands': [
+        {
+          'command': 'toggle-theme',
+          'title': '切换主题',
+          'icon': Icons.brightness_medium,
+          'callback': (BuildContext context, CardManager cardManager) {
+            final themeNotifier =
+                Provider.of<ThemeNotifier>(context, listen: false);
+            themeNotifier.toggleTheme();
+          },
+        },
+      ],
+    },
     {
       'command': 'text-app',
       'icon': Icons.text_fields,
@@ -183,6 +202,8 @@ Map<String, dynamic> commands = {
           'callback': (BuildContext context, CardManager cardManager) {
             print('数字时钟');
             cardManager.addCard(DigitalClock(
+              digitalClockTextColor:
+                  Theme.of(context).textTheme.bodyLarge!.color!,
               isLive: true,
             ));
           }
