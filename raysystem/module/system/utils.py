@@ -84,37 +84,29 @@ class SystemUtils:
             return None
 
     @staticmethod
-    def get_df_disk_usage(path: str) -> Optional[Tuple[float, float, float, float]]:
+    def get_disk_usage(path: str) -> Optional[Tuple[float, float, float, float]]:
         """
-        使用 df 命令获取磁盘使用情况，返回 (total_gb, used_gb, free_gb, usage_percent)
+        使用 statvfs 获取磁盘使用情况，返回与 macOS 一致的数据
+        返回 (total_gb, used_gb, free_gb, usage_percent)
         """
         try:
-            # -P: 使用 POSIX 格式输出
-            # -k: 以千字节为单位
-            # -l: 只显示本地文件系统
-            result = subprocess.run(['df', '-Pkl', path], capture_output=True, text=True, check=True)
-            lines = result.stdout.strip().split('\n')
-            if len(lines) < 2:  # 至少需要标题行和数据行
-                return None
-                
-            # 解析输出的数据行
-            data = lines[1].split()
-            if len(data) < 5:
-                return None
-                
-            # 转换单位到 GB
-            total_kb = float(data[1])
-            used_kb = float(data[2])
-            free_kb = float(data[3])
-            usage_percent = float(data[4].rstrip('%'))
+            import os
+            st = os.statvfs(path)
             
-            return (
-                total_kb / (1024 * 1024),  # 转换为 GB
-                used_kb / (1024 * 1024),
-                free_kb / (1024 * 1024),
-                usage_percent
-            )
-        except (subprocess.SubprocessError, ValueError, IndexError):
+            # 计算总空间和可用空间（使用 f_bfree 而不是 f_bavail）
+            total = st.f_blocks * st.f_frsize
+            free = st.f_bfree * st.f_frsize  # 使用 f_bfree 替代 f_bavail
+            used = total - free
+            
+            # 转换为 GB 和百分比
+            total_gb = total / (1024 ** 3)
+            used_gb = used / (1024 ** 3)
+            free_gb = free / (1024 ** 3)
+            usage_percent = (used / total * 100) if total > 0 else 0
+            
+            return (total_gb, used_gb, free_gb, usage_percent)
+        except Exception as e:
+            print(f"Error getting disk usage: {e}")
             return None
 
     @staticmethod

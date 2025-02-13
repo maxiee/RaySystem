@@ -205,21 +205,19 @@ class SystemMonitor:
 
             # 获取卷标名和使用情况
             volume_name = SystemUtils.get_volume_name(main_partition.device, main_partition.mountpoint, self._volume_names_cache)
-            macos_usage = SystemUtils.get_macos_disk_usage(main_partition.device)
-
-            if macos_usage:
-                total_gb, used_gb, free_gb, usage_percent = macos_usage
-            else:
-                # 回退到使用 df 命令
-                df_usage = SystemUtils.get_df_disk_usage(main_partition.mountpoint)
-                if df_usage:
-                    total_gb, used_gb, free_gb, usage_percent = df_usage
-                else:
-                    usage = psutil.disk_usage(main_partition.mountpoint)
-                    total_gb = usage.total / (1024 ** 3)
-                    used_gb = usage.used / (1024 ** 3)
-                    free_gb = usage.free / (1024 ** 3)
-                    usage_percent = usage.percent
+            
+            # 获取磁盘使用情况，优先使用 macOS 特定方法
+            disk_usage = None
+            if main_partition.fstype == 'apfs':
+                disk_usage = SystemUtils.get_macos_disk_usage(main_partition.device)
+            
+            if disk_usage is None:
+                disk_usage = SystemUtils.get_disk_usage(main_partition.mountpoint)
+                
+            if disk_usage is None:
+                continue  # 如果无法获取磁盘使用情况，跳过此磁盘
+                
+            total_gb, used_gb, free_gb, usage_percent = disk_usage
 
             # 获取磁盘 IO 速度
             device_name = main_partition.device.split('/')[-1]
