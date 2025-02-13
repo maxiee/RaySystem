@@ -354,7 +354,7 @@ class SystemMonitor:
     def get_metrics(self) -> SystemMetrics:
         """Get current system metrics"""
         # CPU usage
-        cpu_percent = psutil.cpu_percent(interval=1)
+        cpu_percent = psutil.cpu_percent(interval=0)
 
         # Memory metrics
         memory = self._get_memory_metrics()
