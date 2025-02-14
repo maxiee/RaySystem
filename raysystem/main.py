@@ -6,6 +6,7 @@ from module.ocr.api import init_ocr_api
 from module.people.people import init_people_module
 from module.repl.repl import init_repl
 from module.storage.storage import init_storage_module
+from module.system.api import init_system_api
 from module.task_queue.task_queue import (
     init_task_queue,
 )
@@ -51,6 +52,7 @@ def main():
     init_info_module()
     init_people_module()
     init_ocr_api()
+    init_system_api()
     uvicorn.run(APP, host="0.0.0.0", port=8000)
 
 
