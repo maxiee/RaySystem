@@ -4,12 +4,14 @@ import 'package:raysystem_flutter/card/card_list_view.dart';
 import 'package:raysystem_flutter/card/card_manager.dart';
 import 'package:raysystem_flutter/commands.dart';
 import 'package:raysystem_flutter/component/status_bar.dart';
+import 'package:raysystem_flutter/component/system_metrics_provider.dart';
 
 void main() {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => CardManager(maxCards: 20)),
       ChangeNotifierProvider(create: (_) => ThemeNotifier()),
+      ChangeNotifierProvider(create: (_) => SystemMetricsProvider()),
     ],
     child: const MyApp(),
   ));

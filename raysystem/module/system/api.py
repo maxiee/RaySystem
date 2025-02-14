@@ -16,6 +16,8 @@ async def get_metrics() -> Union[SystemMetrics, Dict[str, str]]:
     """
     try:
         metrics = get_system_metrics()
+        print("\n=== System Metrics ===")
+        print(f"{metrics}")
         return metrics
     except Exception as e:
         return {"error": str(e)}

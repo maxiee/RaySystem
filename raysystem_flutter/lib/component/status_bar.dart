@@ -1,53 +1,128 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:raysystem_flutter/component/system_metrics_provider.dart';
 
-class StatusBarItem {
+class StatusBarItem extends StatelessWidget {
   final Widget child;
-  final double? flex;
+  const StatusBarItem({super.key, required this.child});
 
-  StatusBarItem({required this.child, this.flex});
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      child: DefaultTextStyle(
+        style: theme.textTheme.bodySmall?.copyWith(
+              fontSize: 11,
+              fontFeatures: [const FontFeature.tabularFigures()],
+            ) ??
+            const TextStyle(fontSize: 11),
+        child: child,
+      ),
+    );
+  }
 }
 
 class StatusBar extends StatelessWidget {
-  final List<StatusBarItem>? left;
-  final List<StatusBarItem>? center;
-  final List<StatusBarItem>? right;
-  final Color? backgroundColor;
-  final Color? foregroundColor;
-  final double height;
-  final EdgeInsets padding;
+  final List<Widget> left;
+  final List<Widget> center;
+  final List<Widget> right;
 
   const StatusBar({
     super.key,
-    this.left,
-    this.center,
-    this.right,
-    this.backgroundColor,
-    this.foregroundColor,
-    this.height = 24.0,
-    this.padding = const EdgeInsets.symmetric(horizontal: 8.0),
+    this.left = const [],
+    this.center = const [],
+    this.right = const [],
   });
 
-  Widget _buildSection(List<StatusBarItem>? items, Color textColor) {
-    if (items == null || items.isEmpty) return const SizedBox();
+  Widget _buildMetricsSection(BuildContext context) {
+    final metrics = context.watch<SystemMetricsProvider>().metrics;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: items.map((item) {
-        return Flexible(
-          flex: (item.flex ?? 1.0).toInt(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: DefaultTextStyle(
-              style: TextStyle(
-                fontSize: 12,
-                color: textColor,
-                fontFamily: 'monospace',
+    if (metrics == null) return const SizedBox.shrink();
+
+    // Style for metric values
+    final valueStyle = TextStyle(
+      color: isDark ? theme.colorScheme.primary : theme.colorScheme.primary,
+      fontWeight: FontWeight.bold,
+      fontSize: 11,
+    );
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 2,
+      children: [
+        // CPU
+        RichText(
+          text: TextSpan(
+            style: DefaultTextStyle.of(context).style.copyWith(fontSize: 11),
+            children: [
+              TextSpan(text: '🔲 CPU '),
+              TextSpan(
+                text: '${metrics.cpuPercent.toStringAsFixed(1)}%',
+                style: valueStyle,
               ),
-              child: item.child,
+            ],
+          ),
+        ),
+        // Memory
+        RichText(
+          text: TextSpan(
+            style: DefaultTextStyle.of(context).style.copyWith(fontSize: 11),
+            children: [
+              TextSpan(text: '💾 MEM '),
+              TextSpan(
+                text: '${(metrics.memory.percent).toStringAsFixed(1)}% ',
+                style: valueStyle,
+              ),
+              TextSpan(
+                  text:
+                      '(${metrics.memory.usedGb.toStringAsFixed(1)}/${metrics.memory.totalGb.toStringAsFixed(1)})'),
+            ],
+          ),
+        ),
+        // Network
+        RichText(
+          text: TextSpan(
+            style: DefaultTextStyle.of(context).style.copyWith(fontSize: 11),
+            children: [
+              TextSpan(text: '📡 NET '),
+              TextSpan(
+                text:
+                    '↑${metrics.network.uploadSpeedMb.toStringAsFixed(2)}MB/s ',
+                style: valueStyle,
+              ),
+              TextSpan(
+                text:
+                    '↓${metrics.network.downloadSpeedMb.toStringAsFixed(2)}MB/s',
+                style: valueStyle,
+              ),
+            ],
+          ),
+        ),
+        // Disk
+        if (metrics.disks.isNotEmpty) ...[
+          RichText(
+            text: TextSpan(
+              style: DefaultTextStyle.of(context).style.copyWith(fontSize: 11),
+              children: [
+                TextSpan(text: '💿 DISK '),
+                TextSpan(
+                  text:
+                      '↑${metrics.disks.first.writeSpeedMb.toStringAsFixed(2)}MB/s ',
+                  style: valueStyle,
+                ),
+                TextSpan(
+                  text:
+                      '↓${metrics.disks.first.readSpeedMb.toStringAsFixed(2)}MB/s',
+                  style: valueStyle,
+                ),
+              ],
             ),
           ),
-        );
-      }).toList(),
+        ],
+      ],
     );
   }
 
@@ -55,58 +130,57 @@ class StatusBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-
-    final effectiveBackgroundColor = backgroundColor ??
-        (isDark
-            ? theme.colorScheme.surface.withOpacity(0.8)
-            : theme.colorScheme.primaryContainer
-                .withOpacity(0.95)); // 使用更深的绿色且略微透明
-
-    final effectiveForegroundColor =
-        foregroundColor ?? (isDark ? theme.colorScheme.primary : Colors.white);
+    // final metrics = context.watch<SystemMetricsProvider>().metrics;
+    // print('Metrics: $metrics'); // 调试信息
 
     return Container(
-      height: height,
-      padding: padding,
       decoration: BoxDecoration(
-        color: effectiveBackgroundColor,
+        color:
+            isDark ? theme.colorScheme.surface : theme.colorScheme.background,
         border: Border(
           bottom: BorderSide(
             color: isDark
-                ? theme.colorScheme.primary.withOpacity(0.5)
-                : theme.colorScheme.primary.withOpacity(0.2),
-            width: 1.0,
+                ? theme.colorScheme.primary.withOpacity(0.3)
+                : theme.colorScheme.primary.withOpacity(0.1),
           ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: isDark
-                ? theme.colorScheme.primary.withOpacity(0.2)
-                : theme.colorScheme.primary.withOpacity(0.1),
-            blurRadius: isDark ? 8 : 4,
-            offset: Offset(0, isDark ? 2 : 1),
-          )
-        ],
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Left section
-          Expanded(
-            flex: 2,
-            child: _buildSection(left, effectiveForegroundColor),
-          ),
-          // Center section
-          Expanded(
-            flex: 1,
-            child:
-                Center(child: _buildSection(center, effectiveForegroundColor)),
-          ),
-          // Right section
-          Expanded(
-            flex: 2,
+          Container(
+            height: 24,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [_buildSection(right, effectiveForegroundColor)],
+              children: [
+                // Left section
+                Row(
+                    children:
+                        left.map((w) => StatusBarItem(child: w)).toList()),
+                // Center section
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children:
+                        center.map((w) => StatusBarItem(child: w)).toList(),
+                  ),
+                ),
+                // Right section with system metrics
+                Row(
+                    children:
+                        right.map((w) => StatusBarItem(child: w)).toList()),
+              ],
+            ),
+          ),
+          // Second row for system metrics
+          Container(
+            height: 20,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                StatusBarItem(child: _buildMetricsSection(context)),
+              ],
             ),
           ),
         ],
