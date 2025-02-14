@@ -14,18 +14,28 @@ import 'package:built_value/iso_8601_date_time_serializer.dart';
 import 'package:openapi/src/date_serializer.dart';
 import 'package:openapi/src/model/date.dart';
 
+import 'package:openapi/src/model/disk_metrics.dart';
 import 'package:openapi/src/model/http_validation_error.dart';
+import 'package:openapi/src/model/memory_metrics.dart';
+import 'package:openapi/src/model/network_metrics.dart';
+import 'package:openapi/src/model/response_get_metrics_system_metrics_get.dart';
 import 'package:openapi/src/model/site.dart';
 import 'package:openapi/src/model/site_create.dart';
+import 'package:openapi/src/model/system_metrics.dart';
 import 'package:openapi/src/model/validation_error.dart';
 import 'package:openapi/src/model/validation_error_loc_inner.dart';
 
 part 'serializers.g.dart';
 
 @SerializersFor([
+  DiskMetrics,
   HTTPValidationError,
+  MemoryMetrics,
+  NetworkMetrics,
+  ResponseGetMetricsSystemMetricsGet,
   Site,
   SiteCreate,
+  SystemMetrics,
   ValidationError,
   ValidationErrorLocInner,
 ])

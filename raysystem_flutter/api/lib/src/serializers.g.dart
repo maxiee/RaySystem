@@ -7,11 +7,19 @@ part of 'serializers.dart';
 // **************************************************************************
 
 Serializers _$serializers = (new Serializers().toBuilder()
+      ..add(DiskMetrics.serializer)
       ..add(HTTPValidationError.serializer)
+      ..add(MemoryMetrics.serializer)
+      ..add(NetworkMetrics.serializer)
+      ..add(ResponseGetMetricsSystemMetricsGet.serializer)
       ..add(Site.serializer)
       ..add(SiteCreate.serializer)
+      ..add(SystemMetrics.serializer)
       ..add(ValidationError.serializer)
       ..add(ValidationErrorLocInner.serializer)
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(DiskMetrics)]),
+          () => new ListBuilder<DiskMetrics>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(ValidationError)]),
           () => new ListBuilder<ValidationError>())

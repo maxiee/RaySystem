@@ -11,6 +11,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**createSiteSitesPost**](DefaultApi.md#createsitesitespost) | **POST** /sites/ | Create Site
 [**deleteSiteSitesSiteIdDelete**](DefaultApi.md#deletesitesitessiteiddelete) | **DELETE** /sites/{site_id} | Delete Site
+[**getMetricsSystemMetricsGet**](DefaultApi.md#getmetricssystemmetricsget) | **GET** /system/metrics | Get Metrics
 [**heeloWorldHelloGet**](DefaultApi.md#heeloworldhelloget) | **GET** /hello | Heelo World
 [**readSiteSitesSiteIdGet**](DefaultApi.md#readsitesitessiteidget) | **GET** /sites/{site_id} | Read Site
 [**readSitesSitesGet**](DefaultApi.md#readsitessitesget) | **GET** /sites/ | Read Sites
@@ -88,6 +89,45 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**JsonObject**](JsonObject.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getMetricsSystemMetricsGet**
+> ResponseGetMetricsSystemMetricsGet getMetricsSystemMetricsGet()
+
+Get Metrics
+
+Get current system metrics including: - CPU usage - Memory usage (including swap) - Disk usage and IO speeds - Network speeds  :return: SystemMetrics object containing all system metrics
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+
+final api = Openapi().getDefaultApi();
+
+try {
+    final response = api.getMetricsSystemMetricsGet();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getMetricsSystemMetricsGet: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**ResponseGetMetricsSystemMetricsGet**](ResponseGetMetricsSystemMetricsGet.md)
 
 ### Authorization
 
