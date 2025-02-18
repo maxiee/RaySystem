@@ -78,14 +78,14 @@ class Channel(ChannelBase):
 class SiteBase(BaseModel):
     name: str
     description: Optional[str]
-    url: str
+    host: str
     favicon: Optional[str]
     rss: Optional[str]
 
 class SiteCreate(SiteBase):
     pass
 
-class SiteUpdate(SiteBase):
+class SiteUpdate(BaseModel):
     id: int
     name: Optional[str]
     description: Optional[str]
@@ -97,5 +97,5 @@ class Site(SiteBase):
     id: int
 
     class Config:
-        orm_mode: True
+        orm_mode: True # type: ignore
 

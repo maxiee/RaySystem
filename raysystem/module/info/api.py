@@ -14,11 +14,11 @@ async def create_site(
     site: schemas.SiteCreate, async_session: AsyncSession = Depends(get_db_session)
 ):
     async with async_session as session:
-        db_site = Site.from_orm(site)
+        db_site = Site(**site.dict())
         session.add(db_site)
         await session.commit()
         await session.refresh(db_site)
-        return db_site
+        return schemas.Site.from_orm(db_site)
 
 
 @APP.get("/sites/", response_model=List[schemas.Site])
