@@ -1,4 +1,5 @@
 import asyncio
+from module.crawler.ddg.ddg import ddg_crawler_task
 from module.ocr.ocr import ocr_text_from_image_path
 from module.storage.storage import storage_get_file_by_protocol
 from module.task_queue.task_queue import (
@@ -94,6 +95,12 @@ async def handle_repl_command(command: str, *args):
         task_queue_print_status()
     elif command == "open-browser":
         await open_browser()
+    elif command == "ddg":
+        if not args:
+            print("Error: Search query is required")
+            return
+        query = " ".join(args)
+        await ddg_crawler_task(query=query)
     elif command == "is-site-exists":
         if not args:
             print("Error: URL argument is required")
