@@ -103,7 +103,7 @@ class RaySchedular:
             id=task_id,
             task_type=task_type,
             interval=interval,
-            next_run=datetime.now() + timedelta(seconds=interval),
+            next_run=datetime.now(),
             tag=tag,
             parameters=parameters,
         )
