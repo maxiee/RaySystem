@@ -1,101 +1,97 @@
 from typing import Optional, List
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
 class InfoBase(BaseModel):
     title: str
     url: str
-    published: Optional[datetime]
-    description: Optional[str]
-    image: Optional[str]
+    published: Optional[datetime] = None
+    description: Optional[str] = None
+    image: Optional[str] = None
     is_new: bool
     is_mark: bool
 
 class InfoCreate(InfoBase):
     site_id: int
-    channel_id: Optional[int]
-    subchannel_id: Optional[int]
+    channel_id: Optional[int] = None
+    subchannel_id: Optional[int] = None
 
 class InfoUpdate(InfoBase):
-    title: Optional[str]
-    url: Optional[str]
-    published: Optional[datetime]
-    description: Optional[str]
-    image: Optional[str]
-    is_new: Optional[bool]
-    is_mark: Optional[bool]
+    title: Optional[str] = None
+    url: Optional[str] = None
+    published: Optional[datetime] = None
+    description: Optional[str] = None
+    image: Optional[str] = None
+    is_new: Optional[bool] = None
+    is_mark: Optional[bool] = None
 
 class Info(InfoBase):
     id: int
     created_at: datetime
     site_id: int
-    channel_id: Optional[int]
-    subchannel_id: Optional[int]
+    channel_id: Optional[int] = None
+    subchannel_id: Optional[int] = None
 
-    class Config:
-        orm_mode: True
+    model_config = ConfigDict(from_attributes=True)
 
 class SubChannelBase(BaseModel):
     name: str
-    url: Optional[str]
-    rss: Optional[str]
+    url: Optional[str] = None
+    rss: Optional[str] = None
 
 class SubChannelCreate(SubChannelBase):
     channel_id: int
 
 class SubChannelUpdate(SubChannelBase):
-    name: Optional[str]
-    url: Optional[str]
-    rss: Optional[str]
+    name: Optional[str] = None
+    url: Optional[str] = None
+    rss: Optional[str] = None
 
 class SubChannel(SubChannelBase):
     id: int
     channel_id: int
 
-    class Config:
-        orm_mode: True
+    model_config = ConfigDict(from_attributes=True)
 
 class ChannelBase(BaseModel):
     name: str
-    url: Optional[str]
-    rss: Optional[str]
+    url: Optional[str] = None
+    rss: Optional[str] = None
 
 class ChannelCreate(ChannelBase):
     site_id: int
 
 class ChannelUpdate(ChannelBase):
-    name: Optional[str]
-    url: Optional[str]
-    rss: Optional[str]
+    name: Optional[str] = None
+    url: Optional[str] = None
+    rss: Optional[str] = None
 
 class Channel(ChannelBase):
     id: int
     site_id: int
 
-    class Config:
-        orm_mode: True
+    model_config = ConfigDict(from_attributes=True)
 
 class SiteBase(BaseModel):
     name: str
-    description: Optional[str]
+    description: Optional[str] = None
     host: str
-    favicon: Optional[str]
-    rss: Optional[str]
+    favicon: Optional[str] = None
+    rss: Optional[str] = None
 
 class SiteCreate(SiteBase):
     pass
 
 class SiteUpdate(BaseModel):
     id: int
-    name: Optional[str]
-    description: Optional[str]
-    url: Optional[str]
-    favicon: Optional[str]
-    rss: Optional[str]
+    name: Optional[str] = None
+    description: Optional[str] = None
+    url: Optional[str] = None
+    favicon: Optional[str] = None
+    rss: Optional[str] = None
 
 class Site(SiteBase):
     id: int
 
-    class Config:
-        orm_mode: True # type: ignore
+    model_config = ConfigDict(from_attributes=True)
 
