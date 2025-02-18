@@ -207,6 +207,12 @@ async def init_task_scheduler():
 
     one_day_in_seconds = 86400
 
+    ddg_ai_agents = "ai agents"
+    if not await task_scheduler_is_schedule_task_exists(ddg_ai_agents):
+        await kTaskScheduler.add_task(
+            ddg_ai_agents, "ddg", one_day_in_seconds, "ddg", {"query": "ai agents"}
+        )
+
     ddg_webassembly = "webassembly"
     if not await task_scheduler_is_schedule_task_exists(ddg_webassembly):
         await kTaskScheduler.add_task(
