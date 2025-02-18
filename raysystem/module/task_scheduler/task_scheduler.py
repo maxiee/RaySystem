@@ -4,6 +4,7 @@ import time
 from typing import Dict, Callable
 from sqlalchemy import select
 
+from module.crawler.ddg.ddg import ddg_crawler_task
 from module.crawler.rss.rss_collector import create_rss_job
 from module.crawler.test.test_crawler import test_crawler_task
 from module.db.db import db_async_session
@@ -202,6 +203,27 @@ async def init_task_scheduler():
     
     # 注册任务处理程序
     kTaskScheduler.register_task_type("test_crawler", test_crawler_task)
+    kTaskScheduler.register_task_type("ddg", ddg_crawler_task)
+
+    one_day_in_seconds = 86400
+
+    ddg_webassembly = "webassembly"
+    if not await task_scheduler_is_schedule_task_exists(ddg_webassembly):
+        await kTaskScheduler.add_task(
+            ddg_webassembly, "ddg", one_day_in_seconds, "ddg", {"query": "webassembly"}
+        )
+
+    ddg_smolagents = "smolagents"
+    if not await task_scheduler_is_schedule_task_exists(ddg_smolagents):
+        await kTaskScheduler.add_task(
+            ddg_smolagents, "ddg", one_day_in_seconds, "ddg", {"query": "smolagents"}
+        )
+    
+    ddg_flutter = "flutter"
+    if not await task_scheduler_is_schedule_task_exists(ddg_flutter):
+        await kTaskScheduler.add_task(
+            ddg_flutter, "ddg", one_day_in_seconds, "ddg", {"query": "flutter"}
+        )
 
     task_id = "test_crawler_1"
     if not await task_scheduler_is_schedule_task_exists(task_id):
