@@ -107,8 +107,7 @@ class RaySchedular:
             parameters=parameters,
         )
         await task_scheduler_add_scheduled_task(new_task)
-        # fixme: 应当使用 task_id 而不是 tag 作为 key
-        self.tasks[tag] = new_task
+        self.tasks[task_id] = new_task
 
     def _debug_print(self, message: str):
         """调试模式下打印信息"""
