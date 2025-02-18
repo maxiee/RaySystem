@@ -26,3 +26,6 @@ dependencies = [
 
 [tool.setuptools]
 packages = ["module", "migrations"]
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "session"
