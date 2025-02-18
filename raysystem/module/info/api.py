@@ -1,4 +1,5 @@
 # Site CRUD operations
+from sqlalchemy import select
 from module.http.http import APP
 import module.info.schemas as schemas
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -27,7 +28,7 @@ async def read_sites(
     async_session: AsyncSession = Depends(get_db_session),
 ):
     async with async_session as session:
-        result = await session.exec(select(Site).offset(skip).limit(limit))
+        result = await session.execute(select(Site).offset(skip).limit(limit))
         sites = result.all()
         return sites
 
