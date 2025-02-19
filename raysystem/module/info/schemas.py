@@ -25,6 +25,30 @@ class InfoUpdate(InfoBase):
     is_new: Optional[bool] = None
     is_mark: Optional[bool] = None
 
+class InfoResponse(BaseModel):
+    id: int
+    title: str
+    url: str
+    published: Optional[datetime] = None
+    created_at: datetime
+    description: Optional[str] = None
+    image: Optional[str] = None
+    is_new: bool
+    is_mark: bool
+    site_id: int
+    channel_id: Optional[int] = None
+    subchannel_id: Optional[int] = None
+    storage_html: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+class InfoList(BaseModel):
+    items: List[InfoResponse]
+    total: int
+    has_more: bool
+
+    model_config = ConfigDict(from_attributes=True)
+
 class Info(InfoBase):
     id: int
     created_at: datetime

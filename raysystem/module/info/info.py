@@ -1,9 +1,10 @@
-from typing import List
-from sqlalchemy import select
+from datetime import datetime
+from typing import List, Optional, Tuple
+from sqlalchemy import select, desc, func
+from sqlalchemy.ext.asyncio import AsyncSession
 from module.base.constants import INFO_MODULE_NAME
 from module.db.db import db_async_session
 from module.fs.fs import fs_make_sure_module_data_path_exists
-from module.info.api import init_info_api
 from module.info.model import Info, Site
 
 
@@ -106,5 +107,4 @@ async def info_get_by_id(info_id: int) -> Info:
 
 def init_info_module():
     # fs_make_sure_module_data_path_exists(INFO_MODULE_NAME)
-    init_info_api()
     print("Info module initialized")
