@@ -4,6 +4,8 @@ analysis_options.yaml
 doc/DefaultApi.md
 doc/DiskMetrics.md
 doc/HTTPValidationError.md
+doc/InfoList.md
+doc/InfoResponse.md
 doc/MemoryMetrics.md
 doc/NetworkMetrics.md
 doc/ResponseGetMetricsSystemMetricsGet.md
@@ -25,6 +27,8 @@ lib/src/date_serializer.dart
 lib/src/model/date.dart
 lib/src/model/disk_metrics.dart
 lib/src/model/http_validation_error.dart
+lib/src/model/info_list.dart
+lib/src/model/info_response.dart
 lib/src/model/memory_metrics.dart
 lib/src/model/network_metrics.dart
 lib/src/model/response_get_metrics_system_metrics_get.dart
@@ -35,8 +39,5 @@ lib/src/model/validation_error.dart
 lib/src/model/validation_error_loc_inner.dart
 lib/src/serializers.dart
 pubspec.yaml
-test/disk_metrics_test.dart
-test/memory_metrics_test.dart
-test/network_metrics_test.dart
-test/response_get_metrics_system_metrics_get_test.dart
-test/system_metrics_test.dart
+test/info_list_test.dart
+test/info_response_test.dart

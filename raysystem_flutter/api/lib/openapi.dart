@@ -14,6 +14,8 @@ export 'package:openapi/src/api/default_api.dart';
 
 export 'package:openapi/src/model/disk_metrics.dart';
 export 'package:openapi/src/model/http_validation_error.dart';
+export 'package:openapi/src/model/info_list.dart';
+export 'package:openapi/src/model/info_response.dart';
 export 'package:openapi/src/model/memory_metrics.dart';
 export 'package:openapi/src/model/network_metrics.dart';
 export 'package:openapi/src/model/response_get_metrics_system_metrics_get.dart';

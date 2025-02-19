@@ -12,7 +12,7 @@ class _$SiteCreate extends SiteCreate {
   @override
   final String? description;
   @override
-  final String url;
+  final String host;
   @override
   final String? favicon;
   @override
@@ -24,12 +24,12 @@ class _$SiteCreate extends SiteCreate {
   _$SiteCreate._(
       {required this.name,
       this.description,
-      required this.url,
+      required this.host,
       this.favicon,
       this.rss})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(name, r'SiteCreate', 'name');
-    BuiltValueNullFieldError.checkNotNull(url, r'SiteCreate', 'url');
+    BuiltValueNullFieldError.checkNotNull(host, r'SiteCreate', 'host');
   }
 
   @override
@@ -45,7 +45,7 @@ class _$SiteCreate extends SiteCreate {
     return other is SiteCreate &&
         name == other.name &&
         description == other.description &&
-        url == other.url &&
+        host == other.host &&
         favicon == other.favicon &&
         rss == other.rss;
   }
@@ -55,7 +55,7 @@ class _$SiteCreate extends SiteCreate {
     var _$hash = 0;
     _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, description.hashCode);
-    _$hash = $jc(_$hash, url.hashCode);
+    _$hash = $jc(_$hash, host.hashCode);
     _$hash = $jc(_$hash, favicon.hashCode);
     _$hash = $jc(_$hash, rss.hashCode);
     _$hash = $jf(_$hash);
@@ -67,7 +67,7 @@ class _$SiteCreate extends SiteCreate {
     return (newBuiltValueToStringHelper(r'SiteCreate')
           ..add('name', name)
           ..add('description', description)
-          ..add('url', url)
+          ..add('host', host)
           ..add('favicon', favicon)
           ..add('rss', rss))
         .toString();
@@ -85,9 +85,9 @@ class SiteCreateBuilder implements Builder<SiteCreate, SiteCreateBuilder> {
   String? get description => _$this._description;
   set description(String? description) => _$this._description = description;
 
-  String? _url;
-  String? get url => _$this._url;
-  set url(String? url) => _$this._url = url;
+  String? _host;
+  String? get host => _$this._host;
+  set host(String? host) => _$this._host = host;
 
   String? _favicon;
   String? get favicon => _$this._favicon;
@@ -106,7 +106,7 @@ class SiteCreateBuilder implements Builder<SiteCreate, SiteCreateBuilder> {
     if ($v != null) {
       _name = $v.name;
       _description = $v.description;
-      _url = $v.url;
+      _host = $v.host;
       _favicon = $v.favicon;
       _rss = $v.rss;
       _$v = null;
@@ -134,7 +134,8 @@ class SiteCreateBuilder implements Builder<SiteCreate, SiteCreateBuilder> {
           name: BuiltValueNullFieldError.checkNotNull(
               name, r'SiteCreate', 'name'),
           description: description,
-          url: BuiltValueNullFieldError.checkNotNull(url, r'SiteCreate', 'url'),
+          host: BuiltValueNullFieldError.checkNotNull(
+              host, r'SiteCreate', 'host'),
           favicon: favicon,
           rss: rss,
         );

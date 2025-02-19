@@ -1,4 +1,4 @@
-# openapi.model.SiteCreate
+# openapi.model.InfoList
 
 ## Load the model package
 ```dart
@@ -8,11 +8,9 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **String** |  | 
-**description** | **String** |  | [optional] 
-**host** | **String** |  | 
-**favicon** | **String** |  | [optional] 
-**rss** | **String** |  | [optional] 
+**items** | [**BuiltList&lt;InfoResponse&gt;**](InfoResponse.md) |  | 
+**total** | **int** |  | 
+**hasMore** | **bool** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -9,6 +9,8 @@ part of 'serializers.dart';
 Serializers _$serializers = (new Serializers().toBuilder()
       ..add(DiskMetrics.serializer)
       ..add(HTTPValidationError.serializer)
+      ..add(InfoList.serializer)
+      ..add(InfoResponse.serializer)
       ..add(MemoryMetrics.serializer)
       ..add(NetworkMetrics.serializer)
       ..add(ResponseGetMetricsSystemMetricsGet.serializer)
@@ -20,6 +22,9 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(DiskMetrics)]),
           () => new ListBuilder<DiskMetrics>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(InfoResponse)]),
+          () => new ListBuilder<InfoResponse>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(ValidationError)]),
           () => new ListBuilder<ValidationError>())

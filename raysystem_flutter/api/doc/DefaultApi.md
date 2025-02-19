@@ -11,6 +11,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**createSiteSitesPost**](DefaultApi.md#createsitesitespost) | **POST** /sites/ | Create Site
 [**deleteSiteSitesSiteIdDelete**](DefaultApi.md#deletesitesitessiteiddelete) | **DELETE** /sites/{site_id} | Delete Site
+[**getInfosInfosGet**](DefaultApi.md#getinfosinfosget) | **GET** /infos/ | Get Infos
 [**getMetricsSystemMetricsGet**](DefaultApi.md#getmetricssystemmetricsget) | **GET** /system/metrics | Get Metrics
 [**heeloWorldHelloGet**](DefaultApi.md#heeloworldhelloget) | **GET** /hello | Heelo World
 [**readSiteSitesSiteIdGet**](DefaultApi.md#readsitesitessiteidget) | **GET** /sites/{site_id} | Read Site
@@ -89,6 +90,51 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**JsonObject**](JsonObject.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getInfosInfosGet**
+> InfoList getInfosInfosGet(createdBefore, limit)
+
+Get Infos
+
+Get a paginated list of info items.  Args:     created_before: Optional timestamp to get items created before this time     limit: Number of items to return (max 100)     session: Database session  Returns:     InfoList containing the items, total count, and whether there are more items
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+
+final api = Openapi().getDefaultApi();
+final DateTime createdBefore = 2013-10-20T19:20:30+01:00; // DateTime | Optional timestamp to get items created before this time
+final int limit = 56; // int | Number of items to return per page
+
+try {
+    final response = api.getInfosInfosGet(createdBefore, limit);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getInfosInfosGet: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **createdBefore** | **DateTime**| Optional timestamp to get items created before this time | [optional] 
+ **limit** | **int**| Number of items to return per page | [optional] [default to 20]
+
+### Return type
+
+[**InfoList**](InfoList.md)
 
 ### Authorization
 

@@ -67,6 +67,7 @@ Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 [*DefaultApi*](doc/DefaultApi.md) | [**createSiteSitesPost**](doc/DefaultApi.md#createsitesitespost) | **POST** /sites/ | Create Site
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteSiteSitesSiteIdDelete**](doc/DefaultApi.md#deletesitesitessiteiddelete) | **DELETE** /sites/{site_id} | Delete Site
+[*DefaultApi*](doc/DefaultApi.md) | [**getInfosInfosGet**](doc/DefaultApi.md#getinfosinfosget) | **GET** /infos/ | Get Infos
 [*DefaultApi*](doc/DefaultApi.md) | [**getMetricsSystemMetricsGet**](doc/DefaultApi.md#getmetricssystemmetricsget) | **GET** /system/metrics | Get Metrics
 [*DefaultApi*](doc/DefaultApi.md) | [**heeloWorldHelloGet**](doc/DefaultApi.md#heeloworldhelloget) | **GET** /hello | Heelo World
 [*DefaultApi*](doc/DefaultApi.md) | [**readSiteSitesSiteIdGet**](doc/DefaultApi.md#readsitesitessiteidget) | **GET** /sites/{site_id} | Read Site
@@ -79,6 +80,8 @@ Class | Method | HTTP request | Description
 
  - [DiskMetrics](doc/DiskMetrics.md)
  - [HTTPValidationError](doc/HTTPValidationError.md)
+ - [InfoList](doc/InfoList.md)
+ - [InfoResponse](doc/InfoResponse.md)
  - [MemoryMetrics](doc/MemoryMetrics.md)
  - [NetworkMetrics](doc/NetworkMetrics.md)
  - [ResponseGetMetricsSystemMetricsGet](doc/ResponseGetMetricsSystemMetricsGet.md)

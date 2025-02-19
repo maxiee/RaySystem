@@ -13,7 +13,7 @@ part 'site_create.g.dart';
 /// Properties:
 /// * [name]
 /// * [description]
-/// * [url]
+/// * [host]
 /// * [favicon]
 /// * [rss]
 @BuiltValue()
@@ -24,8 +24,8 @@ abstract class SiteCreate implements Built<SiteCreate, SiteCreateBuilder> {
   @BuiltValueField(wireName: r'description')
   String? get description;
 
-  @BuiltValueField(wireName: r'url')
-  String get url;
+  @BuiltValueField(wireName: r'host')
+  String get host;
 
   @BuiltValueField(wireName: r'favicon')
   String? get favicon;
@@ -61,32 +61,32 @@ class _$SiteCreateSerializer implements PrimitiveSerializer<SiteCreate> {
       object.name,
       specifiedType: const FullType(String),
     );
-    yield r'description';
-    yield object.description == null
-        ? null
-        : serializers.serialize(
-            object.description,
-            specifiedType: const FullType.nullable(String),
-          );
-    yield r'url';
+    if (object.description != null) {
+      yield r'description';
+      yield serializers.serialize(
+        object.description,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
+    yield r'host';
     yield serializers.serialize(
-      object.url,
+      object.host,
       specifiedType: const FullType(String),
     );
-    yield r'favicon';
-    yield object.favicon == null
-        ? null
-        : serializers.serialize(
-            object.favicon,
-            specifiedType: const FullType.nullable(String),
-          );
-    yield r'rss';
-    yield object.rss == null
-        ? null
-        : serializers.serialize(
-            object.rss,
-            specifiedType: const FullType.nullable(String),
-          );
+    if (object.favicon != null) {
+      yield r'favicon';
+      yield serializers.serialize(
+        object.favicon,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
+    if (object.rss != null) {
+      yield r'rss';
+      yield serializers.serialize(
+        object.rss,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
   }
 
   @override
@@ -127,12 +127,12 @@ class _$SiteCreateSerializer implements PrimitiveSerializer<SiteCreate> {
           if (valueDes == null) continue;
           result.description = valueDes;
           break;
-        case r'url':
+        case r'host':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.url = valueDes;
+          result.host = valueDes;
           break;
         case r'favicon':
           final valueDes = serializers.deserialize(
