@@ -18,6 +18,7 @@ import 'package:openapi/src/model/disk_metrics.dart';
 import 'package:openapi/src/model/http_validation_error.dart';
 import 'package:openapi/src/model/info_list.dart';
 import 'package:openapi/src/model/info_response.dart';
+import 'package:openapi/src/model/info_stats.dart';
 import 'package:openapi/src/model/memory_metrics.dart';
 import 'package:openapi/src/model/network_metrics.dart';
 import 'package:openapi/src/model/response_get_metrics_system_metrics_get.dart';
@@ -34,6 +35,7 @@ part 'serializers.g.dart';
   HTTPValidationError,
   InfoList,
   InfoResponse,
+  InfoStats,
   MemoryMetrics,
   NetworkMetrics,
   ResponseGetMetricsSystemMetricsGet,

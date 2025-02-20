@@ -6,6 +6,7 @@ doc/DiskMetrics.md
 doc/HTTPValidationError.md
 doc/InfoList.md
 doc/InfoResponse.md
+doc/InfoStats.md
 doc/MemoryMetrics.md
 doc/NetworkMetrics.md
 doc/ResponseGetMetricsSystemMetricsGet.md
@@ -29,6 +30,7 @@ lib/src/model/disk_metrics.dart
 lib/src/model/http_validation_error.dart
 lib/src/model/info_list.dart
 lib/src/model/info_response.dart
+lib/src/model/info_stats.dart
 lib/src/model/memory_metrics.dart
 lib/src/model/network_metrics.dart
 lib/src/model/response_get_metrics_system_metrics_get.dart
@@ -39,5 +41,4 @@ lib/src/model/validation_error.dart
 lib/src/model/validation_error_loc_inner.dart
 lib/src/serializers.dart
 pubspec.yaml
-test/info_list_test.dart
-test/info_response_test.dart
+test/info_stats_test.dart

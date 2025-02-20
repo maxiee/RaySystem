@@ -11,6 +11,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**createSiteSitesPost**](DefaultApi.md#createsitesitespost) | **POST** /sites/ | Create Site
 [**deleteSiteSitesSiteIdDelete**](DefaultApi.md#deletesitesitessiteiddelete) | **DELETE** /sites/{site_id} | Delete Site
+[**getInfoStatsInfosStatsGet**](DefaultApi.md#getinfostatsinfosstatsget) | **GET** /infos/stats | Get Info Stats
 [**getInfosInfosGet**](DefaultApi.md#getinfosinfosget) | **GET** /infos/ | Get Infos
 [**getMetricsSystemMetricsGet**](DefaultApi.md#getmetricssystemmetricsget) | **GET** /system/metrics | Get Metrics
 [**heeloWorldHelloGet**](DefaultApi.md#heeloworldhelloget) | **GET** /hello | Heelo World
@@ -90,6 +91,45 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**JsonObject**](JsonObject.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getInfoStatsInfosStatsGet**
+> InfoStats getInfoStatsInfosStatsGet()
+
+Get Info Stats
+
+Get statistics about infos including: - Total count of infos - Count of unread infos - Count of marked (favorited) infos
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+
+final api = Openapi().getDefaultApi();
+
+try {
+    final response = api.getInfoStatsInfosStatsGet();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getInfoStatsInfosStatsGet: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**InfoStats**](InfoStats.md)
 
 ### Authorization
 
