@@ -127,3 +127,55 @@ async def test_get_infos_invalid_limit(app, async_client):
     # 测试零值限制
     response = await async_client.get("/infos/?limit=0")
     assert response.status_code == 422  # FastAPI validation error
+
+@pytest.mark.asyncio
+async def test_get_info_stats_empty(app, async_client, test_session):
+    """测试空数据库的统计信息"""
+    # 清理数据库
+    await test_session.execute(delete(Info))
+    await test_session.execute(delete(Site))
+    await test_session.commit()
+    
+    response = await async_client.get("/infos/stats")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total_count"] == 0
+    assert data["unread_count"] == 0
+    assert data["marked_count"] == 0
+
+@pytest.mark.asyncio
+async def test_get_info_stats_with_data(app, async_client, test_session):
+    """测试包含数据时的统计信息"""
+    # 清理数据库
+    await test_session.execute(delete(Info))
+    await test_session.execute(delete(Site))
+    await test_session.commit()
+    
+    # 准备测试数据
+    site = Site(name="Test Stats Site", host="test-stats.com")
+    test_session.add(site)
+    await test_session.flush()
+    
+    # 创建10条测试数据，包括:
+    # - 5条未读，5条已读
+    # - 3条收藏，7条未收藏
+    base_time = datetime.now()
+    for i in range(10):
+        info = Info(
+            title=f"Test Info {i}",
+            url=f"https://test-stats.com/info/{i}",
+            site_id=site.id,
+            created_at=base_time - timedelta(minutes=i),
+            is_new=(i < 5),  # 前5条是未读
+            is_mark=(i < 3)  # 前3条是收藏
+        )
+        test_session.add(info)
+    await test_session.commit()
+    
+    # 测试统计结果
+    response = await async_client.get("/infos/stats")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total_count"] == 10
+    assert data["unread_count"] == 5
+    assert data["marked_count"] == 3

@@ -16,7 +16,7 @@ class InfoCreate(InfoBase):
     channel_id: Optional[int] = None
     subchannel_id: Optional[int] = None
 
-class InfoUpdate(InfoBase):
+class InfoUpdate(BaseModel):
     title: Optional[str] = None
     url: Optional[str] = None
     published: Optional[datetime] = None
@@ -24,6 +24,8 @@ class InfoUpdate(InfoBase):
     image: Optional[str] = None
     is_new: Optional[bool] = None
     is_mark: Optional[bool] = None
+
+    model_config = ConfigDict(from_attributes=True)
 
 class InfoResponse(BaseModel):
     id: int
@@ -58,6 +60,13 @@ class Info(InfoBase):
 
     model_config = ConfigDict(from_attributes=True)
 
+class InfoStats(BaseModel):
+    total_count: int
+    unread_count: int
+    marked_count: int
+
+    model_config = ConfigDict(from_attributes=True)
+
 class SubChannelBase(BaseModel):
     name: str
     url: Optional[str] = None
@@ -66,10 +75,12 @@ class SubChannelBase(BaseModel):
 class SubChannelCreate(SubChannelBase):
     channel_id: int
 
-class SubChannelUpdate(SubChannelBase):
+class SubChannelUpdate(BaseModel):
     name: Optional[str] = None
     url: Optional[str] = None
     rss: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
 
 class SubChannel(SubChannelBase):
     id: int
@@ -85,10 +96,12 @@ class ChannelBase(BaseModel):
 class ChannelCreate(ChannelBase):
     site_id: int
 
-class ChannelUpdate(ChannelBase):
+class ChannelUpdate(BaseModel):
     name: Optional[str] = None
     url: Optional[str] = None
     rss: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
 
 class Channel(ChannelBase):
     id: int

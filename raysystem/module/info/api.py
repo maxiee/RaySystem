@@ -92,9 +92,38 @@ async def get_infos(
     total = total_result.scalar() or 0  # Ensure total is not None
     
     return schemas.InfoList(
-        items=[schemas.InfoResponse.from_orm(item) for item in items],
+        items=[schemas.InfoResponse.model_validate(item) for item in items],
         total=total,
         has_more=has_more
+    )
+
+@APP.get("/infos/stats", response_model=schemas.InfoStats)
+async def get_info_stats(session: AsyncSession = Depends(get_db_session)):
+    """
+    Get statistics about infos including:
+    - Total count of infos
+    - Count of unread infos
+    - Count of marked (favorited) infos
+    """
+    # Get total count
+    total_query = select(func.count()).select_from(Info)
+    total_result = await session.execute(total_query)
+    total_count = total_result.scalar() or 0
+
+    # Get unread count
+    unread_query = select(func.count()).select_from(Info).where(Info.is_new == True)
+    unread_result = await session.execute(unread_query)
+    unread_count = unread_result.scalar() or 0
+
+    # Get marked count
+    marked_query = select(func.count()).select_from(Info).where(Info.is_mark == True)
+    marked_result = await session.execute(marked_query)
+    marked_count = marked_result.scalar() or 0
+
+    return schemas.InfoStats(
+        total_count=total_count,
+        unread_count=unread_count,
+        marked_count=marked_count
     )
 
 def init_info_api():
