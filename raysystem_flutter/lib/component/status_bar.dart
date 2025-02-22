@@ -42,86 +42,81 @@ class StatusBar extends StatelessWidget {
 
     if (metrics == null) return const SizedBox.shrink();
 
-    // Style for metric values
     final valueStyle = TextStyle(
       color: isDark ? theme.colorScheme.primary : theme.colorScheme.primary,
       fontWeight: FontWeight.bold,
-      fontSize: 11,
+      fontSize: 10,
     );
 
-    return Wrap(
-      spacing: 8,
-      runSpacing: 2,
-      children: [
-        // CPU
-        RichText(
-          text: TextSpan(
-            style: DefaultTextStyle.of(context).style.copyWith(fontSize: 11),
+    Widget buildValueWithUnit(String value, String unit) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FittedBox(
+            child: Text(value, style: valueStyle),
+          ),
+          Text(unit, style: valueStyle.copyWith(fontSize: 8)),
+        ],
+      );
+    }
+
+    Widget buildMetricPair(String topValue, String bottomValue) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          buildValueWithUnit(topValue, '%'),
+          buildValueWithUnit(bottomValue, '%'),
+        ],
+      );
+    }
+
+    Widget buildSpeedPair(String upValue, String downValue, String unit) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              TextSpan(text: '🔲 CPU '),
-              TextSpan(
-                text: '${metrics.cpuPercent.toStringAsFixed(1)}%',
-                style: valueStyle,
-              ),
+              const Text('↑', style: TextStyle(fontSize: 8)),
+              buildValueWithUnit(upValue, unit),
             ],
           ),
-        ),
-        // Memory
-        RichText(
-          text: TextSpan(
-            style: DefaultTextStyle.of(context).style.copyWith(fontSize: 11),
+          Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              TextSpan(text: '💾 MEM '),
-              TextSpan(
-                text: '${(metrics.memory.percent).toStringAsFixed(1)}% ',
-                style: valueStyle,
-              ),
-              TextSpan(
-                  text:
-                      '(${metrics.memory.usedGb.toStringAsFixed(1)}/${metrics.memory.totalGb.toStringAsFixed(1)})'),
+              const Text('↓', style: TextStyle(fontSize: 8)),
+              buildValueWithUnit(downValue, unit),
             ],
-          ),
-        ),
-        // Network
-        RichText(
-          text: TextSpan(
-            style: DefaultTextStyle.of(context).style.copyWith(fontSize: 11),
-            children: [
-              TextSpan(text: '📡 NET '),
-              TextSpan(
-                text:
-                    '↑${metrics.network.uploadSpeedMb.toStringAsFixed(2)}MB/s ',
-                style: valueStyle,
-              ),
-              TextSpan(
-                text:
-                    '↓${metrics.network.downloadSpeedMb.toStringAsFixed(2)}MB/s',
-                style: valueStyle,
-              ),
-            ],
-          ),
-        ),
-        // Disk
-        if (metrics.disks.isNotEmpty) ...[
-          RichText(
-            text: TextSpan(
-              style: DefaultTextStyle.of(context).style.copyWith(fontSize: 11),
-              children: [
-                TextSpan(text: '💿 DISK '),
-                TextSpan(
-                  text:
-                      '↑${metrics.disks.first.writeSpeedMb.toStringAsFixed(2)}MB/s ',
-                  style: valueStyle,
-                ),
-                TextSpan(
-                  text:
-                      '↓${metrics.disks.first.readSpeedMb.toStringAsFixed(2)}MB/s',
-                  style: valueStyle,
-                ),
-              ],
-            ),
           ),
         ],
+      );
+    }
+
+    return Wrap(
+      spacing: 4,
+      runSpacing: 2,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        // CPU and Memory
+        buildMetricPair(
+          'CPU ${metrics.cpuPercent.toStringAsFixed(1)}',
+          'MEM ${metrics.memory.percent.toStringAsFixed(1)}',
+        ),
+        Text('📡'),
+        // Network
+        buildSpeedPair(
+          metrics.network.uploadSpeedMb.toStringAsFixed(1),
+          metrics.network.downloadSpeedMb.toStringAsFixed(1),
+          'MB/s',
+        ),
+        Text('💿'),
+        // Disk
+        if (metrics.disks.isNotEmpty)
+          buildSpeedPair(
+            metrics.disks.first.writeSpeedMb.toStringAsFixed(1),
+            metrics.disks.first.readSpeedMb.toStringAsFixed(1),
+            'MB/s',
+          ),
       ],
     );
   }
@@ -130,8 +125,6 @@ class StatusBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    // final metrics = context.watch<SystemMetricsProvider>().metrics;
-    // print('Metrics: $metrics'); // 调试信息
 
     return Container(
       decoration: BoxDecoration(
@@ -153,11 +146,9 @@ class StatusBar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
               children: [
-                // Left section
                 Row(
                     children:
                         left.map((w) => StatusBarItem(child: w)).toList()),
-                // Center section
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -165,16 +156,14 @@ class StatusBar extends StatelessWidget {
                         center.map((w) => StatusBarItem(child: w)).toList(),
                   ),
                 ),
-                // Right section with system metrics
                 Row(
                     children:
                         right.map((w) => StatusBarItem(child: w)).toList()),
               ],
             ),
           ),
-          // Second row for system metrics
           Container(
-            height: 20,
+            height: 32, // 增加高度以适应垂直布局
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

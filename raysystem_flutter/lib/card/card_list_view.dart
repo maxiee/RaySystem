@@ -38,7 +38,8 @@ class EvaMonitorCard extends StatefulWidget {
   State<EvaMonitorCard> createState() => _EvaMonitorCardState();
 }
 
-class _EvaMonitorCardState extends State<EvaMonitorCard> with SingleTickerProviderStateMixin {
+class _EvaMonitorCardState extends State<EvaMonitorCard>
+    with SingleTickerProviderStateMixin {
   double _scanLinePosition = 0.0;
   Timer? _scanLineTimer;
   late AnimationController _warningController;
@@ -52,12 +53,12 @@ class _EvaMonitorCardState extends State<EvaMonitorCard> with SingleTickerProvid
       duration: const Duration(milliseconds: 500),
       vsync: this,
     )..addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _warningController.reverse();
-      } else if (status == AnimationStatus.dismissed && _showWarning) {
-        _warningController.forward();
-      }
-    });
+        if (status == AnimationStatus.completed) {
+          _warningController.reverse();
+        } else if (status == AnimationStatus.dismissed && _showWarning) {
+          _warningController.forward();
+        }
+      });
 
     // 模拟随机警告效果，实际使用时应该基于真实状态
     Timer.periodic(const Duration(seconds: 5), (timer) {
@@ -147,7 +148,7 @@ class _EvaMonitorCardState extends State<EvaMonitorCard> with SingleTickerProvid
                       ),
                     ),
                   ),
-                  
+
                   // MAGI 风格的扫描线
                   if (!_showWarning) ...[
                     Positioned(
@@ -197,10 +198,14 @@ class _EvaMonitorCardState extends State<EvaMonitorCard> with SingleTickerProvid
                               margin: const EdgeInsets.only(right: 8),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: _showWarning ? warningColor : accentColor,
+                                color:
+                                    _showWarning ? warningColor : accentColor,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: (_showWarning ? warningColor : accentColor).withOpacity(0.5),
+                                    color: (_showWarning
+                                            ? warningColor
+                                            : accentColor)
+                                        .withOpacity(0.5),
                                     blurRadius: 4 + (warningValue * 4),
                                     spreadRadius: 1 + warningValue,
                                   ),
@@ -211,7 +216,8 @@ class _EvaMonitorCardState extends State<EvaMonitorCard> with SingleTickerProvid
                               _showWarning ? 'WARNING' : 'MONITOR ACTIVE',
                               style: TextStyle(
                                 fontSize: 10,
-                                color: _showWarning ? warningColor : accentColor,
+                                color:
+                                    _showWarning ? warningColor : accentColor,
                                 letterSpacing: 1,
                               ),
                             ),
@@ -393,7 +399,7 @@ class WarningEffectPainter extends CustomPainter {
     for (var i = 0; i < size.height; i += 20) {
       canvas.drawLine(
         Offset(0, i + (warningValue * 10)),
-        Offset(size.width, i),
+        Offset(size.width, i.toDouble()),
         stripePaint,
       );
     }
