@@ -121,9 +121,10 @@ class MyApp extends StatelessWidget {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
 
     return MaterialApp(
-      title: 'Stream-like Card Demo',
+      title: 'RaySystem - GitHub: maxiee/RaySystem 🌟',
       theme: lightTheme,
       darkTheme: darkTheme,
+      debugShowCheckedModeBanner: false,
       themeMode: themeNotifier.isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: const HomePage(),
     );
