@@ -63,56 +63,56 @@ class MyApp extends StatelessWidget {
     ),
   );
 
-  // 赛博朋克风格的暗色主题
+  // EVA inspired cyberpunk dark theme
   static final ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: ColorScheme.dark(
-      primary: Color(0xFF00FFFF), // 霓虹青色
-      primaryContainer: Color(0xFF0D3D3D), // 深青色
-      secondary: Color(0xFFFF00FF), // 霓虹粉色
-      tertiary: Color(0xFFFF1493), // 深粉色
-      surface: Color(0xFF1A1A2E), // 深蓝黑色
-      background: Color(0xFF0A0A1E), // 更深的蓝黑色
-      error: Color(0xFFFF0000), // 鲜艳的红色
-      onPrimary: Colors.black,
+      primary: Color(0xFFFF6600), // EVA 标志性橙色
+      primaryContainer: Color(0xFF2D1D15), // 深橙色容器
+      secondary: Color(0xFF00FF00), // NERV 界面特征的荧光绿
+      tertiary: Color(0xFFAE00FF), // 初号机风格的紫色
+      surface: Color(0xFF1A1A2A), // 深蓝紫色表面
+      background: Color(0xFF0A0A16), // NERV 总部风格的深色背景
+      error: Color(0xFFFF0033), // 警告红色
+      onPrimary: Colors.white,
       onSecondary: Colors.black,
-      onSurface: Color(0xFF00FFFF), // 霓虹青色文字
-      onBackground: Color(0xFFE6E6FA), // 淡紫色文字
+      onSurface: Color(0xFF00FF00), // 终端风格的荧光绿文字
+      onBackground: Color(0xFFE6E6FA), // 浅紫色文字
     ),
     appBarTheme: AppBarTheme(
-      backgroundColor: Color(0xFF1A1A2E),
-      foregroundColor: Color(0xFF00FFFF),
+      backgroundColor: Color(0xFF0A0A16),
+      foregroundColor: Color(0xFFFF6600),
       elevation: 0,
     ),
     cardTheme: CardTheme(
-      color: Color(0xFF1E1E32), // 稍亮的深蓝黑色
+      color: Color(0xFF1E1E32), // MAGI 界面风格的深色
       elevation: 8,
-      shadowColor: Color(0xFF00FFFF).withOpacity(0.2),
+      shadowColor: Color(0xFFFF6600).withOpacity(0.3),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: Color(0xFF0D3D3D),
-        foregroundColor: Color(0xFF00FFFF),
+        backgroundColor: Color(0xFF2D1D15),
+        foregroundColor: Color(0xFFFF6600),
         elevation: 5,
-        shadowColor: Color(0xFF00FFFF).withOpacity(0.5),
+        shadowColor: Color(0xFFFF6600).withOpacity(0.4),
       ),
     ),
     textTheme: TextTheme(
       titleLarge: TextStyle(
-        color: Color(0xFF00FFFF),
+        color: Color(0xFFFF6600),
         shadows: [
           Shadow(
-            color: Color(0xFF00FFFF).withOpacity(0.5),
+            color: Color(0xFFFF6600).withOpacity(0.5),
             blurRadius: 8,
           ),
         ],
       ),
-      bodyLarge: TextStyle(color: Color(0xFFE6E6FA)),
+      bodyLarge: TextStyle(color: Color(0xFF00FF00)),
       bodyMedium: TextStyle(color: Color(0xFFE6E6FA)),
     ),
     iconTheme: IconThemeData(
-      color: Color(0xFF00FFFF),
+      color: Color(0xFFFF6600),
     ),
   );
 
