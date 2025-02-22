@@ -2,7 +2,7 @@ import asyncio
 import time
 
 
-async def test_crawler_task(**kwargs):
+async def crawler_test_task(**kwargs):
     print("Test crawler task executed at {}".format(time.time()))
     print(kwargs)
     await asyncio.sleep(1)

@@ -6,7 +6,7 @@ from sqlalchemy import select
 
 from module.crawler.ddg.ddg import ddg_crawler_task
 from module.crawler.rss.rss_collector import create_rss_job
-from module.crawler.test.test_crawler import test_crawler_task
+from module.crawler.test.test_crawler import crawler_test_task
 from module.db.db import db_async_session
 from module.info.info import info_create_site_if_not_exists_by_host
 from module.task_scheduler.model import ScheduledTask, TaskTagSate
@@ -202,7 +202,7 @@ async def init_task_scheduler():
     kTaskScheduler.debug = False  # 确保调度器以非调试模式启动
     
     # 注册任务处理程序
-    kTaskScheduler.register_task_type("test_crawler", test_crawler_task)
+    kTaskScheduler.register_task_type("test_crawler", crawler_test_task)
     kTaskScheduler.register_task_type("ddg", ddg_crawler_task)
 
     one_day_in_seconds = 86400
