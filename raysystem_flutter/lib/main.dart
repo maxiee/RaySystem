@@ -99,6 +99,15 @@ class MyApp extends StatelessWidget {
       ),
     ),
     textTheme: TextTheme(
+      titleLarge: TextStyle(
+        color: Color(0xFF00FFFF),
+        shadows: [
+          Shadow(
+            color: Color(0xFF00FFFF).withOpacity(0.5),
+            blurRadius: 8,
+          ),
+        ],
+      ),
       bodyLarge: TextStyle(color: Color(0xFFE6E6FA)),
       bodyMedium: TextStyle(color: Color(0xFFE6E6FA)),
     ),
@@ -222,7 +231,8 @@ class _HomePageState extends State<HomePage> {
                     final List<dynamic>? subCmds = cmd['commands'];
                     if (subCmds != null) {
                       setState(() {
-                        _commandStack.add(List<Map<String, dynamic>>.from(subCmds));
+                        _commandStack
+                            .add(List<Map<String, dynamic>>.from(subCmds));
                       });
                     }
                   } else if (cmd['callback'] != null) {
