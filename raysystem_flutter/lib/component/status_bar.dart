@@ -138,41 +138,24 @@ class StatusBar extends StatelessWidget {
           ),
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            height: 24,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              children: [
-                Row(
-                    children:
-                        left.map((w) => StatusBarItem(child: w)).toList()),
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children:
-                        center.map((w) => StatusBarItem(child: w)).toList(),
-                  ),
-                ),
-                Row(
-                    children:
-                        right.map((w) => StatusBarItem(child: w)).toList()),
-              ],
+      child: Container(
+        height: 32,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Row(
+          children: [
+            Row(children: left.map((w) => StatusBarItem(child: w)).toList()),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: center.map((w) => StatusBarItem(child: w)).toList(),
+              ),
             ),
-          ),
-          Container(
-            height: 32, // 增加高度以适应垂直布局
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                StatusBarItem(child: _buildMetricsSection(context)),
-              ],
-            ),
-          ),
-        ],
+            Row(children: [
+              StatusBarItem(child: _buildMetricsSection(context)),
+              ...right.map((w) => StatusBarItem(child: w)).toList()
+            ]),
+          ],
+        ),
       ),
     );
   }
