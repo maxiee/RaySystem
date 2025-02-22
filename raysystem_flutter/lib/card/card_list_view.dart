@@ -61,31 +61,37 @@ class _EvaMonitorCardState extends State<EvaMonitorCard>
       });
 
     // 模拟随机警告效果，实际使用时应该基于真实状态
-    Timer.periodic(const Duration(seconds: 5), (timer) {
-      setState(() {
-        _showWarning = !_showWarning;
-        if (_showWarning) {
-          _warningController.forward();
-        }
-      });
+    _warningTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (mounted) {
+        setState(() {
+          _showWarning = !_showWarning;
+          if (_showWarning) {
+            _warningController.forward();
+          }
+        });
+      }
     });
   }
 
-  @override
+  late Timer _warningTimer;
+
   void dispose() {
     _scanLineTimer?.cancel();
+    _warningTimer.cancel();
     _warningController.dispose();
     super.dispose();
   }
 
   void _startScanLineAnimation() {
     _scanLineTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
-      setState(() {
-        _scanLinePosition += 2;
-        if (_scanLinePosition > 300) {
-          _scanLinePosition = 0;
-        }
-      });
+      if (mounted) {
+        setState(() {
+          _scanLinePosition += 2;
+          if (_scanLinePosition > 300) {
+            _scanLinePosition = 0;
+          }
+        });
+      }
     });
   }
 
