@@ -14,6 +14,7 @@ Method | HTTP request | Description
 [**getInfoStatsInfosStatsGet**](DefaultApi.md#getinfostatsinfosstatsget) | **GET** /infos/stats | Get Info Stats
 [**getInfosInfosGet**](DefaultApi.md#getinfosinfosget) | **GET** /infos/ | Get Infos
 [**getMetricsSystemMetricsGet**](DefaultApi.md#getmetricssystemmetricsget) | **GET** /system/metrics | Get Metrics
+[**getScheduledTasksSchedulerTasksGet**](DefaultApi.md#getscheduledtasksschedulertasksget) | **GET** /scheduler_tasks/ | Get Scheduled Tasks
 [**heeloWorldHelloGet**](DefaultApi.md#heeloworldhelloget) | **GET** /hello | Heelo World
 [**readSiteSitesSiteIdGet**](DefaultApi.md#readsitesitessiteidget) | **GET** /sites/{site_id} | Read Site
 [**readSitesSitesGet**](DefaultApi.md#readsitessitesget) | **GET** /sites/ | Read Sites
@@ -214,6 +215,45 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**ResponseGetMetricsSystemMetricsGet**](ResponseGetMetricsSystemMetricsGet.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getScheduledTasksSchedulerTasksGet**
+> BuiltList<ScheduledTaskResponse> getScheduledTasksSchedulerTasksGet()
+
+Get Scheduled Tasks
+
+Get all scheduled tasks information including: - Task ID - Task type - Interval - Tag - Next run time - Task parameters
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+
+final api = Openapi().getDefaultApi();
+
+try {
+    final response = api.getScheduledTasksSchedulerTasksGet();
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling DefaultApi->getScheduledTasksSchedulerTasksGet: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BuiltList&lt;ScheduledTaskResponse&gt;**](ScheduledTaskResponse.md)
 
 ### Authorization
 

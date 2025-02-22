@@ -20,6 +20,7 @@ export 'package:openapi/src/model/info_stats.dart';
 export 'package:openapi/src/model/memory_metrics.dart';
 export 'package:openapi/src/model/network_metrics.dart';
 export 'package:openapi/src/model/response_get_metrics_system_metrics_get.dart';
+export 'package:openapi/src/model/scheduled_task_response.dart';
 export 'package:openapi/src/model/site.dart';
 export 'package:openapi/src/model/site_create.dart';
 export 'package:openapi/src/model/system_metrics.dart';

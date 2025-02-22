@@ -70,6 +70,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**getInfoStatsInfosStatsGet**](doc/DefaultApi.md#getinfostatsinfosstatsget) | **GET** /infos/stats | Get Info Stats
 [*DefaultApi*](doc/DefaultApi.md) | [**getInfosInfosGet**](doc/DefaultApi.md#getinfosinfosget) | **GET** /infos/ | Get Infos
 [*DefaultApi*](doc/DefaultApi.md) | [**getMetricsSystemMetricsGet**](doc/DefaultApi.md#getmetricssystemmetricsget) | **GET** /system/metrics | Get Metrics
+[*DefaultApi*](doc/DefaultApi.md) | [**getScheduledTasksSchedulerTasksGet**](doc/DefaultApi.md#getscheduledtasksschedulertasksget) | **GET** /scheduler_tasks/ | Get Scheduled Tasks
 [*DefaultApi*](doc/DefaultApi.md) | [**heeloWorldHelloGet**](doc/DefaultApi.md#heeloworldhelloget) | **GET** /hello | Heelo World
 [*DefaultApi*](doc/DefaultApi.md) | [**readSiteSitesSiteIdGet**](doc/DefaultApi.md#readsitesitessiteidget) | **GET** /sites/{site_id} | Read Site
 [*DefaultApi*](doc/DefaultApi.md) | [**readSitesSitesGet**](doc/DefaultApi.md#readsitessitesget) | **GET** /sites/ | Read Sites
@@ -87,6 +88,7 @@ Class | Method | HTTP request | Description
  - [MemoryMetrics](doc/MemoryMetrics.md)
  - [NetworkMetrics](doc/NetworkMetrics.md)
  - [ResponseGetMetricsSystemMetricsGet](doc/ResponseGetMetricsSystemMetricsGet.md)
+ - [ScheduledTaskResponse](doc/ScheduledTaskResponse.md)
  - [Site](doc/Site.md)
  - [SiteCreate](doc/SiteCreate.md)
  - [SystemMetrics](doc/SystemMetrics.md)

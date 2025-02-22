@@ -22,6 +22,7 @@ import 'package:openapi/src/model/info_stats.dart';
 import 'package:openapi/src/model/memory_metrics.dart';
 import 'package:openapi/src/model/network_metrics.dart';
 import 'package:openapi/src/model/response_get_metrics_system_metrics_get.dart';
+import 'package:openapi/src/model/scheduled_task_response.dart';
 import 'package:openapi/src/model/site.dart';
 import 'package:openapi/src/model/site_create.dart';
 import 'package:openapi/src/model/system_metrics.dart';
@@ -39,6 +40,7 @@ part 'serializers.g.dart';
   MemoryMetrics,
   NetworkMetrics,
   ResponseGetMetricsSystemMetricsGet,
+  ScheduledTaskResponse,
   Site,
   SiteCreate,
   SystemMetrics,
@@ -49,6 +51,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(Site)]),
         () => ListBuilder<Site>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(ScheduledTaskResponse)]),
+        () => ListBuilder<ScheduledTaskResponse>(),
       )
       ..add(const OneOfSerializer())
       ..add(const AnyOfSerializer())

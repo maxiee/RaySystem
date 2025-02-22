@@ -10,6 +10,7 @@ doc/InfoStats.md
 doc/MemoryMetrics.md
 doc/NetworkMetrics.md
 doc/ResponseGetMetricsSystemMetricsGet.md
+doc/ScheduledTaskResponse.md
 doc/Site.md
 doc/SiteCreate.md
 doc/SystemMetrics.md
@@ -34,6 +35,7 @@ lib/src/model/info_stats.dart
 lib/src/model/memory_metrics.dart
 lib/src/model/network_metrics.dart
 lib/src/model/response_get_metrics_system_metrics_get.dart
+lib/src/model/scheduled_task_response.dart
 lib/src/model/site.dart
 lib/src/model/site_create.dart
 lib/src/model/system_metrics.dart
@@ -41,4 +43,4 @@ lib/src/model/validation_error.dart
 lib/src/model/validation_error_loc_inner.dart
 lib/src/serializers.dart
 pubspec.yaml
-test/info_stats_test.dart
+test/scheduled_task_response_test.dart
