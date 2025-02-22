@@ -10,6 +10,7 @@ from module.db.base import Base
 from module.http.http import APP
 from module.db.db import get_db_session
 from module.info.api import init_info_api
+from module.task_scheduler.api import init_task_scheduler_api
 
 # 使用内存数据库进行测试
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -19,6 +20,7 @@ async def app() -> FastAPI:
     """创建测试应用"""
     # 确保 API 路由已初始化
     init_info_api()
+    init_task_scheduler_api()  # 添加初始化task_scheduler API
     return APP
 
 @pytest_asyncio.fixture(scope="session")
