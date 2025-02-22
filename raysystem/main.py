@@ -10,6 +10,7 @@ from module.system.api import init_system_api
 from module.task_queue.task_queue import (
     init_task_queue,
 )
+from module.task_scheduler.api import init_task_scheduler_api
 from module.task_scheduler.task_scheduler import (
     dispose_task_scheduler,
     init_task_scheduler,
@@ -50,6 +51,7 @@ def main():
     init_fs_module()
     init_storage_module()
     init_info_api()
+    init_task_scheduler_api()
     init_people_module()
     init_ocr_api()
     init_system_api()
