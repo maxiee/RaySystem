@@ -201,22 +201,28 @@ class _HomePageState extends State<HomePage> {
     final isDark = theme.brightness == Brightness.dark;
     final currentCommands = _commandStack.last;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+    return Container(
+      width: double.infinity,
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
         children: [
           ...currentCommands.map((cmd) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+            return SizedBox(
+              height: 32, // 固定按钮高度
               child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
                 onPressed: () {
                   if (cmd.containsKey('commands')) {
                     final List<dynamic>? subCmds = cmd['commands'];
                     if (subCmds != null) {
                       setState(() {
-                        _commandStack
-                            .add(List<Map<String, dynamic>>.from(subCmds));
+                        _commandStack.add(List<Map<String, dynamic>>.from(subCmds));
                       });
                     }
                   } else if (cmd['callback'] != null) {
@@ -228,21 +234,26 @@ class _HomePageState extends State<HomePage> {
                 },
                 icon: Icon(
                   cmd['icon'] as IconData?,
-                  size: 20,
+                  size: 16,
                 ),
                 label: Text(
                   cmd['title']?.toString() ?? '无标题',
-                  style: TextStyle(
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(fontSize: 13),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             );
           }),
           if (_commandStack.length > 1)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+            SizedBox(
+              height: 32, // 返回按钮也使用相同的固定高度
               child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
                 onPressed: () {
                   setState(() {
                     _commandStack.removeLast();
@@ -250,16 +261,14 @@ class _HomePageState extends State<HomePage> {
                 },
                 icon: Icon(
                   Icons.arrow_back,
-                  size: 20,
+                  size: 16,
                   color: isDark
                       ? theme.colorScheme.primary
                       : theme.colorScheme.onPrimary,
                 ),
                 label: Text(
                   '返回',
-                  style: TextStyle(
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(fontSize: 13),
                 ),
               ),
             ),
