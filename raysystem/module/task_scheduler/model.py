@@ -4,7 +4,7 @@ from module.db.base import Base
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import JSON, Integer, String, ForeignKey, DateTime, Boolean, LargeBinary, Enum as SQLAlchemyEnum
 
-class TaskSchduleType(str, Enum):
+class TaskScheduleType(str, Enum):
     """任务调度类型"""
     INTERVAL = "interval" # 按时间间隔执行
     CRON = "cron"          # 按cron表达式定时执行
@@ -21,7 +21,7 @@ class ScheduledTask(Base):
     # 任务类型
     task_type: Mapped[str] = mapped_column(String, index=True)
     # 任务调度类型
-    schedule_type: Mapped[TaskSchduleType] = mapped_column(SQLAlchemyEnum(TaskSchduleType), index=True)
+    schedule_type: Mapped[TaskScheduleType] = mapped_column(SQLAlchemyEnum(TaskScheduleType), index=True)
     # 对于INTERVAL类型，间隔秒数
     interval: Mapped[int] = mapped_column(Integer)
     # 对于CRON类型，存储cron表达式
