@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime, timedelta
 import time
-from typing import Dict, Callable
+from typing import Dict, Callable, List
 from sqlalchemy import select
 
 from module.crawler.ddg.ddg import ddg_crawler_task
@@ -52,6 +52,22 @@ async def task_scheduler_merge_tag_state(tag_state: TaskTagSate):
         await session.merge(tag_state)
         await session.commit()
 
+class EventEmitter:
+    """简单的事件发射器，用于事件驱动任务"""
+    def __init__(self):
+        self._handlers: Dict[str, List[Callable]] = {}
+        
+    def on(self, event_type: str, handler: Callable):
+        """注册事件处理程序"""
+        if event_type not in self._handlers:
+            self._handlers[event_type] = []
+        self._handlers[event_type].append(handler)
+        
+    def emit(self, event_type: str, *args, **kwargs):
+        """触发事件"""
+        if event_type in self._handlers:
+            for handler in self._handlers[event_type]:
+                asyncio.create_task(handler(*args, **kwargs))
 
 class RaySchedular:
     def __init__(self) -> None:
