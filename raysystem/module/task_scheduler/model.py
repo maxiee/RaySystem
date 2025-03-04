@@ -1,7 +1,15 @@
 from datetime import datetime
+from enum import Enum
 from module.db.base import Base
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import JSON, Integer, String, ForeignKey, DateTime, Boolean, LargeBinary
+from sqlalchemy import JSON, Integer, String, ForeignKey, DateTime, Boolean, LargeBinary, Enum as SQLAlchemyEnum
+
+class TaskSchduleType(str, Enum):
+    """任务调度类型"""
+    INTERVAL = "interval" # 按时间间隔执行
+    CRON = "cron"          # 按cron表达式定时执行
+    EVENT = "event"        # 事件驱动执行
+    MANUAL = "manual"      # 手动触发执行
 
 
 class ScheduledTask(Base):
@@ -12,14 +20,22 @@ class ScheduledTask(Base):
     id: Mapped[str] = mapped_column(String, primary_key=True, index=True)
     # 任务类型
     task_type: Mapped[str] = mapped_column(String, index=True)
-    # 执行间隔（秒）
+    # 任务调度类型
+    schedule_type: Mapped[TaskSchduleType] = mapped_column(SQLAlchemyEnum(TaskSchduleType), index=True)
+    # 对于INTERVAL类型，间隔秒数
     interval: Mapped[int] = mapped_column(Integer)
+    # 对于CRON类型，存储cron表达式
+    cron_expression: Mapped[str] = mapped_column(String, nullable=True)
+    # 对于EVENT类型，存储事件类型
+    event_type: Mapped[str] = mapped_column(String, nullable=True)
     # 下次执行时间戳
     next_run: Mapped[datetime] = mapped_column(DateTime)
     # 限流标记
     tag: Mapped[str] = mapped_column(String, index=True)
     # 任务参数，json 格式
     parameters: Mapped[dict] = mapped_column(JSON, nullable=True)
+    # 是否启用
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
 
 
 class TaskTagSate(Base):
