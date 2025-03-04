@@ -26,7 +26,7 @@ class CardListView extends StatelessWidget {
   }
 }
 
-class EvaMonitorCard extends StatefulWidget {
+class EvaMonitorCard extends StatelessWidget {
   final Widget child;
 
   const EvaMonitorCard({
@@ -35,211 +35,92 @@ class EvaMonitorCard extends StatefulWidget {
   });
 
   @override
-  State<EvaMonitorCard> createState() => _EvaMonitorCardState();
-}
-
-class _EvaMonitorCardState extends State<EvaMonitorCard>
-    with SingleTickerProviderStateMixin {
-  double _scanLinePosition = 0.0;
-  Timer? _scanLineTimer;
-  late AnimationController _warningController;
-  bool _showWarning = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _startScanLineAnimation();
-    _warningController = AnimationController(
-      duration: const Duration(milliseconds: 500),
-      vsync: this,
-    )..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          _warningController.reverse();
-        } else if (status == AnimationStatus.dismissed && _showWarning) {
-          _warningController.forward();
-        }
-      });
-
-    // 模拟随机警告效果，实际使用时应该基于真实状态
-    _warningTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (mounted) {
-        setState(() {
-          _showWarning = !_showWarning;
-          if (_showWarning) {
-            _warningController.forward();
-          }
-        });
-      }
-    });
-  }
-
-  late Timer _warningTimer;
-
-  void dispose() {
-    _scanLineTimer?.cancel();
-    _warningTimer.cancel();
-    _warningController.dispose();
-    super.dispose();
-  }
-
-  void _startScanLineAnimation() {
-    _scanLineTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
-      if (mounted) {
-        setState(() {
-          _scanLinePosition += 2;
-          if (_scanLinePosition > 300) {
-            _scanLinePosition = 0;
-          }
-        });
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = isDark ? const Color(0xFFFF6600) : theme.primaryColor;
     final accentColor = isDark ? const Color(0xFF00FF00) : theme.primaryColor;
-    final warningColor = isDark ? const Color(0xFFFF0033) : Colors.red;
 
-    return AnimatedBuilder(
-      animation: _warningController,
-      builder: (context, child) {
-        final warningValue = _warningController.value;
-        return Container(
-          margin: const EdgeInsets.all(2),
+    return Container(
+      margin: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1A1A2A) : theme.cardTheme.color,
+        borderRadius: BorderRadius.circular(4),
+        boxShadow: [
+          BoxShadow(
+            color: primaryColor.withOpacity(0.2),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipPath(
+        clipper: EvaCardClipper(),
+        child: Container(
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF1A1A2A) : theme.cardTheme.color,
-            borderRadius: BorderRadius.circular(4),
-            boxShadow: [
-              BoxShadow(
-                color: Color.lerp(
-                  primaryColor.withOpacity(0.2),
-                  warningColor.withOpacity(0.3),
-                  warningValue,
-                )!,
-                blurRadius: 12 + (warningValue * 4),
-                offset: const Offset(0, 4),
-              ),
-            ],
+            border: Border.all(
+              color: primaryColor.withOpacity(0.5),
+              width: 1,
+            ),
           ),
-          child: ClipPath(
-            clipper: EvaCardClipper(),
-            child: Container(
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1A1A2A) : theme.cardTheme.color,
-                border: Border.all(
-                  color: Color.lerp(
-                    primaryColor.withOpacity(0.5),
-                    warningColor.withOpacity(0.7),
-                    warningValue,
-                  )!,
-                  width: 1,
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: EvaCardDecorationPainter(
+                    primaryColor: primaryColor,
+                    accentColor: accentColor,
+                    isDark: isDark,
+                  ),
                 ),
               ),
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: CustomPaint(
-                      painter: EvaCardDecorationPainter(
-                        primaryColor: Color.lerp(
-                          primaryColor,
-                          warningColor,
-                          warningValue,
-                        )!,
-                        accentColor: accentColor,
-                        isDark: isDark,
-                        warningValue: warningValue,
-                      ),
-                    ),
-                  ),
 
-                  // MAGI 风格的扫描线
-                  if (!_showWarning) ...[
-                    Positioned(
-                      top: _scanLinePosition,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        height: 2,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              primaryColor.withOpacity(0),
-                              primaryColor.withOpacity(0.3),
-                              primaryColor.withOpacity(0),
+              // 内容区域
+              Container(
+                padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 状态指示器
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          margin: const EdgeInsets.only(right: 8),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: accentColor,
+                            boxShadow: [
+                              BoxShadow(
+                                color: accentColor.withOpacity(0.5),
+                                blurRadius: 4,
+                                spreadRadius: 1,
+                              ),
                             ],
                           ),
                         ),
-                      ),
-                    ),
-                  ],
-
-                  // 警告效果
-                  if (_showWarning) ...[
-                    Positioned.fill(
-                      child: CustomPaint(
-                        painter: WarningEffectPainter(
-                          warningColor: warningColor,
-                          warningValue: warningValue,
+                        Text(
+                          'MONITOR ACTIVE',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: accentColor,
+                            letterSpacing: 1,
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-
-                  // 内容区域
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 状态指示器
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              margin: const EdgeInsets.only(right: 8),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color:
-                                    _showWarning ? warningColor : accentColor,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: (_showWarning
-                                            ? warningColor
-                                            : accentColor)
-                                        .withOpacity(0.5),
-                                    blurRadius: 4 + (warningValue * 4),
-                                    spreadRadius: 1 + warningValue,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Text(
-                              _showWarning ? 'WARNING' : 'MONITOR ACTIVE',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color:
-                                    _showWarning ? warningColor : accentColor,
-                                letterSpacing: 1,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        widget.child,
                       ],
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 16),
+                    child,
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
@@ -278,13 +159,11 @@ class EvaCardDecorationPainter extends CustomPainter {
   final Color primaryColor;
   final Color accentColor;
   final bool isDark;
-  final double warningValue;
 
   EvaCardDecorationPainter({
     required this.primaryColor,
     required this.accentColor,
     required this.isDark,
-    required this.warningValue,
   });
 
   @override
@@ -373,44 +252,4 @@ class EvaCardDecorationPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
-}
-
-class WarningEffectPainter extends CustomPainter {
-  final Color warningColor;
-  final double warningValue;
-
-  WarningEffectPainter({
-    required this.warningColor,
-    required this.warningValue,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final warningPaint = Paint()
-      ..color = warningColor.withOpacity(0.1 * warningValue)
-      ..style = PaintingStyle.fill;
-
-    // 绘制警告效果
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      warningPaint,
-    );
-
-    // 绘制警告条纹
-    final stripePaint = Paint()
-      ..color = warningColor.withOpacity(0.2 * warningValue)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-
-    for (var i = 0; i < size.height; i += 20) {
-      canvas.drawLine(
-        Offset(0, i + (warningValue * 10)),
-        Offset(size.width, i.toDouble()),
-        stripePaint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
 }
