@@ -92,6 +92,7 @@ Class | Method | HTTP request | Description
  - [Site](doc/Site.md)
  - [SiteCreate](doc/SiteCreate.md)
  - [SystemMetrics](doc/SystemMetrics.md)
+ - [TaskScheduleType](doc/TaskScheduleType.md)
  - [ValidationError](doc/ValidationError.md)
  - [ValidationErrorLocInner](doc/ValidationErrorLocInner.md)
 

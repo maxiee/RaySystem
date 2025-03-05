@@ -19,6 +19,7 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..add(Site.serializer)
       ..add(SiteCreate.serializer)
       ..add(SystemMetrics.serializer)
+      ..add(TaskScheduleType.serializer)
       ..add(ValidationError.serializer)
       ..add(ValidationErrorLocInner.serializer)
       ..addBuilderFactory(

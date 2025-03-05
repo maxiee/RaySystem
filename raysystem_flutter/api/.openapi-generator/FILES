@@ -14,6 +14,7 @@ doc/ScheduledTaskResponse.md
 doc/Site.md
 doc/SiteCreate.md
 doc/SystemMetrics.md
+doc/TaskScheduleType.md
 doc/ValidationError.md
 doc/ValidationErrorLocInner.md
 lib/openapi.dart
@@ -39,8 +40,9 @@ lib/src/model/scheduled_task_response.dart
 lib/src/model/site.dart
 lib/src/model/site_create.dart
 lib/src/model/system_metrics.dart
+lib/src/model/task_schedule_type.dart
 lib/src/model/validation_error.dart
 lib/src/model/validation_error_loc_inner.dart
 lib/src/serializers.dart
 pubspec.yaml
-test/scheduled_task_response_test.dart
+test/task_schedule_type_test.dart

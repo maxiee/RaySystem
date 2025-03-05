@@ -26,6 +26,7 @@ import 'package:openapi/src/model/scheduled_task_response.dart';
 import 'package:openapi/src/model/site.dart';
 import 'package:openapi/src/model/site_create.dart';
 import 'package:openapi/src/model/system_metrics.dart';
+import 'package:openapi/src/model/task_schedule_type.dart';
 import 'package:openapi/src/model/validation_error.dart';
 import 'package:openapi/src/model/validation_error_loc_inner.dart';
 
@@ -44,6 +45,7 @@ part 'serializers.g.dart';
   Site,
   SiteCreate,
   SystemMetrics,
+  TaskScheduleType,
   ValidationError,
   ValidationErrorLocInner,
 ])

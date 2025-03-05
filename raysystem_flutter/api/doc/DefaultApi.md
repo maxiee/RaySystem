@@ -232,7 +232,7 @@ No authorization required
 
 Get Scheduled Tasks
 
-Get all scheduled tasks information including: - Task ID - Task type - Interval - Tag - Next run time - Task parameters
+Get all scheduled tasks information including: - Task ID - Task type - Schedule type (INTERVAL, CRON, EVENT, MANUAL) - Interval (for INTERVAL type) - Cron expression (for CRON type) - Event type (for EVENT type) - Next run time - Tag - Task parameters - Enabled status
 
 ### Example
 ```dart
