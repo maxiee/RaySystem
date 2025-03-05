@@ -16,11 +16,10 @@ from sqlalchemy import (
 
 class TaskScheduleType(str, Enum):
     """任务调度类型"""
-
-    INTERVAL = "interval"  # 按时间间隔执行
-    CRON = "cron"  # 按cron表达式定时执行
-    EVENT = "event"  # 事件驱动执行
-    MANUAL = "manual"  # 手动触发执行
+    INTERVAL = "INTERVAL"  # 按时间间隔执行
+    CRON = "CRON"  # 按cron表达式定时执行
+    EVENT = "EVENT"  # 事件驱动执行
+    MANUAL = "MANUAL"  # 手动触发执行
 
 
 class ScheduledTask(Base):
