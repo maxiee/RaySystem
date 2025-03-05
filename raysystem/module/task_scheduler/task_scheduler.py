@@ -53,6 +53,18 @@ async def task_scheduler_merge_tag_state(tag_state: TaskTagSate):
         await session.merge(tag_state)
         await session.commit()
 
+async def task_scheduler_update_scheduled_task(task: ScheduledTask):
+    """Update an existing scheduled task in the database"""
+    async with db_async_session() as session:
+        await session.merge(task)
+        await session.commit()
+
+async def task_scheduler_update_tag_state(tag_state: TaskTagSate):
+    """Update an existing tag state in the database"""
+    async with db_async_session() as session:
+        await session.merge(tag_state)
+        await session.commit()
+
 class EventEmitter:
     """简单的事件发射器，用于事件驱动任务"""
     def __init__(self):
@@ -70,7 +82,7 @@ class EventEmitter:
             for handler in self._handlers[event_type]:
                 asyncio.create_task(handler(*args, **kwargs))
 
-class RaySchedular:
+class RayScheduler:
     def __init__(self) -> None:
         self.tasks: Dict[str, ScheduledTask] = {}
         self.tag_states: Dict[str, TaskTagSate] = {}
@@ -86,7 +98,7 @@ class RaySchedular:
         self.event_tasks: Dict[str, List[str]] = {}  # 事件类型 -> 任务ID列表
 
         # 日志记录器
-        self.logger = logging.getLogger("RaySchedular")
+        self.logger = logging.getLogger("RayScheduler")
 
     async def initialize(self):
         """初始化数据库和内存状态"""
@@ -125,7 +137,7 @@ class RaySchedular:
             tag=tag,
             parameters=parameters,
         )
-    
+
     async def add_cron_task(
         self, task_id: str, task_type: str, cron_expression: str, tag: str, parameters: Dict
     ):
@@ -133,9 +145,9 @@ class RaySchedular:
         # 验证cron表达式
         if not croniter.is_valid(cron_expression):
             raise ValueError(f"Invalid cron expression: {cron_expression}")
-            
+
         next_run = croniter(cron_expression, datetime.now()).get_next(datetime)
-        
+
         await self._add_task(
             task_id=task_id,
             task_type=task_type,
@@ -147,7 +159,7 @@ class RaySchedular:
             parameters=parameters,
             next_run=next_run,
         )
-    
+
     async def add_event_task(
         self, task_id: str, task_type: str, event_type: str, tag: str, parameters: Dict
     ):
@@ -156,7 +168,7 @@ class RaySchedular:
         if event_type not in self.event_tasks:
             self.event_tasks[event_type] = []
         self.event_tasks[event_type].append(task_id)
-        
+
         await self._add_task(
             task_id=task_id,
             task_type=task_type,
@@ -167,7 +179,7 @@ class RaySchedular:
             tag=tag,
             parameters=parameters,
         )
-    
+
     async def add_manual_task(
         self, task_id: str, task_type: str, tag: str, parameters: Dict
     ):
@@ -198,10 +210,10 @@ class RaySchedular:
         """内部方法：添加任务"""
         if task_type not in self.task_registry:
             raise ValueError(f"Unregistered task type: {task_type}")
-            
+
         if next_run is None:
             next_run = datetime.now()
-            
+
         new_task = ScheduledTask(
             id=task_id,
             task_type=task_type,
@@ -213,21 +225,20 @@ class RaySchedular:
             tag=tag,
             parameters=parameters,
         )
-        
+
         await task_scheduler_add_scheduled_task(new_task)
         self.tasks[task_id] = new_task
-        
         self._debug_print(f"Added {schedule_type.value} task: {task_id}")
-    
+
     async def emit_event(self, event_type: str, **context):
         """触发事件，执行关联的任务"""
         if event_type not in self.event_tasks:
             self._debug_print(f"No tasks registered for event: {event_type}")
             return
-            
+
         task_ids = self.event_tasks[event_type]
         self._debug_print(f"Event {event_type} triggered. Running {len(task_ids)} tasks.")
-        
+
         for task_id in task_ids:
             if task_id in self.tasks:
                 task = self.tasks[task_id]
@@ -236,51 +247,48 @@ class RaySchedular:
                 await self._execute_task(task, merged_params)
             else:
                 self._debug_print(f"Task {task_id} not found for event {event_type}")
-    
-    async def trigger_task(self, task_id: str, **additional_params):
-        """手动触发特定任务"""
+
+    async def trigger_task(self, task_id: str, **extra_params):
+        """手动触发任务执行"""
         if task_id not in self.tasks:
-            raise ValueError(f"Task not found: {task_id}")
+            self._debug_print(f"Task {task_id} not found")
+            return False
             
         task = self.tasks[task_id]
-        # 合并附加参数和任务参数
-        merged_params = {**task.parameters, **additional_params}
+        # 合并额外参数和任务参数
+        merged_params = {**task.parameters, **extra_params}
         await self._execute_task(task, merged_params)
-    
+        return True
 
-    async def _execute_task(self, task: ScheduledTask, parameters: Dict = {}):
-        """执行单个任务"""
-        current_time = datetime.now()
-        handler = self.task_registry[task.task_type]
-        params = parameters or task.parameters
-
+    async def _execute_task(self, task: ScheduledTask, parameters: Dict):
+        """执行任务"""
         try:
-            self._debug_print(f"执行任务 {task.id} ({task.task_type})")
-            await handler(**params)
+            handler = self.task_registry[task.task_type]
+            await handler(**parameters)
+            await self._update_next_run_time(task, datetime.now())
+            await self._update_tag_state(task.tag, datetime.now())
         except Exception as e:
-            self._debug_print(f"任务 {task.id} 失败: {str(e)}")
-        finally:
-            # 更新任务状态和标签状态
-            self._update_next_run_time(task, current_time)
-            self._update_tag_state(task.tag, current_time)
-            
-            # 持久化更新
-            await task_scheduler_merge_tag_state(self.tag_states[task.tag])
-    
-    def _update_next_run_time(self, task: ScheduledTask, current_time: datetime):
+            self._debug_print(f"Error executing task {task.id}: {e}")
+            # 即使任务执行失败，也要更新标签状态
+            await self._update_tag_state(task.tag, datetime.now())
+
+    async def _update_next_run_time(self, task: ScheduledTask, current_time: datetime):
         """更新任务的下次执行时间"""
         if task.schedule_type == TaskScheduleType.INTERVAL:
             task.next_run = current_time + timedelta(seconds=task.interval)
-        elif task.schedule_type == TaskScheduleType.CRON and task.cron_expression:
+        elif task.schedule_type == TaskScheduleType.CRON:
             task.next_run = croniter(task.cron_expression, current_time).get_next(datetime)
-        # EVENT和MANUAL类型的任务不需要设置下次执行时间
-    
-    def _update_tag_state(self, tag: str, current_time: datetime):
+        # 持久化任务状态
+        await task_scheduler_update_scheduled_task(task)
+
+    async def _update_tag_state(self, tag: str, current_time: datetime):
         """更新标签状态"""
-        if tag in self.tag_states:
-            self.tag_states[tag].last_run = current_time
-        else:
+        if tag not in self.tag_states:
             self.tag_states[tag] = TaskTagSate(tag=tag, last_run=current_time)
+        else:
+            self.tag_states[tag].last_run = current_time
+        # 持久化标签状态
+        await task_scheduler_update_tag_state(self.tag_states[tag])
 
     async def _scheduler_loop(self):
         """核心调度循环"""
@@ -294,7 +302,7 @@ class RaySchedular:
                     and task.next_run <= now
                     and task.enabled):
                     candidates.append(task)
-            
+
             self._debug_print(f"[调度器] 发现 {len(candidates)} 个到期任务")
 
             # 第二阶段：筛选可执行任务（考虑冷却时间）
@@ -304,13 +312,13 @@ class RaySchedular:
                 if (tag_state is None or 
                     (now - tag_state.last_run).total_seconds() >= self.task_cooldown):
                     executable.append(task)
-            
+
             # 第三阶段：选择并执行最早到期的任务
             if executable:
                 executable.sort(key=lambda x: x.next_run)
                 selected = executable[0]
                 self._debug_print(f"[调度器] 执行任务: {selected.id}, 类型: {selected.task_type}")
-                await self._execute_task(selected)
+                await self._execute_task(selected, selected.parameters or {})
 
             await asyncio.sleep(1)
 
@@ -325,20 +333,19 @@ class RaySchedular:
         """停止调度器"""
         self.running = False
         self.logger.info("Task scheduler stopped")
-    
+
     def _debug_print(self, message: str):
         """调试模式下打印信息"""
         if self.debug:
             print(message)
 
-
-kTaskScheduler = RaySchedular()
+kTaskScheduler = RayScheduler()
 
 
 async def init_task_scheduler():
     await kTaskScheduler.initialize()
     kTaskScheduler.debug = False  # 确保调度器以非调试模式启动
-    
+
     # 注册任务处理程序
     kTaskScheduler.register_task_type("test_crawler", crawler_test_task)
     kTaskScheduler.register_task_type("ddg", ddg_crawler_task)
@@ -362,7 +369,7 @@ async def init_task_scheduler():
         await kTaskScheduler.add_interval_task(
             ddg_smolagents, "ddg", one_day_in_seconds, "ddg", {"query": "smolagents"}
         )
-    
+
     ddg_flutter = "flutter"
     if not await task_scheduler_is_schedule_task_exists(ddg_flutter):
         await kTaskScheduler.add_interval_task(
@@ -375,13 +382,13 @@ async def init_task_scheduler():
         await kTaskScheduler.add_interval_task(
             "test_crawler_1", "test_crawler", 5, "test_crawler", {"message": "Hello"}
         )
-    
+
     # 添加定时任务 - 每天凌晨2点执行数据清理
     # if not await task_scheduler_is_schedule_task_exists("daily_cleanup"):
     #     await kTaskScheduler.add_cron_task(
     #         "daily_cleanup", "data_cleanup", "0 2 * * *", "maintenance", {}
     #     )
-    
+
     # 添加事件驱动任务 - 当新文章发布时执行社交媒体推送
     # if not await task_scheduler_is_schedule_task_exists("social_media_push"):
     #     await kTaskScheduler.add_event_task(

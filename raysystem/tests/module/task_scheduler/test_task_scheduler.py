@@ -6,23 +6,25 @@ from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from module.task_scheduler.model import ScheduledTask, TaskScheduleType, TaskTagSate
-from module.task_scheduler.task_scheduler import RaySchedular
+from module.task_scheduler.task_scheduler import RayScheduler
 from sqlalchemy import delete
 
 
-class TestRaySchedular:
-    """RaySchedular 类的单元测试"""
+class TestRayScheduler:
+    """RayScheduler 类的单元测试"""
 
     @pytest_asyncio.fixture
     async def scheduler(self):
         """创建一个测试用的调度器实例"""
-        scheduler = RaySchedular()
+        scheduler = RayScheduler()
         
         # 使用Mock对象替换数据库相关函数调用
         with patch('module.task_scheduler.task_scheduler.task_scheduler_load_scheduled_tasks', new_callable=AsyncMock) as mock_load_tasks, \
              patch('module.task_scheduler.task_scheduler.task_scheduler_load_tag_states', new_callable=AsyncMock) as mock_load_states, \
              patch('module.task_scheduler.task_scheduler.task_scheduler_add_scheduled_task', new_callable=AsyncMock) as mock_add_task, \
-             patch('module.task_scheduler.task_scheduler.task_scheduler_merge_tag_state', new_callable=AsyncMock) as mock_merge_state:
+             patch('module.task_scheduler.task_scheduler.task_scheduler_merge_tag_state', new_callable=AsyncMock) as mock_merge_state, \
+             patch('module.task_scheduler.task_scheduler.task_scheduler_update_tag_state', new_callable=AsyncMock) as mock_update_tag, \
+             patch('module.task_scheduler.task_scheduler.task_scheduler_update_scheduled_task', new_callable=AsyncMock) as mock_update_task:
             
             # 配置初始空数据
             mock_load_tasks.return_value = []
@@ -185,7 +187,7 @@ class TestRaySchedular:
             )
         
         # 触发事件，提供额外的上下文参数
-        with patch('module.task_scheduler.task_scheduler.task_scheduler_merge_tag_state', new_callable=AsyncMock) as mock_merge_state:
+        with patch('module.task_scheduler.task_scheduler.task_scheduler_update_tag_state', new_callable=AsyncMock) as mock_update_tag:
             await scheduler.emit_event(
                 event_type="article_published",
                 article_id=123,
@@ -205,7 +207,7 @@ class TestRaySchedular:
             assert call_args["title"] == "Test Article"
             
             # 验证是否更新了标签状态
-            mock_merge_state.assert_called_once()
+            mock_update_tag.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_trigger_task(self, scheduler):
@@ -224,7 +226,7 @@ class TestRaySchedular:
             )
         
         # 手动触发任务，提供额外的参数
-        with patch('module.task_scheduler.task_scheduler.task_scheduler_merge_tag_state', new_callable=AsyncMock) as mock_merge_state:
+        with patch('module.task_scheduler.task_scheduler.task_scheduler_update_tag_state', new_callable=AsyncMock) as mock_update_tag:
             await scheduler.trigger_task(
                 task_id="test_manual",
                 extra_param="extra_value"
@@ -239,7 +241,7 @@ class TestRaySchedular:
             assert call_args["extra_param"] == "extra_value"
             
             # 验证是否更新了标签状态
-            mock_merge_state.assert_called_once()
+            mock_update_tag.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_scheduler_loop_interval_task(self, scheduler):
@@ -268,7 +270,7 @@ class TestRaySchedular:
         scheduler.tasks[task.id] = task
         
         # 启动调度器并等待一小段时间
-        with patch('module.task_scheduler.task_scheduler.task_scheduler_merge_tag_state', new_callable=AsyncMock) as mock_merge_state:
+        with patch('module.task_scheduler.task_scheduler.task_scheduler_update_tag_state', new_callable=AsyncMock) as mock_update_tag:
             await scheduler.start()
             
             # 等待足够的时间让调度器执行任务
@@ -281,7 +283,7 @@ class TestRaySchedular:
             assert task.next_run > base_time
             
             # 验证是否更新了标签状态
-            mock_merge_state.assert_called()
+            mock_update_tag.assert_called()
             
             # 停止调度器
             await scheduler.stop()
@@ -386,11 +388,11 @@ class TestRaySchedular:
         scheduler.tasks[task.id] = task
         
         # 执行任务，验证异常被正确捕获（不会导致测试失败）
-        with patch('module.task_scheduler.task_scheduler.task_scheduler_merge_tag_state', new_callable=AsyncMock) as mock_merge_state:
+        with patch('module.task_scheduler.task_scheduler.task_scheduler_update_tag_state', new_callable=AsyncMock) as mock_update_tag:
             await scheduler.trigger_task("failing_test")
             
             # 验证即使任务失败，标签状态也会更新
-            mock_merge_state.assert_called_once()
+            mock_update_tag.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_cron_task_next_run_calculation(self, scheduler):
@@ -417,7 +419,7 @@ class TestRaySchedular:
         current_time = datetime.now() + timedelta(minutes=2)
         
         # 保存原始时间并手动更新
-        scheduler._update_next_run_time(task, current_time)
+        await scheduler._update_next_run_time(task, current_time)
         
         # 验证下次执行时间是否按照cron表达式计算
         assert task.next_run != original_next_run
