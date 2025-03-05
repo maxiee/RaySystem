@@ -10,7 +10,7 @@ from module.crawler.rss.rss_collector import create_rss_job
 from module.crawler.test.test_crawler import crawler_test_task
 from module.db.db import db_async_session
 from module.info.info import info_create_site_if_not_exists_by_host
-from module.task_scheduler.model import ScheduledTask, TaskScheduleType, TaskTagSate
+from module.task_scheduler.model import ScheduledTask, TaskScheduleType, TaskTagState
 
 
 async def task_scheduler_load_scheduled_tasks():
@@ -38,11 +38,11 @@ async def task_scheduler_add_scheduled_task(task: ScheduledTask):
 async def task_scheduler_load_tag_states():
     """Load all tag states from the database"""
     async with db_async_session() as session:
-        result = await session.execute(select(TaskTagSate))
+        result = await session.execute(select(TaskTagState))
         return result.scalars().all()
 
 
-async def task_scheduler_merge_tag_state(tag_state: TaskTagSate):
+async def task_scheduler_merge_tag_state(tag_state: TaskTagState):
     """
     Merge a tag state to the database.
     If the tag_state exists, updates it. If not, creates a new record.
@@ -59,7 +59,7 @@ async def task_scheduler_update_scheduled_task(task: ScheduledTask):
         await session.merge(task)
         await session.commit()
 
-async def task_scheduler_update_tag_state(tag_state: TaskTagSate):
+async def task_scheduler_update_tag_state(tag_state: TaskTagState):
     """Update an existing tag state in the database"""
     async with db_async_session() as session:
         await session.merge(tag_state)
@@ -85,7 +85,7 @@ class EventEmitter:
 class RayScheduler:
     def __init__(self) -> None:
         self.tasks: Dict[str, ScheduledTask] = {}
-        self.tag_states: Dict[str, TaskTagSate] = {}
+        self.tag_states: Dict[str, TaskTagState] = {}
         self.running = False
         self.task_cooldown = 300  # 默认5分钟冷却时间
         self.debug = False  # 添加调试模式标志
@@ -284,7 +284,7 @@ class RayScheduler:
     async def _update_tag_state(self, tag: str, current_time: datetime):
         """更新标签状态"""
         if tag not in self.tag_states:
-            self.tag_states[tag] = TaskTagSate(tag=tag, last_run=current_time)
+            self.tag_states[tag] = TaskTagState(tag=tag, last_run=current_time)
         else:
             self.tag_states[tag].last_run = current_time
         # 持久化标签状态

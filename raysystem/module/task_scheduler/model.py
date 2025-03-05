@@ -52,7 +52,7 @@ class ScheduledTask(Base):
     enabled: Mapped[bool] = mapped_column(Boolean, default=True, server_default="1")
 
 
-class TaskTagSate(Base):
+class TaskTagState(Base):
     """任务标签状态表"""
 
     __tablename__ = "task_tag_state"
