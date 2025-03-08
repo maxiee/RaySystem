@@ -9,16 +9,14 @@ class CardListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cardManager = context.watch<CardManager>();
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return ListView.builder(
       itemCount: cardManager.cards.length,
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: EvaMonitorCard(
-            child: cardManager.cards[index],
+          child: RayCard(
+            content: cardManager.cards[index],
           ),
         );
       },
@@ -26,230 +24,90 @@ class CardListView extends StatelessWidget {
   }
 }
 
-class EvaMonitorCard extends StatelessWidget {
-  final Widget child;
+class RayCard extends StatelessWidget {
+  // Properties for the three main sections
+  final Widget? title;
+  final List<Widget>? leadingActions;
+  final List<Widget>? trailingActions;
+  final Widget content;
+  final List<Widget>? footerActions;
 
-  const EvaMonitorCard({
+  // Other card properties
+  final Color? color;
+  final EdgeInsetsGeometry? padding;
+  final EdgeInsetsGeometry? margin;
+  final double? elevation;
+
+  const RayCard({
     super.key,
-    required this.child,
+    this.title,
+    this.leadingActions,
+    this.trailingActions,
+    required this.content,
+    this.footerActions,
+    this.color,
+    this.padding,
+    this.margin,
+    this.elevation,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final primaryColor = isDark ? const Color(0xFFFF6600) : theme.primaryColor;
-    final accentColor = isDark ? const Color(0xFF00FF00) : theme.primaryColor;
 
-    return Container(
-      margin: const EdgeInsets.all(2),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1A1A2A) : theme.cardTheme.color,
-        borderRadius: BorderRadius.circular(4),
-        boxShadow: [
-          BoxShadow(
-            color: primaryColor.withOpacity(0.2),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipPath(
-        clipper: EvaCardClipper(),
-        child: Container(
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1A1A2A) : theme.cardTheme.color,
-            border: Border.all(
-              color: primaryColor.withOpacity(0.5),
-              width: 1,
-            ),
-          ),
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: EvaCardDecorationPainter(
-                    primaryColor: primaryColor,
-                    accentColor: accentColor,
-                    isDark: isDark,
-                  ),
-                ),
-              ),
-
-              // 内容区域
-              Container(
-                padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    return Card(
+      elevation: elevation ?? 1,
+      margin: margin ?? const EdgeInsets.all(8),
+      color: color ?? theme.cardColor,
+      child: Padding(
+        padding: padding ?? const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Title bar with leading and trailing actions
+            if (title != null ||
+                leadingActions != null ||
+                trailingActions != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
                   children: [
-                    // 状态指示器
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          margin: const EdgeInsets.only(right: 8),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: accentColor,
-                            boxShadow: [
-                              BoxShadow(
-                                color: accentColor.withOpacity(0.5),
-                                blurRadius: 4,
-                                spreadRadius: 1,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text(
-                          'MONITOR ACTIVE',
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: accentColor,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    child,
+                    // Left section - leading actions
+                    if (leadingActions != null) ...[
+                      ...leadingActions!,
+                      const SizedBox(width: 8),
+                    ],
+
+                    // Middle section - title
+                    if (title != null) Expanded(child: Center(child: title!)),
+
+                    // Right section - trailing actions
+                    if (trailingActions != null) ...[
+                      if (title != null) const SizedBox(width: 8),
+                      ...trailingActions!,
+                    ],
                   ],
                 ),
               ),
-            ],
-          ),
+
+            // Content area
+            content,
+
+            // Footer actions
+            if (footerActions != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: footerActions!,
+                ),
+              ),
+          ],
         ),
       ),
     );
   }
 }
 
-class EvaCardClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    final w = size.width;
-    final h = size.height;
-    const cutSize = 24.0;
-    const smallCut = 12.0;
-
-    // 左上切角
-    path.moveTo(0, cutSize);
-    path.lineTo(0, h - smallCut);
-    // 左下切角
-    path.lineTo(smallCut, h);
-    path.lineTo(w - cutSize, h);
-    // 右下切角
-    path.lineTo(w, h - cutSize);
-    path.lineTo(w, smallCut);
-    // 右上切角
-    path.lineTo(w - smallCut, 0);
-    path.lineTo(cutSize, 0);
-    path.close();
-
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-}
-
-class EvaCardDecorationPainter extends CustomPainter {
-  final Color primaryColor;
-  final Color accentColor;
-  final bool isDark;
-
-  EvaCardDecorationPainter({
-    required this.primaryColor,
-    required this.accentColor,
-    required this.isDark,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-    const cutSize = 24.0;
-    const smallCut = 12.0;
-
-    // 绘制装饰性边框
-    final borderPaint = Paint()
-      ..color = primaryColor.withOpacity(0.7)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-
-    final accentPaint = Paint()
-      ..color = accentColor.withOpacity(0.5)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-
-    // 左上角装饰
-    canvas.drawLine(
-      Offset(0, cutSize + 20),
-      Offset(0, cutSize),
-      borderPaint,
-    );
-    canvas.drawLine(
-      Offset(0, cutSize),
-      Offset(cutSize, 0),
-      borderPaint,
-    );
-    canvas.drawLine(
-      Offset(cutSize, 0),
-      Offset(cutSize + 20, 0),
-      borderPaint,
-    );
-
-    // 右下角装饰
-    canvas.drawLine(
-      Offset(w, h - cutSize - 20),
-      Offset(w, h - cutSize),
-      borderPaint,
-    );
-    canvas.drawLine(
-      Offset(w, h - cutSize),
-      Offset(w - cutSize, h),
-      borderPaint,
-    );
-    canvas.drawLine(
-      Offset(w - cutSize, h),
-      Offset(w - cutSize - 20, h),
-      borderPaint,
-    );
-
-    // 绘制装饰性对角线
-    canvas.drawLine(
-      Offset(cutSize + 40, 0),
-      Offset(cutSize + 60, 20),
-      accentPaint,
-    );
-    canvas.drawLine(
-      Offset(w - cutSize - 40, h),
-      Offset(w - cutSize - 60, h - 20),
-      accentPaint,
-    );
-
-    // 绘制状态指示装饰线
-    if (isDark) {
-      final statusPaint = Paint()
-        ..shader = LinearGradient(
-          colors: [
-            primaryColor.withOpacity(0.7),
-            primaryColor.withOpacity(0),
-          ],
-        ).createShader(Rect.fromLTWH(0, 0, 100, 2));
-
-      canvas.drawLine(
-        const Offset(16, 40),
-        Offset(116, 40),
-        Paint()
-          ..shader = statusPaint.shader
-          ..strokeWidth = 2,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
-}
+// Removed EvaCardClipper and EvaCardDecorationPainter classes as they are no longer needed
