@@ -4,6 +4,7 @@ import 'package:raysystem_flutter/api/api.dart'; // 添加这一行
 import 'package:raysystem_flutter/commands/command.dart';
 import 'package:raysystem_flutter/form/form_field.dart';
 import 'package:raysystem_flutter/form/form_manager.dart';
+import 'package:appflowy_editor/appflowy_editor.dart';
 
 final playgroundCommands = Command(
   command: 'playground-app',
@@ -83,6 +84,25 @@ final playgroundCommands = Command(
           padding: const EdgeInsets.all(8.0),
           child: Text(result.data.toString()),
         ));
+      },
+    ),
+    Command(
+      command: 'appflowy-editor',
+      title: '富文本编辑器',
+      icon: Icons.edit_document,
+      callback: (context, cardManager) {
+        final editorState = EditorState.blank();
+        cardManager.addCard(
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            height: 400,
+            width: double.infinity,
+            child: AppFlowyEditor(
+              editorState: editorState,
+              shrinkWrap: true,
+            ),
+          ),
+        );
       },
     ),
   ],
