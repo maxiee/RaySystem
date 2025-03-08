@@ -39,6 +39,7 @@ dependencies:
   screen_capturer: ^0.2.3
   dio: ^5.2.0
   openapi_generator_annotations: ^6.1.0
+  appflowy_editor: ^5.1.0
   openapi:
     path: ./api
 
