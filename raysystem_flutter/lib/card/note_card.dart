@@ -59,32 +59,64 @@ class _NoteCardState extends State<NoteCard> {
   void _loadNote() async {
     if (_currentNoteId == null) return;
 
-    final notesProvider = Provider.of<NotesProvider>(context, listen: false);
+    // 确保组件仍然挂载
+    if (!mounted) return;
 
-    // Check if we already have the note in the provider
+    setState(() {
+      _isLoading = true;
+    });
+
+    NotesProvider? notesProvider;
+    try {
+      notesProvider = Provider.of<NotesProvider>(context, listen: false);
+    } catch (e) {
+      // 如果在获取 Provider 时出错（例如组件被卸载），则提前返回
+      debugPrint('Error accessing NotesProvider: ${e.toString()}');
+      return;
+    }
+
+    // 检查是否已经有笔记在提供者中
     final existingNote = notesProvider.getNoteById(_currentNoteId!);
     if (existingNote != null) {
-      _updateUIFromNote(existingNote.note);
-      setState(() {
-        _isLoading = false;
-      });
-    } else {
-      // Fetch the note if not already available
-      await notesProvider.fetchNote(_currentNoteId!);
+      if (mounted) {
+        _updateUIFromNote(existingNote.note);
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      return;
+    }
 
-      // Check if note was loaded successfully
+    // 如果没有现有笔记，则从 API 获取
+    try {
+      await notesProvider.fetchNote(_currentNoteId!);
+      
+      // 再次检查组件是否还挂载
+      if (!mounted) return;
+      
+      // 检查笔记是否加载成功
       final loadedNote = notesProvider.getNoteById(_currentNoteId!);
       if (loadedNote != null) {
         _updateUIFromNote(loadedNote.note);
       } else {
         setState(() {
-          _errorMessage = 'Failed to load note';
+          _errorMessage = '加载笔记失败';
         });
       }
-
-      setState(() {
-        _isLoading = false;
-      });
+    } catch (e) {
+      // 捕获任何异常并显示错误消息
+      if (mounted) {
+        setState(() {
+          _errorMessage = '加载笔记出错: ${e.toString()}';
+        });
+      }
+    } finally {
+      // 最后检查一次组件是否挂载
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 

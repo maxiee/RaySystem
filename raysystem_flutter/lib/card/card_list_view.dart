@@ -11,17 +11,49 @@ class CardListView extends StatelessWidget {
     final cardManager = context.watch<CardManager>();
 
     return ListView.builder(
+      // 设置为 true 以确保 item 在滑出屏幕时不会被回收
+      addAutomaticKeepAlives: true,
       itemCount: cardManager.cards.length,
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: RayCard(
-            content: cardManager.cards[index],
+          // 使用 KeepAliveWrapper 包装卡片
+          child: KeepAliveWrapper(
+            child: RayCard(
+              content: cardManager.cards[index],
+            ),
           ),
         );
       },
     );
   }
+}
+
+/// 用于保持卡片在滑出屏幕时不被销毁的包装器
+class KeepAliveWrapper extends StatefulWidget {
+  final Widget child;
+
+  const KeepAliveWrapper({
+    Key? key,
+    required this.child,
+  }) : super(key: key);
+
+  @override
+  State<KeepAliveWrapper> createState() => _KeepAliveWrapperState();
+}
+
+class _KeepAliveWrapperState extends State<KeepAliveWrapper>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    // 必须调用 super.build
+    super.build(context);
+    return widget.child;
+  }
+
+  @override
+  // 返回 true 以保持此组件活着
+  bool get wantKeepAlive => true;
 }
 
 class RayCard extends StatelessWidget {
