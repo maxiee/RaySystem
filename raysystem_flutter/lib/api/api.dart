@@ -13,3 +13,7 @@ class API {}
 final api = generatedAPI.Openapi(
   basePathOverride: 'http://127.0.0.1:8000',
 ).getDefaultApi();
+
+final notesApi = generatedAPI.Openapi(
+  basePathOverride: 'http://127.0.0.1:8000',
+).getNotesApi();
