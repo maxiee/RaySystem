@@ -22,6 +22,7 @@ from module.db.base import Base
 import module.info.model
 import module.people.model
 import module.task_scheduler.model
+import module.note.model  # Add the new Note model
 
 target_metadata = Base.metadata
 
