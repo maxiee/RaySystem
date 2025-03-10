@@ -76,6 +76,12 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**readSitesSitesGet**](doc/DefaultApi.md#readsitessitesget) | **GET** /sites/ | Read Sites
 [*DefaultApi*](doc/DefaultApi.md) | [**recognizeTextOcrRecognizePost**](doc/DefaultApi.md#recognizetextocrrecognizepost) | **POST** /ocr/recognize | Recognize Text
 [*DefaultApi*](doc/DefaultApi.md) | [**rootGet**](doc/DefaultApi.md#rootget) | **GET** / | Root
+[*NotesApi*](doc/NotesApi.md) | [**createNoteNotesPost**](doc/NotesApi.md#createnotenotespost) | **POST** /notes/ | Create Note
+[*NotesApi*](doc/NotesApi.md) | [**deleteNoteNotesNoteIdDelete**](doc/NotesApi.md#deletenotenotesnoteiddelete) | **DELETE** /notes/{note_id} | Delete Note
+[*NotesApi*](doc/NotesApi.md) | [**getNoteNotesNoteIdGet**](doc/NotesApi.md#getnotenotesnoteidget) | **GET** /notes/{note_id} | Get Note
+[*NotesApi*](doc/NotesApi.md) | [**listRecentNotesNotesGet**](doc/NotesApi.md#listrecentnotesnotesget) | **GET** /notes/ | List Recent Notes
+[*NotesApi*](doc/NotesApi.md) | [**searchNotesNotesSearchGet**](doc/NotesApi.md#searchnotesnotessearchget) | **GET** /notes/search | Search Notes
+[*NotesApi*](doc/NotesApi.md) | [**updateNoteNotesNoteIdPut**](doc/NotesApi.md#updatenotenotesnoteidput) | **PUT** /notes/{note_id} | Update Note
 
 
 ## Documentation For Models
@@ -87,6 +93,10 @@ Class | Method | HTTP request | Description
  - [InfoStats](doc/InfoStats.md)
  - [MemoryMetrics](doc/MemoryMetrics.md)
  - [NetworkMetrics](doc/NetworkMetrics.md)
+ - [NoteCreate](doc/NoteCreate.md)
+ - [NoteResponse](doc/NoteResponse.md)
+ - [NoteUpdate](doc/NoteUpdate.md)
+ - [NotesListResponse](doc/NotesListResponse.md)
  - [ResponseGetMetricsSystemMetricsGet](doc/ResponseGetMetricsSystemMetricsGet.md)
  - [ScheduledTaskResponse](doc/ScheduledTaskResponse.md)
  - [Site](doc/Site.md)

@@ -9,6 +9,11 @@ doc/InfoResponse.md
 doc/InfoStats.md
 doc/MemoryMetrics.md
 doc/NetworkMetrics.md
+doc/NoteCreate.md
+doc/NoteResponse.md
+doc/NoteUpdate.md
+doc/NotesApi.md
+doc/NotesListResponse.md
 doc/ResponseGetMetricsSystemMetricsGet.md
 doc/ScheduledTaskResponse.md
 doc/Site.md
@@ -20,6 +25,7 @@ doc/ValidationErrorLocInner.md
 lib/openapi.dart
 lib/src/api.dart
 lib/src/api/default_api.dart
+lib/src/api/notes_api.dart
 lib/src/api_util.dart
 lib/src/auth/api_key_auth.dart
 lib/src/auth/auth.dart
@@ -35,6 +41,10 @@ lib/src/model/info_response.dart
 lib/src/model/info_stats.dart
 lib/src/model/memory_metrics.dart
 lib/src/model/network_metrics.dart
+lib/src/model/note_create.dart
+lib/src/model/note_response.dart
+lib/src/model/note_update.dart
+lib/src/model/notes_list_response.dart
 lib/src/model/response_get_metrics_system_metrics_get.dart
 lib/src/model/scheduled_task_response.dart
 lib/src/model/site.dart
@@ -45,4 +55,8 @@ lib/src/model/validation_error.dart
 lib/src/model/validation_error_loc_inner.dart
 lib/src/serializers.dart
 pubspec.yaml
-test/task_schedule_type_test.dart
+test/note_create_test.dart
+test/note_response_test.dart
+test/note_update_test.dart
+test/notes_api_test.dart
+test/notes_list_response_test.dart

@@ -11,6 +11,7 @@ export 'package:openapi/src/serializers.dart';
 export 'package:openapi/src/model/date.dart';
 
 export 'package:openapi/src/api/default_api.dart';
+export 'package:openapi/src/api/notes_api.dart';
 
 export 'package:openapi/src/model/disk_metrics.dart';
 export 'package:openapi/src/model/http_validation_error.dart';
@@ -19,6 +20,10 @@ export 'package:openapi/src/model/info_response.dart';
 export 'package:openapi/src/model/info_stats.dart';
 export 'package:openapi/src/model/memory_metrics.dart';
 export 'package:openapi/src/model/network_metrics.dart';
+export 'package:openapi/src/model/note_create.dart';
+export 'package:openapi/src/model/note_response.dart';
+export 'package:openapi/src/model/note_update.dart';
+export 'package:openapi/src/model/notes_list_response.dart';
 export 'package:openapi/src/model/response_get_metrics_system_metrics_get.dart';
 export 'package:openapi/src/model/scheduled_task_response.dart';
 export 'package:openapi/src/model/site.dart';

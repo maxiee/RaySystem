@@ -21,6 +21,10 @@ import 'package:openapi/src/model/info_response.dart';
 import 'package:openapi/src/model/info_stats.dart';
 import 'package:openapi/src/model/memory_metrics.dart';
 import 'package:openapi/src/model/network_metrics.dart';
+import 'package:openapi/src/model/note_create.dart';
+import 'package:openapi/src/model/note_response.dart';
+import 'package:openapi/src/model/note_update.dart';
+import 'package:openapi/src/model/notes_list_response.dart';
 import 'package:openapi/src/model/response_get_metrics_system_metrics_get.dart';
 import 'package:openapi/src/model/scheduled_task_response.dart';
 import 'package:openapi/src/model/site.dart';
@@ -40,6 +44,10 @@ part 'serializers.g.dart';
   InfoStats,
   MemoryMetrics,
   NetworkMetrics,
+  NoteCreate,
+  NoteResponse,
+  NoteUpdate,
+  NotesListResponse,
   ResponseGetMetricsSystemMetricsGet,
   ScheduledTaskResponse,
   Site,
