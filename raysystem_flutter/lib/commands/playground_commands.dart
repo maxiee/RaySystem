@@ -92,14 +92,35 @@ final playgroundCommands = Command(
       icon: Icons.edit_document,
       callback: (context, cardManager) {
         final editorState = EditorState.blank();
+        final editorScrollController =
+            EditorScrollController(editorState: editorState);
         cardManager.addCard(
           Container(
             padding: const EdgeInsets.all(8.0),
             height: 400,
             width: double.infinity,
-            child: AppFlowyEditor(
+            child: FloatingToolbar(
+              items: [
+                paragraphItem,
+                ...headingItems,
+                ...markdownFormatItems,
+                quoteItem,
+                bulletedListItem,
+                numberedListItem,
+                linkItem,
+                buildTextColorItem(),
+                buildHighlightColorItem(),
+                ...textDirectionItems,
+                ...alignmentItems
+              ],
+              textDirection: TextDirection.ltr,
               editorState: editorState,
-              shrinkWrap: true,
+              editorScrollController: editorScrollController,
+              child: AppFlowyEditor(
+                editorState: editorState,
+                editorScrollController: editorScrollController,
+                shrinkWrap: true,
+              ),
             ),
           ),
         );
