@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:one_clock/one_clock.dart';
 import 'package:raysystem_flutter/api/api.dart'; // 添加这一行
 import 'package:raysystem_flutter/commands/command.dart';
+import 'package:raysystem_flutter/component/note_tree_card.dart'; // Import the note tree card
 import 'package:raysystem_flutter/form/form_field.dart';
 import 'package:raysystem_flutter/form/form_manager.dart';
 import 'package:appflowy_editor/appflowy_editor.dart';
@@ -121,6 +122,42 @@ final playgroundCommands = Command(
                 editorScrollController: editorScrollController,
                 shrinkWrap: true,
               ),
+            ),
+          ),
+        );
+      },
+    ),
+    // Add new command for note tree explorer
+    Command(
+      command: 'note-tree-explorer',
+      title: '笔记目录树',
+      icon: Icons.account_tree,
+      callback: (context, cardManager) async {
+        final result = await FormManager.showForm(
+          context: context,
+          title: '选择笔记树样式',
+          fields: [
+            RSFormField(
+              label: '树视图样式',
+              id: 'style',
+              type: FieldType.dropdown,
+              options: ['经典树视图 (连接线)', '简约树视图'],
+              defaultValue: '经典树视图 (连接线)',
+            ),
+          ],
+        );
+
+        if (result == null) {
+          return;
+        }
+
+        bool useClassicStyle = result['style'] == '经典树视图 (连接线)';
+
+        cardManager.addCard(
+          SizedBox(
+            height: 400,
+            child: NoteTreeCard(
+              useClassicStyle: useClassicStyle,
             ),
           ),
         );
