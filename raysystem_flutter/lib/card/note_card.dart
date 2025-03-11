@@ -23,6 +23,7 @@ class NoteCard extends StatefulWidget {
 class _NoteCardState extends State<NoteCard> {
   late TextEditingController _titleController;
   EditorState? _editorState;
+  EditorScrollController? _editorScrollController;
   bool _isNew = false;
   bool _isLoading = true;
   bool _isSaving = false;
@@ -90,10 +91,10 @@ class _NoteCardState extends State<NoteCard> {
     // 如果没有现有笔记，则从 API 获取
     try {
       await notesProvider.fetchNote(_currentNoteId!);
-      
+
       // 再次检查组件是否还挂载
       if (!mounted) return;
-      
+
       // 检查笔记是否加载成功
       final loadedNote = notesProvider.getNoteById(_currentNoteId!);
       if (loadedNote != null) {
@@ -131,6 +132,8 @@ class _NoteCardState extends State<NoteCard> {
             }
           : {'document': jsonDecode(note.contentAppflowy)});
       _editorState = EditorState(document: document);
+      _editorScrollController =
+          EditorScrollController(editorState: _editorState!);
     } catch (e) {
       debugPrint('Error parsing note content: $e');
       _initializeEmptyEditor();
@@ -140,6 +143,8 @@ class _NoteCardState extends State<NoteCard> {
   void _initializeEmptyEditor() {
     // 避免使用 Document.empty()，直接创建一个最基本的空文档
     _editorState = EditorState.blank();
+    _editorScrollController =
+        EditorScrollController(editorState: _editorState!);
   }
 
   Future<void> _saveNote() async {
@@ -267,12 +272,38 @@ class _NoteCardState extends State<NoteCard> {
         ),
         const Divider(),
         Expanded(
-          child: _editorState != null
-              ? AppFlowyEditor(
-                  editorState: _editorState!,
-                  editable: widget.isEditable,
-                  shrinkWrap: false,
-                )
+          child: _editorState != null && _editorScrollController != null
+              ? widget.isEditable
+                  ? FloatingToolbar(
+                      items: [
+                        paragraphItem,
+                        ...headingItems,
+                        ...markdownFormatItems,
+                        quoteItem,
+                        bulletedListItem,
+                        numberedListItem,
+                        linkItem,
+                        buildTextColorItem(),
+                        buildHighlightColorItem(),
+                        ...textDirectionItems,
+                        ...alignmentItems
+                      ],
+                      textDirection: TextDirection.ltr,
+                      editorState: _editorState!,
+                      editorScrollController: _editorScrollController!,
+                      child: AppFlowyEditor(
+                        editorState: _editorState!,
+                        editorScrollController: _editorScrollController,
+                        editable: widget.isEditable,
+                        shrinkWrap: false,
+                      ),
+                    )
+                  : AppFlowyEditor(
+                      editorState: _editorState!,
+                      editorScrollController: _editorScrollController,
+                      editable: widget.isEditable,
+                      shrinkWrap: false,
+                    )
               : const Center(child: CircularProgressIndicator()),
         ),
         if (widget.isEditable)
