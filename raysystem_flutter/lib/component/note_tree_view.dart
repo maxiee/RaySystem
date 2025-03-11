@@ -388,7 +388,16 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
                     ),
                   )
                 else
-                  SizedBox(width: 16),
+                  CustomPaint(
+                    size: const Size(16, 24),
+                    painter: DashedLinePainter(
+                      isVertical: false,
+                      strokeWidth: 0.8,
+                      color: Colors.grey[400]!,
+                      dashWidth: 1,
+                      dashSpace: 2,
+                    ),
+                  ),
 
                 const SizedBox(width: 4),
 
