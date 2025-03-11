@@ -311,106 +311,284 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
         height: 24, // Keep compact
         color:
             isSelected ? Theme.of(context).highlightColor : Colors.transparent,
-        child: Row(
+        child: Stack(
           children: [
-            // Draw tree lines for each level
-            ...List.generate(isLast.length, (index) {
-              return SizedBox(
-                width: 16,
-                child: isLast[index]
-                    ? Container() // No vertical line if it's the last item
-                    : Center(
-                        child: Container(
-                          width: 1,
-                          height: 24,
-                          color: Colors.grey[400],
+            // Draw connecting lines
+            Positioned.fill(
+              child: Row(
+                children: [
+                  // Draw tree lines for each level
+                  ...List.generate(isLast.length, (index) {
+                    // Indentation for each level
+                    return SizedBox(
+                      width: 16,
+                      child: isLast[index]
+                          ? const SizedBox() // No vertical line if it's the last item
+                          : CustomPaint(
+                              size: const Size(16, 24),
+                              painter: DashedLinePainter(
+                                isVertical: true,
+                                dashWidth: 1,
+                                dashSpace: 2,
+                                strokeWidth: 0.8,
+                                color: Colors.grey[400]!,
+                              ),
+                            ),
+                    );
+                  }),
+
+                  // Draw the branch line (horizontal + vertical)
+                  SizedBox(
+                    width: 16,
+                    child: CustomPaint(
+                      size: const Size(16, 24),
+                      painter: BranchLinePainter(
+                        isLastItem: isLastInLevel,
+                        strokeWidth: 0.8,
+                        color: Colors.grey[400]!,
+                        isDashed: true,
+                        dashWidth: 1,
+                        dashSpace: 2,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Draw content (folder/file icon and name)
+            Row(
+              children: [
+                // Space for indentation levels
+                SizedBox(width: 16.0 * isLast.length),
+
+                // Space for the branch connection
+                const SizedBox(width: 16),
+
+                // Expand/Collapse button for folders
+                if (item.isFolder)
+                  GestureDetector(
+                    onTap: () => _toggleExpand(item),
+                    child: Container(
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.grey[400]!,
+                          width: 0.8,
                         ),
                       ),
-              );
-            }),
+                      child: Center(
+                        child: Icon(
+                          item.isExpanded ? Icons.remove : Icons.add,
+                          size: 12.0,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  SizedBox(width: 16),
 
-            // The connection line to the current node
-            SizedBox(
-              width: 16,
-              child: Center(
-                child: Row(
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 1,
-                      color: Colors.grey[400],
-                    ),
-                    Expanded(
-                      child: isLastInLevel
-                          ? Container(
-                              height: 12,
-                              width: 1,
-                              color: Colors.grey[400],
-                            )
-                          : Container(
-                              height: 24,
-                              width: 1,
-                              color: Colors.grey[400],
-                            ),
-                    ),
-                  ],
+                const SizedBox(width: 4),
+
+                // Icon
+                Icon(
+                  item.icon ??
+                      (item.isFolder
+                          ? (item.isExpanded ? Icons.folder_open : Icons.folder)
+                          : Icons.description),
+                  size: 16,
+                  color: item.isFolder ? Colors.amber[700] : Colors.blue[700],
                 ),
-              ),
-            ),
 
-            // Expand/Collapse button for folders
-            if (item.isFolder)
-              GestureDetector(
-                onTap: () => _toggleExpand(item),
-                child: Container(
-                  width: 16,
-                  height: 16,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey[400]!,
-                      width: 1,
+                const SizedBox(width: 4),
+
+                // Item name
+                Expanded(
+                  child: Text(
+                    item.name,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      item.isExpanded ? Icons.remove : Icons.add,
-                      size: 12.0,
-                      color: Colors.grey[800],
-                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              )
-            else
-              SizedBox(width: 16),
-
-            const SizedBox(width: 4),
-
-            // Icon
-            Icon(
-              item.icon ??
-                  (item.isFolder
-                      ? (item.isExpanded ? Icons.folder_open : Icons.folder)
-                      : Icons.description),
-              size: 16,
-              color: item.isFolder ? Colors.amber[700] : Colors.blue[700],
-            ),
-
-            const SizedBox(width: 4),
-
-            // Item name
-            Expanded(
-              child: Text(
-                item.name,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
+              ],
             ),
           ],
         ),
       ),
     );
   }
+}
+
+/// Custom painter to draw dashed lines
+class DashedLinePainter extends CustomPainter {
+  final bool isVertical;
+  final double dashWidth;
+  final double dashSpace;
+  final double strokeWidth;
+  final Color color;
+
+  DashedLinePainter({
+    required this.isVertical,
+    required this.dashWidth,
+    required this.dashSpace,
+    required this.strokeWidth,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    double start = 0;
+    final totalLength = isVertical ? size.height : size.width;
+    final dashLength = dashWidth + dashSpace;
+
+    while (start < totalLength) {
+      // Draw a small dash
+      double end = start + dashWidth;
+      if (end > totalLength) end = totalLength;
+
+      if (isVertical) {
+        canvas.drawLine(
+            Offset(size.width / 2, start), Offset(size.width / 2, end), paint);
+      } else {
+        canvas.drawLine(Offset(start, size.height / 2),
+            Offset(end, size.height / 2), paint);
+      }
+
+      start = start + dashLength;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// Custom painter for the branch lines (L-shaped connection)
+class BranchLinePainter extends CustomPainter {
+  final bool isLastItem;
+  final double strokeWidth;
+  final Color color;
+  final bool isDashed;
+  final double dashWidth;
+  final double dashSpace;
+
+  BranchLinePainter({
+    required this.isLastItem,
+    required this.strokeWidth,
+    required this.color,
+    this.isDashed = true,
+    this.dashWidth = 1,
+    this.dashSpace = 2,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    // Draw horizontal line from middle to right
+    if (isDashed) {
+      // Draw dashed horizontal line
+      double startX = size.width / 2; // Start from middle
+      double endX = size.width; // Go all the way to the right
+      double y = size.height / 2;
+
+      double current = startX;
+      while (current < endX) {
+        double dashEnd = current + dashWidth;
+        if (dashEnd > endX) dashEnd = endX;
+
+        canvas.drawLine(
+          Offset(current, y),
+          Offset(dashEnd, y),
+          paint,
+        );
+
+        current = current + dashWidth + dashSpace;
+      }
+    } else {
+      // Solid line from middle to right
+      canvas.drawLine(
+        Offset(size.width / 2, size.height / 2),
+        Offset(size.width, size.height / 2),
+        paint,
+      );
+    }
+
+    // Vertical line
+    if (isLastItem) {
+      // Draw only half-height vertical line if it's the last item
+      if (isDashed) {
+        // Draw dashed vertical line
+        double startY = 0;
+        double endY = size.height / 2;
+        double x = size.width / 2;
+
+        double current = startY;
+        while (current < endY) {
+          double dashEnd = current + dashWidth;
+          if (dashEnd > endY) dashEnd = endY;
+
+          canvas.drawLine(
+            Offset(x, current),
+            Offset(x, dashEnd),
+            paint,
+          );
+
+          current = current + dashWidth + dashSpace;
+        }
+      } else {
+        // Solid vertical line
+        canvas.drawLine(
+          Offset(size.width / 2, 0),
+          Offset(size.width / 2, size.height / 2),
+          paint,
+        );
+      }
+    } else {
+      // Draw full-height vertical line
+      if (isDashed) {
+        // Draw dashed vertical line
+        double startY = 0;
+        double endY = size.height;
+        double x = size.width / 2;
+
+        double current = startY;
+        while (current < endY) {
+          double dashEnd = current + dashWidth;
+          if (dashEnd > endY) dashEnd = endY;
+
+          canvas.drawLine(
+            Offset(x, current),
+            Offset(x, dashEnd),
+            paint,
+          );
+
+          current = current + dashWidth + dashSpace;
+        }
+      } else {
+        // Solid vertical line
+        canvas.drawLine(
+          Offset(size.width / 2, 0),
+          Offset(size.width / 2, size.height),
+          paint,
+        );
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
