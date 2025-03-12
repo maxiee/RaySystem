@@ -20,7 +20,7 @@ class TestNoteHierarchy:
                 # 如果parent_id存在，确认它是有效的
                 if parent_id is not None:
                     parent_note = await self.get_note_by_id(parent_id, test_session)
-                    if parent_note is None:
+                    if (parent_note is None):
                         raise ValueError(f"Parent note with ID {parent_id} does not exist")
                     
                     # 检查是否会创建循环引用
@@ -35,6 +35,11 @@ class TestNoteHierarchy:
                     updated_at=datetime.now()
                 )
                 test_session.add(note)
+                
+                # 刷新父节点以确保关系正确建立
+                if parent_id is not None:
+                    await test_session.refresh(parent_note)
+                    
                 await test_session.commit()
                 await test_session.refresh(note)
                 return note
@@ -43,9 +48,10 @@ class TestNoteHierarchy:
                 result = await test_session.execute(
                     select(Note)
                     .filter(Note.id == note_id)
-                    .options(joinedload(Note.children))
+                    .options(joinedload(Note.children).joinedload(Note.children))  # 递归加载子节点
                 )
-                return result.unique().scalars().first()
+                note = result.unique().scalars().first()
+                return note
                 
             async def move_note(self, note_id, new_parent_id=None):
                 note = await self.get_note_by_id(note_id)
@@ -68,18 +74,24 @@ class TestNoteHierarchy:
                 return note
                 
             async def delete_note(self, note_id):
-                note = await self.get_note_by_id(note_id)
+                # 获取包含所有子节点的笔记
+                note = await test_session.execute(
+                    select(Note)
+                    .filter(Note.id == note_id)
+                    .options(joinedload(Note.children).joinedload(Note.children))  # 递归加载所有层级的子节点
+                )
+                note = note.unique().scalars().first()
+                
                 if not note:
                     return False
-                
-                # 首先递归删除所有子节点
-                children = list(note.children)  # Make a copy to avoid modifying during iteration
-                for child in children:
+
+                # 递归删除所有子节点
+                for child in note.children:
                     await self.delete_note(child.id)
-                
-                # 然后删除当前节点
+
+                # 删除当前节点
                 await test_session.delete(note)
-                await test_session.commit()
+                await test_session.commit()  # 直接提交，不需要flush
                 return True
                 
             async def get_child_notes(self, parent_id=None, limit=50, offset=0):
@@ -291,8 +303,12 @@ class TestNoteHierarchy:
             parent_id=child1.id
         )
         
+        # Store IDs before moving
+        child1_id = child1.id
+        grandchild_id = grandchild.id
+        
         # 现在移动 child1 到 root2 下
-        moved_child = await note_manager.move_note(child1.id, root2.id)
+        moved_child = await note_manager.move_note(child1_id, root2.id)
         
         # 验证移动是否成功
         assert moved_child.parent_id == root2.id
@@ -308,16 +324,20 @@ class TestNoteHierarchy:
         )
         updated_root2 = updated_root2.unique().scalars().first()
         
-        updated_grandchild = await note_manager.get_note_by_id(grandchild.id)
+        # Get a fresh instance of grandchild
+        updated_grandchild = await test_session.execute(
+            select(Note).filter(Note.id == grandchild_id)
+        )
+        updated_grandchild = updated_grandchild.unique().scalars().first()
         
         # 检查层级关系是否正确更新
         assert len(updated_root1.children) == 0
         assert len(updated_root2.children) == 1
-        assert updated_root2.children[0].id == child1.id
+        assert updated_root2.children[0].id == child1_id
         
         # 确保孙节点的父节点关系不变
-        assert updated_grandchild.parent_id == child1.id
-        
+        assert updated_grandchild.parent_id == child1_id
+
     @pytest.mark.asyncio
     async def test_move_to_root(self, note_manager, test_session):
         """测试将笔记移动到根级别"""
@@ -421,44 +441,49 @@ class TestNoteHierarchy:
     @pytest.mark.asyncio
     async def test_delete_cascade(self, note_manager, test_session):
         """测试删除笔记时级联删除子笔记"""
-        # 创建一个层级结构
+        # 创建一个层级结构并保存ID
         root = await note_manager.create_note(
             title="Root to Delete",
             content_appflowy="Root content"
         )
+        root_id = root.id
         
         child1 = await note_manager.create_note(
             title="Child 1",
             content_appflowy="Child 1 content",
-            parent_id=root.id
+            parent_id=root_id
         )
+        child1_id = child1.id
         
         child2 = await note_manager.create_note(
             title="Child 2",
             content_appflowy="Child 2 content",
-            parent_id=root.id
+            parent_id=root_id
         )
+        child2_id = child2.id
         
         grandchild = await note_manager.create_note(
             title="Grandchild",
             content_appflowy="Grandchild content",
-            parent_id=child1.id
+            parent_id=child1_id
         )
+        grandchild_id = grandchild.id
         
-        # 显式加载子节点进行级联删除
-        root_with_children = await test_session.execute(
-            select(Note).filter(Note.id == root.id).options(joinedload(Note.children))
+        # 获取需要删除的节点
+        root = await test_session.execute(
+            select(Note).filter(Note.id == root_id)
+            .options(joinedload(Note.children))
         )
-        root_with_children = root_with_children.unique().scalars().first()
+        root = root.unique().scalars().first()
         
         # 删除根节点
-        await note_manager.delete_note(root.id)
+        await note_manager.delete_note(root_id)
         
         # 验证整个层级结构都被删除
         result = await test_session.execute(
-            select(Note).where(Note.id.in_([root.id, child1.id, child2.id, grandchild.id]))
+            select(Note).where(Note.id.in_([root_id, child1_id, child2_id, grandchild_id]))
         )
-        remaining_notes = result.scalars().all()
+        remaining_notes = result.unique().scalars().all()
         assert len(remaining_notes) == 0
             
     @pytest.mark.asyncio

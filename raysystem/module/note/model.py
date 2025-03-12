@@ -9,6 +9,11 @@ class Note(Base):
     """
     __tablename__ = "note"
     
+    # Disable delete row confirmation warning
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }
+    
     # Note ID (primary key)
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     
