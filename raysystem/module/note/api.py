@@ -1,10 +1,11 @@
 from fastapi import FastAPI, HTTPException, Query
-from typing import List, Optional
+from typing import List, Optional, cast
 from pydantic import BaseModel
 from datetime import datetime
 
 from module.http.http import APP
 from module.note.note import kNoteManager
+from module.note.model import Note
 
 # --- Schema definitions ---
 
@@ -30,6 +31,10 @@ class NotesListResponse(BaseModel):
     total: int
     items: List[NoteResponse]
 
+# Helper function to convert SQLAlchemy Note objects to NoteResponse Pydantic models
+def convert_notes_to_response(notes: List[Note]) -> List[NoteResponse]:
+    return [NoteResponse.model_validate(note) for note in notes]
+
 # --- API endpoints ---
 
 @APP.post("/notes/", response_model=NoteResponse, tags=["notes"])
@@ -38,7 +43,7 @@ async def create_note(note: NoteCreate):
     Create a new note with title and AppFlowy editor content
     """
     result = await kNoteManager.create_note(note.title, note.content_appflowy)
-    return result
+    return NoteResponse.model_validate(result)
 
 @APP.get("/notes/{note_id}", response_model=NoteResponse, tags=["notes"])
 async def get_note(note_id: int):
@@ -48,7 +53,7 @@ async def get_note(note_id: int):
     note = await kNoteManager.get_note_by_id(note_id)
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
-    return note
+    return NoteResponse.model_validate(note)
 
 @APP.put("/notes/{note_id}", response_model=NoteResponse, tags=["notes"])
 async def update_note(note_id: int, note: NoteUpdate):
@@ -58,7 +63,7 @@ async def update_note(note_id: int, note: NoteUpdate):
     updated_note = await kNoteManager.update_note(note_id, note.title, note.content_appflowy)
     if not updated_note:
         raise HTTPException(status_code=404, detail="Note not found")
-    return updated_note
+    return NoteResponse.model_validate(updated_note)
 
 @APP.delete("/notes/{note_id}", response_model=bool, tags=["notes"])
 async def delete_note(note_id: int):
@@ -80,7 +85,8 @@ async def list_recent_notes(
     """
     notes = await kNoteManager.get_recently_updated_notes(limit, offset)
     total = await kNoteManager.get_total_notes_count()
-    return NotesListResponse(total=total, items=notes)
+    response_notes = convert_notes_to_response(notes)
+    return NotesListResponse(total=total, items=response_notes)
 
 @APP.get("/notes/search", response_model=NotesListResponse, tags=["notes"])
 async def search_notes(
@@ -95,7 +101,8 @@ async def search_notes(
     # We could optimize this by implementing a count query, but for simplicity 
     # we'll just get all matched notes for now
     total = len(notes) + offset if offset > 0 else len(notes) 
-    return NotesListResponse(total=total, items=notes)
+    response_notes = convert_notes_to_response(notes)
+    return NotesListResponse(total=total, items=response_notes)
 
 def init_note_api():
     """Initialize note API endpoints"""
