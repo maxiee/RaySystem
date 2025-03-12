@@ -1,4 +1,5 @@
 // Openapi Generator last run: : 2025-03-10T22:06:48.535618
+import 'dart:io';
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
 import 'package:openapi/openapi.dart' as generatedAPI;
 
@@ -10,10 +11,16 @@ import 'package:openapi/openapi.dart' as generatedAPI;
     skipIfSpecIsUnchanged: false)
 class API {}
 
+// 获取API基础URL，优先从环境变量获取，否则使用默认地址
+String getBaseUrl() {
+  return Platform.environment['RAYSYSTEM_API_BASE_URL'] ??
+      'http://127.0.0.1:8000';
+}
+
 final api = generatedAPI.Openapi(
-  basePathOverride: 'http://127.0.0.1:8000',
+  basePathOverride: getBaseUrl(),
 ).getDefaultApi();
 
 final notesApi = generatedAPI.Openapi(
-  basePathOverride: 'http://127.0.0.1:8000',
+  basePathOverride: getBaseUrl(),
 ).getNotesApi();
