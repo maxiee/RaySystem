@@ -307,6 +307,7 @@ class TestNoteHierarchy:
             parent_id=child1_id
         )
         grandchild_id = grandchild.id
+        print(f"child1_id: {child1_id}, grandchild_id: {grandchild_id}")
         
         # 获取需要删除的节点
         result = await test_session.execute(
@@ -317,6 +318,7 @@ class TestNoteHierarchy:
         
         # 删除 child1 节点
         await note_manager.delete_note(child1_id)
+        await test_session.flush()  # 确保变更被刷新到数据库
         
         # 验证 child1 被删除
         result = await test_session.execute(
@@ -335,6 +337,7 @@ class TestNoteHierarchy:
         
         # 删除根节点
         await note_manager.delete_note(root_id)
+        await test_session.flush()  # 确保变更被刷新到数据库
         
         # 验证根节点被删除
         result = await test_session.execute(
