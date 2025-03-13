@@ -278,8 +278,9 @@ class TestNoteHierarchy:
         assert path[2].id == grandchild.id
         
     @pytest.mark.asyncio
-    async def test_delete_cascade(self, note_manager, test_session):
+    async def test_delete_cascade(self, test_session):
         """测试删除笔记时将子笔记重新分配给祖父级"""
+        note_manager = NoteManager(test_session)
         # 创建一个层级结构并保存ID
         root = await note_manager.create_note(
             title="Root to Delete",
@@ -310,47 +311,33 @@ class TestNoteHierarchy:
         print(f"child1_id: {child1_id}, grandchild_id: {grandchild_id}")
         
         # 获取需要删除的节点
-        result = await test_session.execute(
-            select(Note).filter(Note.id == child1_id)
-            .options(joinedload(Note.children))
-        )
-        child1 = result.scalars().first()
+        child1 = await note_manager.get_note_by_id(child1_id)
         
+        print('=========start delete===========')
         # 删除 child1 节点
         await note_manager.delete_note(child1_id)
-        await test_session.flush()  # 确保变更被刷新到数据库
+        print('==========end delete==========')
         
         # 验证 child1 被删除
-        result = await test_session.execute(
-            select(Note).filter(Note.id == child1_id)
-        )
-        deleted_note = result.scalars().first()
+        deleted_note = await note_manager.get_note_by_id(child1_id)
         assert deleted_note is None
         
         # 验证 grandchild 仍然存在，但被重新指向 root
-        result = await test_session.execute(
-            select(Note).filter(Note.id == grandchild_id)
-        )
-        updated_grandchild = result.scalars().first()
+        updated_grandchild = await note_manager.get_note_by_id(grandchild_id)
         assert updated_grandchild is not None
         assert updated_grandchild.parent_id == root_id
         
         # 删除根节点
         await note_manager.delete_note(root_id)
-        await test_session.flush()  # 确保变更被刷新到数据库
         
         # 验证根节点被删除
-        result = await test_session.execute(
-            select(Note).filter(Note.id == root_id)
-        )
-        deleted_root = result.scalars().first()
+        deleted_root = await note_manager.get_note_by_id(root_id)
         assert deleted_root is None
         
         # 验证 child2 和 grandchild 仍然存在，但现在是根节点
-        result = await test_session.execute(
-            select(Note).filter(Note.id.in_([child2_id, grandchild_id]))
-        )
-        remaining_notes = result.scalars().all()
+        remaining_notes = []
+        remaining_notes.append(await note_manager.get_note_by_id(child2_id))
+        remaining_notes.append(await note_manager.get_note_by_id(grandchild_id))
         assert len(remaining_notes) == 2
         
         for note in remaining_notes:

@@ -52,12 +52,12 @@ async def test_session_maker(test_engine):
     )
     return async_session
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="session")
 async def test_session(test_session_maker) -> AsyncGenerator[AsyncSession, None]:
     """创建测试会话"""
     async with test_session_maker() as session:
         yield session
-        await session.rollback()
+        # await session.rollback()
 
 @pytest_asyncio.fixture
 async def async_client(app: FastAPI, test_session_maker) -> AsyncGenerator[AsyncClient, None]:

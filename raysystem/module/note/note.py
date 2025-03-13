@@ -140,18 +140,21 @@ class NoteManager:
                 
             # Store grandparent_id (which could be None for root notes)
             grandparent_id = note.parent_id
+
+            # Now delete the note
+            await session.delete(note)
+            await session.flush()
             
             # Reparent all children to the grandparent
             if note.children:
                 for child in note.children:
                     child.parent_id = grandparent_id
                     child.updated_at = datetime.now()
-                
+                                
                 # Flush to ensure children are updated before deleting parent
                 await session.flush()
             
-            # Now delete the note
-            await session.delete(note)
+            
             await session.commit()
             return True
     
