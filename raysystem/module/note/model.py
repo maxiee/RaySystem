@@ -9,11 +9,6 @@ class Note(Base):
     """
     __tablename__ = "note"
     
-    # Disable delete row confirmation warning
-    __mapper_args__ = {
-        'confirm_deleted_rows': False
-    }
-    
     # Note ID (primary key)
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     
@@ -27,9 +22,9 @@ class Note(Base):
     parent_id: Mapped[int | None] = mapped_column(ForeignKey("note.id"), nullable=True, index=True)
     
     # Relationship with parent and children
-    children = relationship("Note", 
-                           backref=backref("parent", remote_side=[id]),
-                           cascade="all, delete-orphan")
+    # 不指定cascade参数，默认就是save-update, merge, refresh-expire
+    # 显式不包含delete和delete-orphan，这样删除父节点时不会自动删除子节点
+    children = relationship("Note", backref=backref("parent", remote_side=[id]))
     
     # Note creation timestamp
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)

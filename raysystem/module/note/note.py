@@ -3,7 +3,6 @@ from typing import List, Optional, Tuple
 from sqlalchemy import select, or_, desc, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-
 from module.db.db import db_async_session
 from module.note.model import Note
 
@@ -11,6 +10,12 @@ class NoteManager:
     """
     Manages CRUD operations for notes
     """
+
+    def __init__(self, session: Optional[AsyncSession] = None):
+        """
+        Initialize NoteManager with an optional session
+        """
+        self.session = session or db_async_session()
     
     async def create_note(self, title: str, content_appflowy: str, parent_id: Optional[int] = None) -> Note:
         """
@@ -24,15 +29,15 @@ class NoteManager:
         Returns:
             The newly created Note object
         """
-        async with db_async_session() as session:
+        async with self.session as session:
             # If parent_id is provided, verify it exists
             if parent_id is not None:
-                parent_note = await self.get_note_by_id(parent_id, session)
+                parent_note = await self.get_note_by_id(parent_id)
                 if parent_note is None:
                     raise ValueError(f"Parent note with ID {parent_id} does not exist")
                 
                 # Check for circular reference (though this should be impossible for a new note)
-                if await self._would_create_cycle(None, parent_id, session):
+                if await self._would_create_cycle(None, parent_id):
                     raise ValueError("Cannot create note: would create circular reference")
             
             note = Note(
@@ -64,14 +69,14 @@ class NoteManager:
         Returns:
             Updated Note object or None if note doesn't exist
         """
-        async with db_async_session() as session:
-            note = await self.get_note_by_id(note_id, session)
+        async with self.session as session:
+            note = await self.get_note_by_id(note_id)
             if not note:
                 return None
             
             # Check if parent_id would create a circular reference
             if parent_id is not None and parent_id != note.parent_id:
-                if await self._would_create_cycle(note_id, parent_id, session):
+                if await self._would_create_cycle(note_id, parent_id):
                     raise ValueError("Cannot update note: would create circular reference")
                 
             note.title = title
@@ -86,7 +91,7 @@ class NoteManager:
             await session.refresh(note)
             return note
     
-    async def get_note_by_id(self, note_id: int, session: Optional[AsyncSession] = None) -> Optional[Note]:
+    async def get_note_by_id(self, note_id: int) -> Optional[Note]:
         """
         Retrieve a note by its ID
         
@@ -97,15 +102,7 @@ class NoteManager:
         Returns:
             Note object or None if not found
         """
-        if session:
-            result = await session.execute(
-                select(Note)
-                .filter(Note.id == note_id)
-                .options(joinedload(Note.children))
-            )
-            return result.scalars().first()
-        
-        async with db_async_session() as session:
+        async with self.session as session:
             result = await session.execute(
                 select(Note)
                 .filter(Note.id == note_id)
@@ -115,19 +112,45 @@ class NoteManager:
     
     async def delete_note(self, note_id: int) -> bool:
         """
-        Delete a note by its ID (will also delete all child notes due to cascade)
+        Delete a note by its ID and reassign its children to the deleted note's parent.
+        
+        When a note is deleted:
+        1. If it has children, all children will be moved to have the same parent as the deleted note
+           (or become root notes if the deleted note was a root note)
+        2. This ensures no child notes are orphaned or deleted when deleting a parent note
         
         Args:
             note_id: ID of the note to delete
+            session: Optional database session to use
             
         Returns:
             True if note was deleted, False if note wasn't found
         """
-        async with db_async_session() as session:
-            note = await self.get_note_by_id(note_id, session)
+        async with self.session as session:
+            # Get note with its children
+            result = await session.execute(
+                select(Note)
+                .filter(Note.id == note_id)
+                .options(joinedload(Note.children))
+            )
+            note = result.scalars().first()
+            
             if not note:
                 return False
                 
+            # Store grandparent_id (which could be None for root notes)
+            grandparent_id = note.parent_id
+            
+            # Reparent all children to the grandparent
+            if note.children:
+                for child in note.children:
+                    child.parent_id = grandparent_id
+                    child.updated_at = datetime.now()
+                
+                # Flush to ensure children are updated before deleting parent
+                await session.flush()
+            
+            # Now delete the note
             await session.delete(note)
             await session.commit()
             return True
@@ -140,11 +163,12 @@ class NoteManager:
             search_term: Term to search for in note titles
             limit: Maximum number of results to return
             offset: Number of results to skip (for pagination)
+            session: Optional database session to use
             
         Returns:
             List of matching Note objects
         """
-        async with db_async_session() as session:
+        async with self.session as session:
             result = await session.execute(
                 select(Note)
                 .filter(Note.title.ilike(f"%{search_term}%"))
@@ -161,11 +185,12 @@ class NoteManager:
         Args:
             limit: Maximum number of results to return
             offset: Number of results to skip (for pagination)
+            session: Optional database session to use
             
         Returns:
             List of Note objects ordered by update time (newest first)
-        """
-        async with db_async_session() as session:
+        """        
+        async with self.session as session:
             result = await session.execute(
                 select(Note)
                 .order_by(desc(Note.updated_at))
@@ -182,7 +207,7 @@ class NoteManager:
         Returns:
             Total number of notes
         """
-        async with db_async_session() as session:
+        async with self.session as session:
             result = await session.execute(select(func.count()).select_from(Note))
             return result.scalar_one()
     
@@ -199,11 +224,12 @@ class NoteManager:
             parent_id: ID of the parent note, or None to get root notes
             limit: Maximum number of results to return
             offset: Number of results to skip (for pagination)
+            session: Optional database session to use
             
         Returns:
             List of child Note objects
         """
-        async with db_async_session() as session:
+        async with self.session as session:
             query = select(Note).options(joinedload(Note.children))
             
             # If parent_id is None, get notes without parent (root notes)
@@ -217,7 +243,7 @@ class NoteManager:
                 .limit(limit)
                 .offset(offset)
             )
-            return list(result.scalars().all())
+            return list(result.unique().scalars().all())
     
     async def get_child_notes_count(self, parent_id: Optional[int] = None) -> int:
         """
@@ -225,11 +251,12 @@ class NoteManager:
         
         Args:
             parent_id: ID of the parent note, or None to get root notes count
+            session: Optional database session to use
             
         Returns:
             Count of child notes
-        """
-        async with db_async_session() as session:
+        """        
+        async with self.session as session:
             query = select(func.count()).select_from(Note)
             
             # If parent_id is None, count notes without parent (root notes)
@@ -248,12 +275,13 @@ class NoteManager:
         Args:
             note_id: ID of the note to move
             new_parent_id: ID of the new parent, or None to move to root level
+            session: Optional database session to use
             
         Returns:
             Updated Note object or None if note doesn't exist
         """
-        async with db_async_session() as session:
-            note = await self.get_note_by_id(note_id, session)
+        async with self.session as session:
+            note = await self.get_note_by_id(note_id)
             if not note:
                 return None
             
@@ -262,7 +290,7 @@ class NoteManager:
                 return note
             
             # Check if new_parent_id would create a circular reference
-            if new_parent_id is not None and await self._would_create_cycle(note_id, new_parent_id, session):
+            if new_parent_id is not None and await self._would_create_cycle(note_id, new_parent_id):
                 raise ValueError("Cannot move note: would create circular reference")
             
             # Update parent and save
@@ -278,14 +306,15 @@ class NoteManager:
         
         Args:
             note_id: ID of the note to get path for
+            session: Optional database session to use
             
         Returns:
             List of Note objects representing the path, starting from root
         """
         path = []
-        async with db_async_session() as session:
+        async with self.session as session:
             # Start with the requested note
-            current = await self.get_note_by_id(note_id, session)
+            current = await self.get_note_by_id(note_id)
             if not current:
                 return []
             
@@ -294,7 +323,7 @@ class NoteManager:
             
             # Follow parent references up to the root
             while current.parent_id is not None:
-                parent = await self.get_note_by_id(current.parent_id, session)
+                parent = await self.get_note_by_id(current.parent_id)
                 if not parent:  # This shouldn't happen if DB integrity is maintained
                     break
                 
@@ -305,8 +334,7 @@ class NoteManager:
     
     async def _would_create_cycle(self, 
                                  note_id: Optional[int], 
-                                 parent_id: int, 
-                                 session: AsyncSession) -> bool:
+                                 parent_id: int) -> bool:
         """
         Check if setting parent_id for note_id would create a circular reference
         
@@ -342,7 +370,7 @@ class NoteManager:
                 return True
             
             # Get parent of the current note
-            result = await session.execute(
+            result = await self.session.execute(
                 select(Note.parent_id).filter(Note.id == current_id)
             )
             current_id = result.scalar_one_or_none()
