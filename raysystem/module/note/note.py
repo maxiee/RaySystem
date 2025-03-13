@@ -281,7 +281,14 @@ class NoteManager:
             Updated Note object or None if note doesn't exist
         """
         async with self.session as session:
-            note = await self.get_note_by_id(note_id)
+            # Fetch the note directly within this session context
+            result = await session.execute(
+                select(Note)
+                .filter(Note.id == note_id)
+                .options(joinedload(Note.children))
+            )
+            note = result.scalars().first()
+            
             if not note:
                 return None
             
