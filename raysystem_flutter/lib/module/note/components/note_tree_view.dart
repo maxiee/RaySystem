@@ -17,12 +17,12 @@ class NoteTreeViewClassic extends StatefulWidget {
   final MockNoteTreeService? treeService;
 
   const NoteTreeViewClassic({
-    Key? key,
+    super.key,
     this.initialItems,
     this.onItemSelected,
     this.autoLoadInitialData = true,
     this.treeService,
-  }) : super(key: key);
+  });
 
   @override
   State<NoteTreeViewClassic> createState() => _NoteTreeViewClassicState();
