@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:appflowy_editor/appflowy_editor.dart';
 import 'package:openapi/openapi.dart';
-import '../app/providers/notes_provider.dart';
+import '../module/note/providers/notes_provider.dart';
 
 class NoteCard extends StatefulWidget {
   final int? noteId; // Null for a new note

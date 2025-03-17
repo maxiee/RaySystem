@@ -6,7 +6,7 @@ import 'package:raysystem_flutter/commands.dart';
 import 'package:raysystem_flutter/component/status_bar.dart';
 import 'package:raysystem_flutter/component/system_metrics_provider.dart';
 import 'package:raysystem_flutter/api/api.dart';
-import 'package:raysystem_flutter/app/providers/notes_provider.dart';
+import 'package:raysystem_flutter/module/note/providers/notes_provider.dart';
 
 void main() {
   runApp(MultiProvider(

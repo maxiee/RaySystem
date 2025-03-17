@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:raysystem_flutter/card/card_manager.dart';
 import 'package:raysystem_flutter/commands/command.dart';
-import 'package:raysystem_flutter/app/providers/notes_provider.dart';
+import 'package:raysystem_flutter/module/note/providers/notes_provider.dart';
 import 'package:raysystem_flutter/card/note_card.dart';
 import 'package:raysystem_flutter/card/recent_notes_list_card.dart';
 
@@ -54,10 +54,11 @@ final noteCommands = Command(
             ),
           ),
         );
-        
+
         // 在下一帧中安全地加载笔记
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          final notesProvider = Provider.of<NotesProvider>(context, listen: false);
+          final notesProvider =
+              Provider.of<NotesProvider>(context, listen: false);
           notesProvider.loadRecentNotes(refresh: true);
         });
       },
@@ -118,7 +119,8 @@ final noteCommands = Command(
 );
 
 // Helper function to perform search and display results
-void _performSearch(BuildContext context, CardManager cardManager, String query) {
+void _performSearch(
+    BuildContext context, CardManager cardManager, String query) {
   // 安全地添加搜索卡片
   cardManager.addCard(
     SizedBox(
@@ -140,7 +142,7 @@ void _performSearch(BuildContext context, CardManager cardManager, String query)
       ),
     ),
   );
-  
+
   // 在下一帧中安全地执行搜索
   WidgetsBinding.instance.addPostFrameCallback((_) {
     final notesProvider = Provider.of<NotesProvider>(context, listen: false);
@@ -213,7 +215,7 @@ class _SearchResultsList extends StatelessWidget {
 
         // Filter notes by the search query
         final notes = provider.allNotes;
-        
+
         if (notes.isEmpty) {
           return const Center(child: Text('没有找到匹配的笔记'));
         }
@@ -225,7 +227,7 @@ class _SearchResultsList extends StatelessWidget {
           itemBuilder: (context, index) {
             final noteState = notes[index];
             final note = noteState.note;
-            
+
             return ListTile(
               title: Text(
                 note.title,
@@ -244,7 +246,7 @@ class _SearchResultsList extends StatelessWidget {
       },
     );
   }
-  
+
   String _formatDateTime(DateTime dateTime) {
     return '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }

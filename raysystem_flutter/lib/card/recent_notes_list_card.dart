@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import '../app/providers/notes_provider.dart';
+import '../module/note/providers/notes_provider.dart';
 
 class RecentNotesListCard extends StatefulWidget {
   final Function(int noteId)? onNoteTap;
