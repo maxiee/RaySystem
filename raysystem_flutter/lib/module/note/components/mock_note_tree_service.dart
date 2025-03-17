@@ -21,7 +21,11 @@ class MockNoteTreeService {
     _logDebug('Initializing mock data with ${mockData.length} root items');
 
     // Cache root level items
-    _mockTreeCache['root'] = mockData;
+    _mockTreeCache['root'] = mockData
+        .map((item) => item.copyWith(
+              children: [], // Empty children array for lazy loading
+            ))
+        .toList();
 
     // Cache all children by parent ID
     _cacheChildren(mockData);
