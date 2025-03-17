@@ -4,11 +4,8 @@ import 'note_tree_view.dart';
 
 /// A card widget that displays a note tree explorer
 class NoteTreeCard extends StatefulWidget {
-  final bool useClassicStyle;
-
   const NoteTreeCard({
     Key? key,
-    this.useClassicStyle = true,
   }) : super(key: key);
 
   @override
@@ -74,16 +71,10 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
 
           // Tree View
           Expanded(
-            child: widget.useClassicStyle
-                ? NoteTreeViewClassic(
-                    items: _mockItems,
-                    onItemSelected: _handleItemSelected,
-                  )
-                : NoteTreeView(
-                    items: _mockItems,
-                    onItemSelected: _handleItemSelected,
-                  ),
-          ),
+              child: NoteTreeViewClassic(
+            items: _mockItems,
+            onItemSelected: _handleItemSelected,
+          )),
 
           // Actions bar
           Padding(

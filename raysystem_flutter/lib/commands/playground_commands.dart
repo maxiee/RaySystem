@@ -133,32 +133,10 @@ final playgroundCommands = Command(
       title: '笔记目录树',
       icon: Icons.account_tree,
       callback: (context, cardManager) async {
-        final result = await FormManager.showForm(
-          context: context,
-          title: '选择笔记树样式',
-          fields: [
-            RSFormField(
-              label: '树视图样式',
-              id: 'style',
-              type: FieldType.dropdown,
-              options: ['经典树视图 (连接线)', '简约树视图'],
-              defaultValue: '经典树视图 (连接线)',
-            ),
-          ],
-        );
-
-        if (result == null) {
-          return;
-        }
-
-        bool useClassicStyle = result['style'] == '经典树视图 (连接线)';
-
         cardManager.addCard(
           SizedBox(
             height: 400,
-            child: NoteTreeCard(
-              useClassicStyle: useClassicStyle,
-            ),
+            child: NoteTreeCard(),
           ),
         );
       },
