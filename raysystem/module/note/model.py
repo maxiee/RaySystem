@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Integer, String, DateTime, ForeignKey
+from sqlalchemy import Integer, String, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 from module.db.base import Base
 
@@ -20,6 +20,9 @@ class Note(Base):
     
     # Parent note ID for hierarchical structure
     parent_id: Mapped[int | None] = mapped_column(ForeignKey("note.id"), nullable=True, index=True)
+    
+    # Flag indicating if this note has children
+    has_children: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     
     # Relationship with parent and children
     # 不指定cascade参数，默认就是save-update, merge, refresh-expire

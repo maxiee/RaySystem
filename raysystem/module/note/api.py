@@ -47,8 +47,10 @@ def convert_notes_to_response(notes: List[Note]) -> List[NoteResponse]:
 def convert_notes_to_tree_nodes(notes: List[Note], with_has_children: bool = True) -> List[NoteTreeNode]:
     result = []
     for note in notes:
-        has_children = False
-        if with_has_children:
+        # Use the has_children field from the database directly
+        has_children = note.has_children
+        # Only calculate if needed and with_has_children flag is True (for backward compatibility)
+        if with_has_children and not hasattr(note, 'has_children'):
             has_children = len(note.children) > 0
         
         tree_node = NoteTreeNode(
