@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'note_tree_model.dart';
 import 'note_tree_view.dart';
+import 'mock_note_tree_service.dart';
 
 /// A card widget that displays a note tree explorer
 class NoteTreeCard extends StatefulWidget {
@@ -13,14 +14,13 @@ class NoteTreeCard extends StatefulWidget {
 }
 
 class _NoteTreeCardState extends State<NoteTreeCard> {
-  List<NoteTreeItem> _mockItems = [];
   NoteTreeItem? _selectedItem;
 
-  @override
-  void initState() {
-    super.initState();
-    _mockItems = MockNoteTreeData.generateMockData();
-  }
+  // Create a shared instance of the mock service
+  final _noteTreeService = MockNoteTreeService();
+
+  // We no longer need to preload the items, we'll let the tree view handle it
+  bool _isRefreshing = false;
 
   void _handleItemSelected(NoteTreeItem item) {
     setState(() {
@@ -71,10 +71,27 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
 
           // Tree View
           Expanded(
-              child: NoteTreeViewClassic(
-            items: _mockItems,
-            onItemSelected: _handleItemSelected,
-          )),
+            child: Stack(
+              children: [
+                NoteTreeViewClassic(
+                  // Use the mock service for lazy-loading
+                  treeService: _noteTreeService,
+                  autoLoadInitialData:
+                      true, // Let the tree view load initial data
+                  onItemSelected: _handleItemSelected,
+                ),
+
+                // Show an overlay loading indicator during refresh
+                if (_isRefreshing)
+                  Container(
+                    color: Colors.black12,
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+              ],
+            ),
+          ),
 
           // Actions bar
           Padding(
@@ -85,11 +102,25 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
                 ElevatedButton.icon(
                   icon: const Icon(Icons.refresh, size: 16),
                   label: const Text('Refresh'),
-                  onPressed: () {
-                    setState(() {
-                      _mockItems = MockNoteTreeData.generateMockData();
-                    });
-                  },
+                  onPressed: _isRefreshing
+                      ? null
+                      : () {
+                          setState(() {
+                            _isRefreshing = true;
+
+                            // Create a new tree service to force a fresh load
+                            // In a real app, this would just clear caches or reload from API
+                            _noteTreeService.resetCache();
+
+                            // We need to rebuild to create a new tree view with empty initial items
+                            Future.delayed(const Duration(milliseconds: 300),
+                                () {
+                              setState(() {
+                                _isRefreshing = false;
+                              });
+                            });
+                          });
+                        },
                 ),
               ],
             ),

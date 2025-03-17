@@ -1,15 +1,27 @@
 import 'package:flutter/material.dart';
 import 'note_tree_model.dart';
+import 'mock_note_tree_service.dart';
 
 /// A widget that shows a classic tree view with connecting lines
 class NoteTreeViewClassic extends StatefulWidget {
-  final List<NoteTreeItem> items;
+  /// Initial items to show in the tree (typically root level items)
+  final List<NoteTreeItem>? initialItems;
+
+  /// Callback when an item is selected
   final Function(NoteTreeItem)? onItemSelected;
+
+  /// Flag to determine if the widget should load initial data itself
+  final bool autoLoadInitialData;
+
+  /// Service to load tree data (optional, will create one if not provided)
+  final MockNoteTreeService? treeService;
 
   const NoteTreeViewClassic({
     Key? key,
-    required this.items,
+    this.initialItems,
     this.onItemSelected,
+    this.autoLoadInitialData = true,
+    this.treeService,
   }) : super(key: key);
 
   @override
@@ -19,43 +31,168 @@ class NoteTreeViewClassic extends StatefulWidget {
 class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
   String? _selectedItemId;
 
-  // Deep copy the items to avoid modifying the original list
+  /// Items in the tree
   late List<NoteTreeItem> _items;
+
+  /// Mock service for data loading (would be replaced with real API service)
+  late final MockNoteTreeService _treeService;
+
+  /// Tracks which folders are currently loading their children
+  final Set<String> _loadingFolders = {};
+
+  /// Loading state for initial data
+  bool _isInitialLoading = false;
+
+  /// Cache to track which folders have children (to show expand button)
+  final Map<String, bool> _hasChildrenCache = {};
 
   @override
   void initState() {
     super.initState();
-    _initializeItems();
+    _treeService = widget.treeService ?? MockNoteTreeService();
+    _items = widget.initialItems ?? [];
+
+    if (widget.autoLoadInitialData && _items.isEmpty) {
+      _loadInitialData();
+    }
   }
 
   @override
   void didUpdateWidget(NoteTreeViewClassic oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.items != oldWidget.items) {
-      _initializeItems();
+    if (widget.initialItems != oldWidget.initialItems &&
+        widget.initialItems != null) {
+      setState(() {
+        _items = widget.initialItems!;
+      });
     }
   }
 
-  void _initializeItems() {
-    // Create deep copies of items to manage expansion state internally
-    _items = _copyItems(widget.items);
+  /// Load initial/root data
+  Future<void> _loadInitialData() async {
+    setState(() {
+      _isInitialLoading = true;
+    });
+
+    try {
+      final initialItems = await _treeService.getInitialItems();
+
+      // For each folder, check if it has children and cache the result
+      for (var item in initialItems.where((item) => item.isFolder)) {
+        _checkHasChildren(item.id);
+      }
+
+      setState(() {
+        _items = initialItems;
+        _isInitialLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isInitialLoading = false;
+      });
+      // In a real app, you would show an error message
+      debugPrint('Error loading initial data: $e');
+    }
   }
 
-  List<NoteTreeItem> _copyItems(List<NoteTreeItem> source) {
-    return source.map((item) {
-      return item.copyWith(
-        children: item.children.isNotEmpty ? _copyItems(item.children) : [],
-      );
-    }).toList();
+  /// Check if a folder has children and cache the result
+  Future<void> _checkHasChildren(String folderId) async {
+    try {
+      final hasChildren = await _treeService.hasChildren(folderId);
+      setState(() {
+        _hasChildrenCache[folderId] = hasChildren;
+      });
+    } catch (e) {
+      debugPrint('Error checking if folder has children: $e');
+    }
+  }
+
+  /// Load children for a specific folder
+  Future<void> _loadChildren(NoteTreeItem folder) async {
+    if (_loadingFolders.contains(folder.id)) {
+      return; // Already loading
+    }
+
+    setState(() {
+      _loadingFolders.add(folder.id);
+    });
+
+    try {
+      final children = await _treeService.getChildrenFor(folder.id);
+
+      // For each folder in the children, check if it has children
+      for (var item in children.where((item) => item.isFolder)) {
+        _checkHasChildren(item.id);
+      }
+
+      setState(() {
+        // Find item index in the current items list
+        int folderIndex = -1;
+        for (int i = 0; i < _items.length; i++) {
+          if (_items[i].id == folder.id) {
+            folderIndex = i;
+            break;
+          }
+        }
+
+        // If found directly in the root level
+        if (folderIndex != -1) {
+          // Update with new version that has the children
+          _items[folderIndex] = _items[folderIndex].copyWith(
+            isExpanded: true,
+            children: children,
+          );
+        } else {
+          // Otherwise update it wherever it is in the tree
+          _findAndUpdateItem(_items, folder.id, (foundItem) {
+            // 直接更新原始引用的字段
+            foundItem.isExpanded = true;
+            // 重要：直接替换children数组
+            foundItem.children.clear();
+            foundItem.children.addAll(children);
+
+            // For debugging
+            debugPrint(
+                '📂 Updated folder ${folder.id} with ${children.length} children');
+          });
+        }
+
+        _loadingFolders.remove(folder.id);
+      });
+    } catch (e) {
+      setState(() {
+        _loadingFolders.remove(folder.id);
+      });
+      // In a real app, you would show an error message
+      debugPrint('Error loading children for ${folder.id}: $e');
+    }
   }
 
   void _toggleExpand(NoteTreeItem item) {
-    setState(() {
-      // Find the corresponding item in our internal list
-      _findAndUpdateItem(_items, item.id, (foundItem) {
-        foundItem.isExpanded = !foundItem.isExpanded;
+    if (!item.isFolder) return;
+
+    // If folder is already expanded, just collapse it
+    if (item.isExpanded) {
+      setState(() {
+        _findAndUpdateItem(_items, item.id, (foundItem) {
+          foundItem.isExpanded = false;
+        });
       });
-    });
+      return;
+    }
+
+    // If children are already loaded, just expand
+    if (item.children.isNotEmpty) {
+      setState(() {
+        _findAndUpdateItem(_items, item.id, (foundItem) {
+          foundItem.isExpanded = true;
+        });
+      });
+      return;
+    }
+
+    // Otherwise, load children first
+    _loadChildren(item);
   }
 
   void _selectItem(NoteTreeItem item) {
@@ -70,12 +207,14 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
 
   bool _findAndUpdateItem(
       List<NoteTreeItem> items, String id, Function(NoteTreeItem) update) {
-    for (var i = 0; i < items.length; i++) {
+    for (int i = 0; i < items.length; i++) {
       if (items[i].id == id) {
+        // Apply the update function to the found item
         update(items[i]);
         return true;
       }
 
+      // Continue searching in children
       if (items[i].children.isNotEmpty) {
         if (_findAndUpdateItem(items[i].children, id, update)) {
           return true;
@@ -89,12 +228,14 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
   Widget build(BuildContext context) {
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: _buildTreeNodes(_items, isLast: []),
-        ),
-      ),
+      child: _isInitialLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: _buildTreeNodes(_items, isLast: []),
+              ),
+            ),
     );
   }
 
@@ -128,6 +269,8 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
   Widget _buildTreeNode(NoteTreeItem item,
       {required List<bool> isLast, required bool isLastInLevel}) {
     final isSelected = _selectedItemId == item.id;
+    final isLoading = _loadingFolders.contains(item.id);
+    final hasChildren = item.isFolder && (_hasChildrenCache[item.id] ?? false);
 
     return InkWell(
       onTap: () => _selectItem(item),
@@ -189,25 +332,38 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
                 // Space for the branch connection
                 const SizedBox(width: 16),
 
-                // Expand/Collapse button for folders
+                // Expand/Collapse button for folders or loading indicator
                 if (item.isFolder)
                   GestureDetector(
-                    onTap: () => _toggleExpand(item),
+                    onTap: isLoading ? null : () => _toggleExpand(item),
                     child: Container(
                       width: 16,
                       height: 16,
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: Colors.grey[400]!,
+                          color: hasChildren || isLoading
+                              ? Colors.grey[400]!
+                              : Colors.transparent,
                           width: 0.8,
                         ),
                       ),
                       child: Center(
-                        child: Icon(
-                          item.isExpanded ? Icons.remove : Icons.add,
-                          size: 12.0,
-                          color: Colors.grey[800],
-                        ),
+                        child: isLoading
+                            ? SizedBox(
+                                width: 10,
+                                height: 10,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 1.5,
+                                  color: Colors.grey[600],
+                                ),
+                              )
+                            : hasChildren
+                                ? Icon(
+                                    item.isExpanded ? Icons.remove : Icons.add,
+                                    size: 12.0,
+                                    color: Colors.grey[800],
+                                  )
+                                : const SizedBox(), // Empty if no children
                       ),
                     ),
                   )
