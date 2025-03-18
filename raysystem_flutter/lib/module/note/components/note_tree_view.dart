@@ -268,56 +268,65 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
     return widgets;
   }
 
+  /// 构建单个树节点的UI
+  /// [item] 当前要构建的树节点项目
+  /// [isLast] 记录从根节点到当前节点路径上，每一级是否为该级的最后一个节点
+  /// [isLastInLevel] 当前节点是否为其所在层级的最后一个节点
   Widget _buildTreeNode(NoteTreeItem item,
       {required List<bool> isLast, required bool isLastInLevel}) {
+    // 判断当前节点是否被选中
     final isSelected = _selectedItemId == item.id;
+    // 判断当前节点是否正在加载子节点
     final isLoading = _loadingFolders.contains(item.id);
+    // 判断当前节点是否有子节点（用于显示展开/折叠按钮）
     final hasChildren = item.isFolder && (_hasChildrenCache[item.id] ?? false);
 
     return InkWell(
+      // 点击整个节点区域时触发选中事件
       onTap: () => _selectItem(item),
       child: Container(
-        height: 24, // Keep compact
+        height: 24, // 设置节点高度保持紧凑布局
+        // 选中状态时使用高亮背景色，否则透明
         color:
             isSelected ? Theme.of(context).highlightColor : Colors.transparent,
         child: Stack(
           children: [
-            // Draw connecting lines
+            // 绘制连接线部分
             Positioned.fill(
               child: Row(
                 children: [
-                  // Draw tree lines for each level
+                  // 为每一级层级绘制对应的连接线
                   ...List.generate(isLast.length, (index) {
-                    // Indentation for each level
+                    // 每一级层级的缩进宽度
                     return SizedBox(
                       width: 16,
                       child: isLast[index]
-                          ? const SizedBox() // No vertical line if it's the last item
+                          ? const SizedBox() // 如果是该级的最后一项，则不需要绘制垂直连接线
                           : CustomPaint(
                               size: const Size(16, 24),
                               painter: DashedLinePainter(
-                                isVertical: true,
-                                dashWidth: 1,
-                                dashSpace: 2,
-                                strokeWidth: 0.8,
-                                color: Colors.grey[400]!,
+                                isVertical: true, // 垂直虚线
+                                dashWidth: 1, // 虚线段宽度
+                                dashSpace: 2, // 虚线间隔
+                                strokeWidth: 0.8, // 线条粗细
+                                color: Colors.grey[400]!, // 线条颜色
                               ),
                             ),
                     );
                   }),
 
-                  // Draw the branch line (horizontal + vertical)
+                  // 绘制分支连接线（水平+垂直组合）
                   SizedBox(
                     width: 16,
                     child: CustomPaint(
                       size: const Size(16, 24),
                       painter: BranchLinePainter(
-                        isLastItem: isLastInLevel,
-                        strokeWidth: 0.8,
-                        color: Colors.grey[400]!,
-                        isDashed: true,
-                        dashWidth: 1,
-                        dashSpace: 2,
+                        isLastItem: isLastInLevel, // 是否为最后一项，决定了连接线的形状
+                        strokeWidth: 0.8, // 线条粗细
+                        color: Colors.grey[400]!, // 线条颜色
+                        isDashed: true, // 使用虚线样式
+                        dashWidth: 1, // 虚线段宽度
+                        dashSpace: 2, // 虚线间隔
                       ),
                     ),
                   ),
@@ -325,23 +334,25 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
               ),
             ),
 
-            // Draw content (folder/file icon and name)
+            // 绘制节点内容部分（文件夹/文件图标和名称）
             Row(
               children: [
-                // Space for indentation levels
+                // 根据层级缩进的空间
                 SizedBox(width: 16.0 * isLast.length),
 
-                // Space for the branch connection
+                // 分支连接线的空间
                 const SizedBox(width: 16),
 
-                // Expand/Collapse button for folders or loading indicator
+                // 文件夹的展开/折叠按钮或加载指示器
                 if (item.isFolder)
                   GestureDetector(
+                    // 点击展开/折叠按钮时触发对应事件，如果正在加载则禁用点击
                     onTap: isLoading ? null : () => _toggleExpand(item),
                     child: Container(
                       width: 16,
                       height: 16,
                       decoration: BoxDecoration(
+                        // 如果有子节点或正在加载，则显示边框
                         border: Border.all(
                           color: hasChildren || isLoading
                               ? Colors.grey[400]!
@@ -354,6 +365,7 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
                             ? SizedBox(
                                 width: 10,
                                 height: 10,
+                                // 加载中显示旋转进度指示器
                                 child: CircularProgressIndicator(
                                   strokeWidth: 1.5,
                                   color: Colors.grey[600],
@@ -361,19 +373,21 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
                               )
                             : hasChildren
                                 ? Icon(
+                                    // 根据展开状态显示加号或减号图标
                                     item.isExpanded ? Icons.remove : Icons.add,
                                     size: 12.0,
                                     color: Colors.grey[800],
                                   )
-                                : const SizedBox(), // Empty if no children
+                                : const SizedBox(), // 没有子节点时显示空白
                       ),
                     ),
                   )
                 else
+                  // 非文件夹项目显示水平虚线
                   CustomPaint(
                     size: const Size(16, 24),
                     painter: DashedLinePainter(
-                      isVertical: false,
+                      isVertical: false, // 水平虚线
                       strokeWidth: 0.8,
                       color: Colors.grey[400]!,
                       dashWidth: 1,
@@ -383,28 +397,32 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
 
                 const SizedBox(width: 4),
 
-                // Icon
+                // 节点图标
                 Icon(
+                  // 使用节点提供的图标，或根据节点类型选择默认图标
                   item.icon ??
                       (item.isFolder
                           ? (item.isExpanded ? Icons.folder_open : Icons.folder)
                           : Icons.description),
                   size: 16,
-                  color: item.isFolder ? Colors.amber[700] : Colors.blue[700],
+                  color: item.isFolder
+                      ? Colors.amber[700]
+                      : Colors.blue[700], // 文件夹和文件使用不同颜色
                 ),
 
                 const SizedBox(width: 4),
 
-                // Item name
+                // 节点名称文本
                 Expanded(
                   child: Text(
                     item.name,
                     style: TextStyle(
                       fontSize: 13,
+                      // 选中状态使用粗体显示
                       fontWeight:
                           isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
-                    overflow: TextOverflow.ellipsis,
+                    overflow: TextOverflow.ellipsis, // 文本过长时显示省略号
                   ),
                 ),
               ],
