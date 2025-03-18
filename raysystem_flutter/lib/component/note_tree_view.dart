@@ -77,9 +77,9 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
     try {
       final initialItems = await _treeService.getInitialItems();
 
-      // For each folder, check if it has children and cache the result
+      // For each folder, assume it has children based on isFolder property
       for (var item in initialItems.where((item) => item.isFolder)) {
-        _checkHasChildren(item.id);
+        _hasChildrenCache[item.id] = true;
       }
 
       setState(() {
@@ -92,18 +92,6 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
       });
       // In a real app, you would show an error message
       debugPrint('Error loading initial data: $e');
-    }
-  }
-
-  /// Check if a folder has children and cache the result
-  Future<void> _checkHasChildren(String folderId) async {
-    try {
-      final hasChildren = await _treeService.hasChildren(folderId);
-      setState(() {
-        _hasChildrenCache[folderId] = hasChildren;
-      });
-    } catch (e) {
-      debugPrint('Error checking if folder has children: $e');
     }
   }
 
@@ -120,9 +108,9 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
     try {
       final children = await _treeService.getChildrenFor(folder.id);
 
-      // For each folder in the children, check if it has children
+      // For each folder in the children, assume it has children
       for (var item in children.where((item) => item.isFolder)) {
-        _checkHasChildren(item.id);
+        _hasChildrenCache[item.id] = true;
       }
 
       setState(() {
