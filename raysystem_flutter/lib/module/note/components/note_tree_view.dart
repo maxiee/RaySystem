@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:raysystem_flutter/module/note/components/painters.dart';
 import 'note_tree_model.dart';
 import 'mock_note_tree_service.dart';
 
@@ -17,12 +18,12 @@ class NoteTreeViewClassic extends StatefulWidget {
   final MockNoteTreeService? treeService;
 
   const NoteTreeViewClassic({
-    super.key,
+    Key? key,
     this.initialItems,
     this.onItemSelected,
     this.autoLoadInitialData = true,
     this.treeService,
-  });
+  }) : super(key: key);
 
   @override
   State<NoteTreeViewClassic> createState() => _NoteTreeViewClassicState();
@@ -77,9 +78,9 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
     try {
       final initialItems = await _treeService.getInitialItems();
 
-      // For each folder, check if it has children and cache the result
+      // For each folder, assume it has children based on isFolder property
       for (var item in initialItems.where((item) => item.isFolder)) {
-        _checkHasChildren(item.id);
+        _hasChildrenCache[item.id] = true;
       }
 
       setState(() {
@@ -92,18 +93,6 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
       });
       // In a real app, you would show an error message
       debugPrint('Error loading initial data: $e');
-    }
-  }
-
-  /// Check if a folder has children and cache the result
-  Future<void> _checkHasChildren(String folderId) async {
-    try {
-      final hasChildren = await _treeService.hasChildren(folderId);
-      setState(() {
-        _hasChildrenCache[folderId] = hasChildren;
-      });
-    } catch (e) {
-      debugPrint('Error checking if folder has children: $e');
     }
   }
 
@@ -120,12 +109,13 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
     try {
       final children = await _treeService.getChildrenFor(folder.id);
 
-      // For each folder in the children, check if it has children
+      // For each folder in the children, assume it has children
       for (var item in children.where((item) => item.isFolder)) {
-        _checkHasChildren(item.id);
+        _hasChildrenCache[item.id] = true;
       }
 
       setState(() {
+        // 在当前根级别项目列表中查找该文件夹的索引位置
         // Find item index in the current items list
         int folderIndex = -1;
         for (int i = 0; i < _items.length; i++) {
@@ -135,14 +125,17 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
           }
         }
 
+        // 如果文件夹直接位于根级别(即_items数组中)
         // If found directly in the root level
         if (folderIndex != -1) {
+          // 使用copyWith方法创建一个新对象，设置isExpanded为true并添加children
           // Update with new version that has the children
           _items[folderIndex] = _items[folderIndex].copyWith(
             isExpanded: true,
             children: children,
           );
         } else {
+          // 如果文件夹不在根级别，则在整个树中查找并更新它
           // Otherwise update it wherever it is in the tree
           _findAndUpdateItem(_items, folder.id, (foundItem) {
             // 直接更新原始引用的字段
@@ -156,11 +149,12 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
                 '📂 Updated folder ${folder.id} with ${children.length} children');
           });
         }
-
+        // 完成加载，从加载中文件夹集合中移除此ID
         _loadingFolders.remove(folder.id);
       });
     } catch (e) {
       setState(() {
+        // 如果加载失败，仍然从加载中文件夹集合中移除此ID
         _loadingFolders.remove(folder.id);
       });
       // In a real app, you would show an error message
@@ -205,22 +199,30 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
     }
   }
 
+  /// 在树结构中查找指定ID的节点并对其应用更新操作
+  ///
+  /// [items] 要搜索的节点列表
+  /// [id] 要查找的节点ID
+  /// [update] 找到节点后要应用的更新函数
+  ///
+  /// 返回一个布尔值，表示是否找到并更新了节点
   bool _findAndUpdateItem(
       List<NoteTreeItem> items, String id, Function(NoteTreeItem) update) {
     for (int i = 0; i < items.length; i++) {
       if (items[i].id == id) {
-        // Apply the update function to the found item
+        // 找到匹配ID的节点，应用更新函数
         update(items[i]);
         return true;
       }
 
-      // Continue searching in children
+      // 递归搜索子节点
       if (items[i].children.isNotEmpty) {
         if (_findAndUpdateItem(items[i].children, id, update)) {
           return true;
         }
       }
     }
+    // 在整个树中未找到指定ID的节点
     return false;
   }
 
@@ -412,172 +414,4 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
       ),
     );
   }
-}
-
-/// Custom painter to draw dashed lines
-class DashedLinePainter extends CustomPainter {
-  final bool isVertical;
-  final double dashWidth;
-  final double dashSpace;
-  final double strokeWidth;
-  final Color color;
-
-  DashedLinePainter({
-    required this.isVertical,
-    required this.dashWidth,
-    required this.dashSpace,
-    required this.strokeWidth,
-    required this.color,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
-
-    double start = 0;
-    final totalLength = isVertical ? size.height : size.width;
-    final dashLength = dashWidth + dashSpace;
-
-    while (start < totalLength) {
-      // Draw a small dash
-      double end = start + dashWidth;
-      if (end > totalLength) end = totalLength;
-
-      if (isVertical) {
-        canvas.drawLine(
-            Offset(size.width / 2, start), Offset(size.width / 2, end), paint);
-      } else {
-        canvas.drawLine(Offset(start, size.height / 2),
-            Offset(end, size.height / 2), paint);
-      }
-
-      start = start + dashLength;
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-/// Custom painter for the branch lines (L-shaped connection)
-class BranchLinePainter extends CustomPainter {
-  final bool isLastItem;
-  final double strokeWidth;
-  final Color color;
-  final bool isDashed;
-  final double dashWidth;
-  final double dashSpace;
-
-  BranchLinePainter({
-    required this.isLastItem,
-    required this.strokeWidth,
-    required this.color,
-    this.isDashed = true,
-    this.dashWidth = 1,
-    this.dashSpace = 2,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
-
-    // Draw horizontal line from middle to right
-    if (isDashed) {
-      // Draw dashed horizontal line
-      double startX = size.width / 2; // Start from middle
-      double endX = size.width; // Go all the way to the right
-      double y = size.height / 2;
-
-      double current = startX;
-      while (current < endX) {
-        double dashEnd = current + dashWidth;
-        if (dashEnd > endX) dashEnd = endX;
-
-        canvas.drawLine(
-          Offset(current, y),
-          Offset(dashEnd, y),
-          paint,
-        );
-
-        current = current + dashWidth + dashSpace;
-      }
-    } else {
-      // Solid line from middle to right
-      canvas.drawLine(
-        Offset(size.width / 2, size.height / 2),
-        Offset(size.width, size.height / 2),
-        paint,
-      );
-    }
-
-    // Vertical line
-    if (isLastItem) {
-      // Draw only half-height vertical line if it's the last item
-      if (isDashed) {
-        // Draw dashed vertical line
-        double startY = 0;
-        double endY = size.height / 2;
-        double x = size.width / 2;
-
-        double current = startY;
-        while (current < endY) {
-          double dashEnd = current + dashWidth;
-          if (dashEnd > endY) dashEnd = endY;
-
-          canvas.drawLine(
-            Offset(x, current),
-            Offset(x, dashEnd),
-            paint,
-          );
-
-          current = current + dashWidth + dashSpace;
-        }
-      } else {
-        // Solid vertical line
-        canvas.drawLine(
-          Offset(size.width / 2, 0),
-          Offset(size.width / 2, size.height / 2),
-          paint,
-        );
-      }
-    } else {
-      // Draw full-height vertical line
-      if (isDashed) {
-        // Draw dashed vertical line
-        double startY = 0;
-        double endY = size.height;
-        double x = size.width / 2;
-
-        double current = startY;
-        while (current < endY) {
-          double dashEnd = current + dashWidth;
-          if (dashEnd > endY) dashEnd = endY;
-
-          canvas.drawLine(
-            Offset(x, current),
-            Offset(x, dashEnd),
-            paint,
-          );
-
-          current = current + dashWidth + dashSpace;
-        }
-      } else {
-        // Solid vertical line
-        canvas.drawLine(
-          Offset(size.width / 2, 0),
-          Offset(size.width / 2, size.height),
-          paint,
-        );
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:raysystem_flutter/component/note_tree_view.dart';
+import 'package:raysystem_flutter/module/note/components/note_tree_view.dart';
 import 'package:raysystem_flutter/module/note/components/note_tree_model.dart';
 import 'mock_note_tree_service.dart';
 
