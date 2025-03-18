@@ -198,22 +198,30 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
     }
   }
 
+  /// 在树结构中查找指定ID的节点并对其应用更新操作
+  ///
+  /// [items] 要搜索的节点列表
+  /// [id] 要查找的节点ID
+  /// [update] 找到节点后要应用的更新函数
+  ///
+  /// 返回一个布尔值，表示是否找到并更新了节点
   bool _findAndUpdateItem(
       List<NoteTreeItem> items, String id, Function(NoteTreeItem) update) {
     for (int i = 0; i < items.length; i++) {
       if (items[i].id == id) {
-        // Apply the update function to the found item
+        // 找到匹配ID的节点，应用更新函数
         update(items[i]);
         return true;
       }
 
-      // Continue searching in children
+      // 递归搜索子节点
       if (items[i].children.isNotEmpty) {
         if (_findAndUpdateItem(items[i].children, id, update)) {
           return true;
         }
       }
     }
+    // 在整个树中未找到指定ID的节点
     return false;
   }
 
