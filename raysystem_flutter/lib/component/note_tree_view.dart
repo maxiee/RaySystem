@@ -114,6 +114,7 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
       }
 
       setState(() {
+        // 在当前根级别项目列表中查找该文件夹的索引位置
         // Find item index in the current items list
         int folderIndex = -1;
         for (int i = 0; i < _items.length; i++) {
@@ -123,14 +124,17 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
           }
         }
 
+        // 如果文件夹直接位于根级别(即_items数组中)
         // If found directly in the root level
         if (folderIndex != -1) {
+          // 使用copyWith方法创建一个新对象，设置isExpanded为true并添加children
           // Update with new version that has the children
           _items[folderIndex] = _items[folderIndex].copyWith(
             isExpanded: true,
             children: children,
           );
         } else {
+          // 如果文件夹不在根级别，则在整个树中查找并更新它
           // Otherwise update it wherever it is in the tree
           _findAndUpdateItem(_items, folder.id, (foundItem) {
             // 直接更新原始引用的字段
@@ -144,11 +148,12 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
                 '📂 Updated folder ${folder.id} with ${children.length} children');
           });
         }
-
+        // 完成加载，从加载中文件夹集合中移除此ID
         _loadingFolders.remove(folder.id);
       });
     } catch (e) {
       setState(() {
+        // 如果加载失败，仍然从加载中文件夹集合中移除此ID
         _loadingFolders.remove(folder.id);
       });
       // In a real app, you would show an error message
