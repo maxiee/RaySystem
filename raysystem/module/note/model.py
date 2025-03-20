@@ -22,7 +22,7 @@ class Note(Base):
     parent_id: Mapped[int | None] = mapped_column(ForeignKey("note.id"), nullable=True, index=True)
     
     # Flag indicating if this note has children
-    has_children: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    has_children: Mapped[bool] = mapped_column(Boolean, default=False, index=True, server_default="0")
     
     # Relationship with parent and children
     # 不指定cascade参数，默认就是save-update, merge, refresh-expire
