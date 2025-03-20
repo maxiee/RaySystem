@@ -181,7 +181,8 @@ class NoteManager:
             )
             return list(result.scalars().all())
     
-    async def get_recently_updated_notes(self, limit: int = 20, offset: int = 0) -> List[Note]:
+    async def get_recently_updated_notes(self, limit: int = 20, offset: int = 0,
+                                         session: Optional[AsyncSession] = None) -> List[Note]:
         """
         Get recently updated notes ordered by update time
         
@@ -193,24 +194,25 @@ class NoteManager:
         Returns:
             List of Note objects ordered by update time (newest first)
         """        
-        async with self.session as session:
+        session_to_use = session or self.session
+        async with session_to_use as session:
             result = await session.execute(
                 select(Note)
                 .order_by(desc(Note.updated_at))
                 .limit(limit)
                 .offset(offset)
-                .options(joinedload(Note.children))
             )
             return list(result.scalars().all())
     
-    async def get_total_notes_count(self) -> int:
+    async def get_total_notes_count(self, session: Optional[AsyncSession] = None) -> int:
         """
         Get the total number of notes in the database
         
         Returns:
             Total number of notes
         """
-        async with self.session as session:
+        session_to_use = session or self.session
+        async with session_to_use as session:
             result = await session.execute(select(func.count()).select_from(Note))
             return result.scalar_one()
     

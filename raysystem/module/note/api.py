@@ -1,8 +1,9 @@
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Depends
 from typing import List, Optional, cast
 from pydantic import BaseModel
 from datetime import datetime
-
+from sqlalchemy.ext.asyncio import AsyncSession
+from module.db.db import get_db_session
 from module.http.http import APP
 from module.note.note import kNoteManager
 from module.note.model import Note
@@ -117,13 +118,14 @@ async def delete_note(note_id: int):
 @APP.get("/notes/", response_model=NotesListResponse, tags=["notes"])
 async def list_recent_notes(
     limit: int = Query(20, description="Maximum number of notes to return"), 
-    offset: int = Query(0, description="Number of notes to skip")
+    offset: int = Query(0, description="Number of notes to skip"),
+    session: AsyncSession = Depends(get_db_session)
 ):
     """
     List recently updated notes sorted by update time (newest first)
     """
-    notes = await kNoteManager.get_recently_updated_notes(limit, offset)
-    total = await kNoteManager.get_total_notes_count()
+    notes = await kNoteManager.get_recently_updated_notes(limit, offset, session)
+    total = await kNoteManager.get_total_notes_count(session)
     response_notes = convert_notes_to_response(notes)
     return NotesListResponse(total=total, items=response_notes)
 
