@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'note_tree_model.dart';
+import 'note_tree_service.dart';
 
 /// Service to provide mock tree data with simulated network delays
-class MockNoteTreeService {
+class MockNoteTreeService implements NoteTreeService {
   /// In-memory cache of the entire tree structure for mock data purposes
   final Map<String, List<NoteTreeItem>> _mockTreeCache = {};
 
@@ -34,7 +35,7 @@ class MockNoteTreeService {
     _logDebug('Cache initialized with keys: ${_mockTreeCache.keys.toList()}');
   }
 
-  /// Reset the cache and reinitialize data - used for refresh functionality
+  @override
   void resetCache() {
     _logDebug('Resetting cache');
     _mockTreeCache.clear();
@@ -56,7 +57,7 @@ class MockNoteTreeService {
     }
   }
 
-  /// Get initial/root level items with a simulated delay
+  @override
   Future<List<NoteTreeItem>> getInitialItems() async {
     // Simulate network delay (shorter for initial load)
     await Future.delayed(const Duration(milliseconds: 300));
@@ -76,7 +77,7 @@ class MockNoteTreeService {
         .toList();
   }
 
-  /// Get children for a specific parent ID with a simulated delay
+  @override
   Future<List<NoteTreeItem>> getChildrenFor(String parentId) async {
     // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 500));
@@ -100,7 +101,7 @@ class MockNoteTreeService {
         .toList();
   }
 
-  /// Check if a folder has any children (could be called to prefetch this info)
+  @override
   Future<bool> hasChildren(String folderId) async {
     // Simulate a quick check
     await Future.delayed(const Duration(milliseconds: 100));

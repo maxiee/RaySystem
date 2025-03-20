@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:raysystem_flutter/module/note/components/note_tree_view.dart';
 import 'package:raysystem_flutter/module/note/components/note_tree_model.dart';
+import 'note_tree_service.dart';
 import 'mock_note_tree_service.dart';
 
 /// A card widget that displays a note tree explorer
 class NoteTreeCard extends StatefulWidget {
+  /// Optional tree service to use instead of the default mock service
+  final NoteTreeService? treeService;
+
   const NoteTreeCard({
     Key? key,
+    this.treeService,
   }) : super(key: key);
 
   @override
@@ -16,11 +21,17 @@ class NoteTreeCard extends StatefulWidget {
 class _NoteTreeCardState extends State<NoteTreeCard> {
   NoteTreeItem? _selectedItem;
 
-  // Create a shared instance of the mock service
-  final _noteTreeService = MockNoteTreeService();
+  // Create a service instance - using provided one or creating a mock
+  late final NoteTreeService _noteTreeService;
 
   // We no longer need to preload the items, we'll let the tree view handle it
   bool _isRefreshing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _noteTreeService = widget.treeService ?? MockNoteTreeService();
+  }
 
   void _handleItemSelected(NoteTreeItem item) {
     setState(() {
@@ -74,10 +85,9 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
             child: Stack(
               children: [
                 NoteTreeViewClassic(
-                  // Use the mock service for lazy-loading
+                  // Pass the abstract service to the tree view
                   treeService: _noteTreeService,
-                  autoLoadInitialData:
-                      true, // Let the tree view load initial data
+                  autoLoadInitialData: true,
                   onItemSelected: _handleItemSelected,
                 ),
 
@@ -108,8 +118,7 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
                           setState(() {
                             _isRefreshing = true;
 
-                            // Create a new tree service to force a fresh load
-                            // In a real app, this would just clear caches or reload from API
+                            // Reset the service cache
                             _noteTreeService.resetCache();
 
                             // We need to rebuild to create a new tree view with empty initial items
