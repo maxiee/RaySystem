@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:raysystem_flutter/card/card_manager.dart';
+import 'package:raysystem_flutter/card/note_card.dart';
 import 'package:raysystem_flutter/module/note/components/note_tree_view.dart';
 import 'package:raysystem_flutter/module/note/components/note_tree_model.dart';
 import 'package:raysystem_flutter/module/note/providers/notes_provider.dart';
@@ -10,10 +12,14 @@ import '../api/mock_note_tree_service.dart';
 class NoteTreeCard extends StatefulWidget {
   /// Optional tree service to use instead of the default mock service
   final NoteTreeService? treeService;
+  
+  /// 卡片管理器，用于添加新卡片
+  final CardManager? cardManager;
 
   const NoteTreeCard({
     Key? key,
     this.treeService,
+    this.cardManager,
   }) : super(key: key);
 
   @override
@@ -42,6 +48,23 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
     setState(() {
       _selectedItem = item;
     });
+  }
+  
+  // 处理双击笔记事件 - 添加到CardManager
+  void _handleItemDoubleClicked(NoteTreeItem item) {
+    // 确保有可用的CardManager
+    final cardManager = widget.cardManager ?? Provider.of<CardManager>(context, listen: false);
+    
+    // 添加新的笔记卡片到卡片流
+    cardManager.addCard(
+      SizedBox(
+        height: 400,
+        child: NoteCard(
+          noteId: item.id,
+          isEditable: true,
+        ),
+      ),
+    );
   }
 
   // Handle adding a child note to the selected parent
@@ -219,6 +242,7 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
                   autoLoadInitialData: true,
                   onItemSelected: _handleItemSelected,
                   onAddChildNote: _handleAddChildNote,
+                  onItemDoubleClicked: _handleItemDoubleClicked,
                 ),
 
                 // Show an overlay loading indicator during refresh

@@ -14,6 +14,9 @@ class NoteTreeViewClassic extends StatefulWidget {
 
   /// Callback when add child note is requested
   final Function(NoteTreeItem)? onAddChildNote;
+  
+  /// Callback when a note is double-clicked
+  final Function(NoteTreeItem)? onItemDoubleClicked;
 
   /// Flag to determine if the widget should load initial data itself
   final bool autoLoadInitialData;
@@ -26,6 +29,7 @@ class NoteTreeViewClassic extends StatefulWidget {
     this.initialItems,
     this.onItemSelected,
     this.onAddChildNote,
+    this.onItemDoubleClicked,
     this.autoLoadInitialData = true,
     this.treeService,
   }) : super(key: key);
@@ -243,6 +247,13 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
       widget.onItemSelected!(item);
     }
   }
+  
+  // 处理双击事件
+  void _handleDoubleClick(NoteTreeItem item) {
+    if (widget.onItemDoubleClicked != null) {
+      widget.onItemDoubleClicked!(item);
+    }
+  }
 
   /// Show context menu for an item
   void _showContextMenu(BuildContext context, NoteTreeItem item, Offset position) {
@@ -363,6 +374,8 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
       child: InkWell(
         // 点击整个节点区域时触发选中事件
         onTap: () => _selectItem(item),
+        // 双击节点时触发双击事件
+        onDoubleTap: () => _handleDoubleClick(item),
         child: Container(
           height: 24, // 设置节点高度保持紧凑布局
           // 选中状态时使用高亮背景色，否则透明
