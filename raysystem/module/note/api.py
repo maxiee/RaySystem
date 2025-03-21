@@ -146,7 +146,7 @@ async def search_notes(
     return NotesListResponse(total=total, items=response_notes)
 
 # --- Tree-related endpoints ---
-@APP.get("/notes/tree/children", response_model=NoteTreeResponse, tags=["notes", "tree"])
+@APP.get("/notes/tree/children", response_model=NoteTreeResponse, tags=["notes"])
 async def get_child_notes(
     parent_id: Optional[int] = Query(None, description="Parent note ID, if None returns root notes"),
     limit: int = Query(50, description="Maximum number of notes to return"),
@@ -162,7 +162,7 @@ async def get_child_notes(
     tree_nodes = convert_notes_to_tree_nodes(notes)
     return NoteTreeResponse(total=total, items=tree_nodes)
 
-@APP.post("/notes/{note_id}/move", response_model=NoteResponse, tags=["notes", "tree"])
+@APP.post("/notes/{note_id}/move", response_model=NoteResponse, tags=["notes"])
 async def move_note(
     note_id: int,
     new_parent_id: Optional[int] = Query(None, description="New parent ID, None for root level")
@@ -175,7 +175,7 @@ async def move_note(
         raise HTTPException(status_code=404, detail="Note not found")
     return NoteResponse.model_validate(updated_note)
 
-@APP.get("/notes/{note_id}/path", response_model=List[NoteResponse], tags=["notes", "tree"])
+@APP.get("/notes/{note_id}/path", response_model=List[NoteResponse], tags=["notes"])
 async def get_note_path(note_id: int):
     """
     Get the path from root to the specified note (breadcrumbs)

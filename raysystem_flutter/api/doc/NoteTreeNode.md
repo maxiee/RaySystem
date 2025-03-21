@@ -1,4 +1,4 @@
-# openapi.model.NoteUpdate
+# openapi.model.NoteTreeNode
 
 ## Load the model package
 ```dart
@@ -10,7 +10,11 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **title** | **String** |  | 
 **contentAppflowy** | **String** |  | 
+**id** | **int** |  | 
 **parentId** | **int** |  | [optional] 
+**createdAt** | [**DateTime**](DateTime.md) |  | 
+**updatedAt** | [**DateTime**](DateTime.md) |  | 
+**hasChildren** | **bool** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

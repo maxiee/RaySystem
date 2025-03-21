@@ -16,6 +16,8 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..add(NetworkMetrics.serializer)
       ..add(NoteCreate.serializer)
       ..add(NoteResponse.serializer)
+      ..add(NoteTreeNode.serializer)
+      ..add(NoteTreeResponse.serializer)
       ..add(NoteUpdate.serializer)
       ..add(NotesListResponse.serializer)
       ..add(ResponseGetMetricsSystemMetricsGet.serializer)
@@ -35,6 +37,9 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(NoteResponse)]),
           () => new ListBuilder<NoteResponse>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(NoteTreeNode)]),
+          () => new ListBuilder<NoteTreeNode>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(ValidationError)]),
           () => new ListBuilder<ValidationError>())

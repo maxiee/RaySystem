@@ -22,6 +22,8 @@ export 'package:openapi/src/model/memory_metrics.dart';
 export 'package:openapi/src/model/network_metrics.dart';
 export 'package:openapi/src/model/note_create.dart';
 export 'package:openapi/src/model/note_response.dart';
+export 'package:openapi/src/model/note_tree_node.dart';
+export 'package:openapi/src/model/note_tree_response.dart';
 export 'package:openapi/src/model/note_update.dart';
 export 'package:openapi/src/model/notes_list_response.dart';
 export 'package:openapi/src/model/response_get_metrics_system_metrics_get.dart';

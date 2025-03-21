@@ -6,46 +6,63 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'note_create.g.dart';
+part 'note_tree_node.g.dart';
 
-/// NoteCreate
+/// NoteTreeNode
 ///
 /// Properties:
 /// * [title]
 /// * [contentAppflowy]
+/// * [id]
 /// * [parentId]
+/// * [createdAt]
+/// * [updatedAt]
+/// * [hasChildren]
 @BuiltValue()
-abstract class NoteCreate implements Built<NoteCreate, NoteCreateBuilder> {
+abstract class NoteTreeNode
+    implements Built<NoteTreeNode, NoteTreeNodeBuilder> {
   @BuiltValueField(wireName: r'title')
   String get title;
 
   @BuiltValueField(wireName: r'content_appflowy')
   String get contentAppflowy;
 
+  @BuiltValueField(wireName: r'id')
+  int get id;
+
   @BuiltValueField(wireName: r'parent_id')
   int? get parentId;
 
-  NoteCreate._();
+  @BuiltValueField(wireName: r'created_at')
+  DateTime get createdAt;
 
-  factory NoteCreate([void updates(NoteCreateBuilder b)]) = _$NoteCreate;
+  @BuiltValueField(wireName: r'updated_at')
+  DateTime get updatedAt;
+
+  @BuiltValueField(wireName: r'has_children')
+  bool get hasChildren;
+
+  NoteTreeNode._();
+
+  factory NoteTreeNode([void updates(NoteTreeNodeBuilder b)]) = _$NoteTreeNode;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(NoteCreateBuilder b) => b;
+  static void _defaults(NoteTreeNodeBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<NoteCreate> get serializer => _$NoteCreateSerializer();
+  static Serializer<NoteTreeNode> get serializer => _$NoteTreeNodeSerializer();
 }
 
-class _$NoteCreateSerializer implements PrimitiveSerializer<NoteCreate> {
+class _$NoteTreeNodeSerializer implements PrimitiveSerializer<NoteTreeNode> {
   @override
-  final Iterable<Type> types = const [NoteCreate, _$NoteCreate];
+  final Iterable<Type> types = const [NoteTreeNode, _$NoteTreeNode];
 
   @override
-  final String wireName = r'NoteCreate';
+  final String wireName = r'NoteTreeNode';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    NoteCreate object, {
+    NoteTreeNode object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
     yield r'title';
@@ -58,6 +75,11 @@ class _$NoteCreateSerializer implements PrimitiveSerializer<NoteCreate> {
       object.contentAppflowy,
       specifiedType: const FullType(String),
     );
+    yield r'id';
+    yield serializers.serialize(
+      object.id,
+      specifiedType: const FullType(int),
+    );
     if (object.parentId != null) {
       yield r'parent_id';
       yield serializers.serialize(
@@ -65,12 +87,27 @@ class _$NoteCreateSerializer implements PrimitiveSerializer<NoteCreate> {
         specifiedType: const FullType.nullable(int),
       );
     }
+    yield r'created_at';
+    yield serializers.serialize(
+      object.createdAt,
+      specifiedType: const FullType(DateTime),
+    );
+    yield r'updated_at';
+    yield serializers.serialize(
+      object.updatedAt,
+      specifiedType: const FullType(DateTime),
+    );
+    yield r'has_children';
+    yield serializers.serialize(
+      object.hasChildren,
+      specifiedType: const FullType(bool),
+    );
   }
 
   @override
   Object serialize(
     Serializers serializers,
-    NoteCreate object, {
+    NoteTreeNode object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -83,7 +120,7 @@ class _$NoteCreateSerializer implements PrimitiveSerializer<NoteCreate> {
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required NoteCreateBuilder result,
+    required NoteTreeNodeBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
@@ -104,6 +141,13 @@ class _$NoteCreateSerializer implements PrimitiveSerializer<NoteCreate> {
           ) as String;
           result.contentAppflowy = valueDes;
           break;
+        case r'id':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(int),
+          ) as int;
+          result.id = valueDes;
+          break;
         case r'parent_id':
           final valueDes = serializers.deserialize(
             value,
@@ -111,6 +155,27 @@ class _$NoteCreateSerializer implements PrimitiveSerializer<NoteCreate> {
           ) as int?;
           if (valueDes == null) continue;
           result.parentId = valueDes;
+          break;
+        case r'created_at':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(DateTime),
+          ) as DateTime;
+          result.createdAt = valueDes;
+          break;
+        case r'updated_at':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(DateTime),
+          ) as DateTime;
+          result.updatedAt = valueDes;
+          break;
+        case r'has_children':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.hasChildren = valueDes;
           break;
         default:
           unhandled.add(key);
@@ -121,12 +186,12 @@ class _$NoteCreateSerializer implements PrimitiveSerializer<NoteCreate> {
   }
 
   @override
-  NoteCreate deserialize(
+  NoteTreeNode deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = NoteCreateBuilder();
+    final result = NoteTreeNodeBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

@@ -78,8 +78,11 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**rootGet**](doc/DefaultApi.md#rootget) | **GET** / | Root
 [*NotesApi*](doc/NotesApi.md) | [**createNoteNotesPost**](doc/NotesApi.md#createnotenotespost) | **POST** /notes/ | Create Note
 [*NotesApi*](doc/NotesApi.md) | [**deleteNoteNotesNoteIdDelete**](doc/NotesApi.md#deletenotenotesnoteiddelete) | **DELETE** /notes/{note_id} | Delete Note
+[*NotesApi*](doc/NotesApi.md) | [**getChildNotesNotesTreeChildrenGet**](doc/NotesApi.md#getchildnotesnotestreechildrenget) | **GET** /notes/tree/children | Get Child Notes
 [*NotesApi*](doc/NotesApi.md) | [**getNoteNotesNoteIdGet**](doc/NotesApi.md#getnotenotesnoteidget) | **GET** /notes/{note_id} | Get Note
+[*NotesApi*](doc/NotesApi.md) | [**getNotePathNotesNoteIdPathGet**](doc/NotesApi.md#getnotepathnotesnoteidpathget) | **GET** /notes/{note_id}/path | Get Note Path
 [*NotesApi*](doc/NotesApi.md) | [**listRecentNotesNotesGet**](doc/NotesApi.md#listrecentnotesnotesget) | **GET** /notes/ | List Recent Notes
+[*NotesApi*](doc/NotesApi.md) | [**moveNoteNotesNoteIdMovePost**](doc/NotesApi.md#movenotenotesnoteidmovepost) | **POST** /notes/{note_id}/move | Move Note
 [*NotesApi*](doc/NotesApi.md) | [**searchNotesNotesSearchGet**](doc/NotesApi.md#searchnotesnotessearchget) | **GET** /notes/search | Search Notes
 [*NotesApi*](doc/NotesApi.md) | [**updateNoteNotesNoteIdPut**](doc/NotesApi.md#updatenotenotesnoteidput) | **PUT** /notes/{note_id} | Update Note
 
@@ -95,6 +98,8 @@ Class | Method | HTTP request | Description
  - [NetworkMetrics](doc/NetworkMetrics.md)
  - [NoteCreate](doc/NoteCreate.md)
  - [NoteResponse](doc/NoteResponse.md)
+ - [NoteTreeNode](doc/NoteTreeNode.md)
+ - [NoteTreeResponse](doc/NoteTreeResponse.md)
  - [NoteUpdate](doc/NoteUpdate.md)
  - [NotesListResponse](doc/NotesListResponse.md)
  - [ResponseGetMetricsSystemMetricsGet](doc/ResponseGetMetricsSystemMetricsGet.md)

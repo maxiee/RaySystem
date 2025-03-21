@@ -13,6 +13,7 @@ part 'note_update.g.dart';
 /// Properties:
 /// * [title]
 /// * [contentAppflowy]
+/// * [parentId]
 @BuiltValue()
 abstract class NoteUpdate implements Built<NoteUpdate, NoteUpdateBuilder> {
   @BuiltValueField(wireName: r'title')
@@ -20,6 +21,9 @@ abstract class NoteUpdate implements Built<NoteUpdate, NoteUpdateBuilder> {
 
   @BuiltValueField(wireName: r'content_appflowy')
   String get contentAppflowy;
+
+  @BuiltValueField(wireName: r'parent_id')
+  int? get parentId;
 
   NoteUpdate._();
 
@@ -54,6 +58,13 @@ class _$NoteUpdateSerializer implements PrimitiveSerializer<NoteUpdate> {
       object.contentAppflowy,
       specifiedType: const FullType(String),
     );
+    if (object.parentId != null) {
+      yield r'parent_id';
+      yield serializers.serialize(
+        object.parentId,
+        specifiedType: const FullType.nullable(int),
+      );
+    }
   }
 
   @override
@@ -92,6 +103,14 @@ class _$NoteUpdateSerializer implements PrimitiveSerializer<NoteUpdate> {
             specifiedType: const FullType(String),
           ) as String;
           result.contentAppflowy = valueDes;
+          break;
+        case r'parent_id':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(int),
+          ) as int?;
+          if (valueDes == null) continue;
+          result.parentId = valueDes;
           break;
         default:
           unhandled.add(key);

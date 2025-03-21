@@ -11,8 +11,11 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**createNoteNotesPost**](NotesApi.md#createnotenotespost) | **POST** /notes/ | Create Note
 [**deleteNoteNotesNoteIdDelete**](NotesApi.md#deletenotenotesnoteiddelete) | **DELETE** /notes/{note_id} | Delete Note
+[**getChildNotesNotesTreeChildrenGet**](NotesApi.md#getchildnotesnotestreechildrenget) | **GET** /notes/tree/children | Get Child Notes
 [**getNoteNotesNoteIdGet**](NotesApi.md#getnotenotesnoteidget) | **GET** /notes/{note_id} | Get Note
+[**getNotePathNotesNoteIdPathGet**](NotesApi.md#getnotepathnotesnoteidpathget) | **GET** /notes/{note_id}/path | Get Note Path
 [**listRecentNotesNotesGet**](NotesApi.md#listrecentnotesnotesget) | **GET** /notes/ | List Recent Notes
+[**moveNoteNotesNoteIdMovePost**](NotesApi.md#movenotenotesnoteidmovepost) | **POST** /notes/{note_id}/move | Move Note
 [**searchNotesNotesSearchGet**](NotesApi.md#searchnotesnotessearchget) | **GET** /notes/search | Search Notes
 [**updateNoteNotesNoteIdPut**](NotesApi.md#updatenotenotesnoteidput) | **PUT** /notes/{note_id} | Update Note
 
@@ -103,6 +106,53 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getChildNotesNotesTreeChildrenGet**
+> NoteTreeResponse getChildNotesNotesTreeChildrenGet(parentId, limit, offset)
+
+Get Child Notes
+
+Get child notes for a given parent_id. If parent_id is None, returns root-level notes (notes without a parent).
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+
+final api = Openapi().getNotesApi();
+final int parentId = 56; // int | Parent note ID, if None returns root notes
+final int limit = 56; // int | Maximum number of notes to return
+final int offset = 56; // int | Number of notes to skip
+
+try {
+    final response = api.getChildNotesNotesTreeChildrenGet(parentId, limit, offset);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling NotesApi->getChildNotesNotesTreeChildrenGet: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **parentId** | **int**| Parent note ID, if None returns root notes | [optional] 
+ **limit** | **int**| Maximum number of notes to return | [optional] [default to 50]
+ **offset** | **int**| Number of notes to skip | [optional] [default to 0]
+
+### Return type
+
+[**NoteTreeResponse**](NoteTreeResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getNoteNotesNoteIdGet**
 > NoteResponse getNoteNotesNoteIdGet(noteId)
 
@@ -134,6 +184,49 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**NoteResponse**](NoteResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getNotePathNotesNoteIdPathGet**
+> BuiltList<NoteResponse> getNotePathNotesNoteIdPathGet(noteId)
+
+Get Note Path
+
+Get the path from root to the specified note (breadcrumbs)
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+
+final api = Openapi().getNotesApi();
+final int noteId = 56; // int | 
+
+try {
+    final response = api.getNotePathNotesNoteIdPathGet(noteId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling NotesApi->getNotePathNotesNoteIdPathGet: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **noteId** | **int**|  | 
+
+### Return type
+
+[**BuiltList&lt;NoteResponse&gt;**](NoteResponse.md)
 
 ### Authorization
 
@@ -179,6 +272,51 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**NotesListResponse**](NotesListResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **moveNoteNotesNoteIdMovePost**
+> NoteResponse moveNoteNotesNoteIdMovePost(noteId, newParentId)
+
+Move Note
+
+Move a note to a new parent. If new_parent_id is None, the note becomes a root note.
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+
+final api = Openapi().getNotesApi();
+final int noteId = 56; // int | 
+final int newParentId = 56; // int | New parent ID, None for root level
+
+try {
+    final response = api.moveNoteNotesNoteIdMovePost(noteId, newParentId);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling NotesApi->moveNoteNotesNoteIdMovePost: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **noteId** | **int**|  | 
+ **newParentId** | **int**| New parent ID, None for root level | [optional] 
+
+### Return type
+
+[**NoteResponse**](NoteResponse.md)
 
 ### Authorization
 

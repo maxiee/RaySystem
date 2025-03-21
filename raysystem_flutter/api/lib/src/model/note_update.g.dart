@@ -11,11 +11,14 @@ class _$NoteUpdate extends NoteUpdate {
   final String title;
   @override
   final String contentAppflowy;
+  @override
+  final int? parentId;
 
   factory _$NoteUpdate([void Function(NoteUpdateBuilder)? updates]) =>
       (new NoteUpdateBuilder()..update(updates))._build();
 
-  _$NoteUpdate._({required this.title, required this.contentAppflowy})
+  _$NoteUpdate._(
+      {required this.title, required this.contentAppflowy, this.parentId})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(title, r'NoteUpdate', 'title');
     BuiltValueNullFieldError.checkNotNull(
@@ -34,7 +37,8 @@ class _$NoteUpdate extends NoteUpdate {
     if (identical(other, this)) return true;
     return other is NoteUpdate &&
         title == other.title &&
-        contentAppflowy == other.contentAppflowy;
+        contentAppflowy == other.contentAppflowy &&
+        parentId == other.parentId;
   }
 
   @override
@@ -42,6 +46,7 @@ class _$NoteUpdate extends NoteUpdate {
     var _$hash = 0;
     _$hash = $jc(_$hash, title.hashCode);
     _$hash = $jc(_$hash, contentAppflowy.hashCode);
+    _$hash = $jc(_$hash, parentId.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -50,7 +55,8 @@ class _$NoteUpdate extends NoteUpdate {
   String toString() {
     return (newBuiltValueToStringHelper(r'NoteUpdate')
           ..add('title', title)
-          ..add('contentAppflowy', contentAppflowy))
+          ..add('contentAppflowy', contentAppflowy)
+          ..add('parentId', parentId))
         .toString();
   }
 }
@@ -67,6 +73,10 @@ class NoteUpdateBuilder implements Builder<NoteUpdate, NoteUpdateBuilder> {
   set contentAppflowy(String? contentAppflowy) =>
       _$this._contentAppflowy = contentAppflowy;
 
+  int? _parentId;
+  int? get parentId => _$this._parentId;
+  set parentId(int? parentId) => _$this._parentId = parentId;
+
   NoteUpdateBuilder() {
     NoteUpdate._defaults(this);
   }
@@ -76,6 +86,7 @@ class NoteUpdateBuilder implements Builder<NoteUpdate, NoteUpdateBuilder> {
     if ($v != null) {
       _title = $v.title;
       _contentAppflowy = $v.contentAppflowy;
+      _parentId = $v.parentId;
       _$v = null;
     }
     return this;
@@ -102,6 +113,7 @@ class NoteUpdateBuilder implements Builder<NoteUpdate, NoteUpdateBuilder> {
               title, r'NoteUpdate', 'title'),
           contentAppflowy: BuiltValueNullFieldError.checkNotNull(
               contentAppflowy, r'NoteUpdate', 'contentAppflowy'),
+          parentId: parentId,
         );
     replace(_$result);
     return _$result;

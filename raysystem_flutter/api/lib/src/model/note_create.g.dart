@@ -11,11 +11,14 @@ class _$NoteCreate extends NoteCreate {
   final String title;
   @override
   final String contentAppflowy;
+  @override
+  final int? parentId;
 
   factory _$NoteCreate([void Function(NoteCreateBuilder)? updates]) =>
       (new NoteCreateBuilder()..update(updates))._build();
 
-  _$NoteCreate._({required this.title, required this.contentAppflowy})
+  _$NoteCreate._(
+      {required this.title, required this.contentAppflowy, this.parentId})
       : super._() {
     BuiltValueNullFieldError.checkNotNull(title, r'NoteCreate', 'title');
     BuiltValueNullFieldError.checkNotNull(
@@ -34,7 +37,8 @@ class _$NoteCreate extends NoteCreate {
     if (identical(other, this)) return true;
     return other is NoteCreate &&
         title == other.title &&
-        contentAppflowy == other.contentAppflowy;
+        contentAppflowy == other.contentAppflowy &&
+        parentId == other.parentId;
   }
 
   @override
@@ -42,6 +46,7 @@ class _$NoteCreate extends NoteCreate {
     var _$hash = 0;
     _$hash = $jc(_$hash, title.hashCode);
     _$hash = $jc(_$hash, contentAppflowy.hashCode);
+    _$hash = $jc(_$hash, parentId.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -50,7 +55,8 @@ class _$NoteCreate extends NoteCreate {
   String toString() {
     return (newBuiltValueToStringHelper(r'NoteCreate')
           ..add('title', title)
-          ..add('contentAppflowy', contentAppflowy))
+          ..add('contentAppflowy', contentAppflowy)
+          ..add('parentId', parentId))
         .toString();
   }
 }
@@ -67,6 +73,10 @@ class NoteCreateBuilder implements Builder<NoteCreate, NoteCreateBuilder> {
   set contentAppflowy(String? contentAppflowy) =>
       _$this._contentAppflowy = contentAppflowy;
 
+  int? _parentId;
+  int? get parentId => _$this._parentId;
+  set parentId(int? parentId) => _$this._parentId = parentId;
+
   NoteCreateBuilder() {
     NoteCreate._defaults(this);
   }
@@ -76,6 +86,7 @@ class NoteCreateBuilder implements Builder<NoteCreate, NoteCreateBuilder> {
     if ($v != null) {
       _title = $v.title;
       _contentAppflowy = $v.contentAppflowy;
+      _parentId = $v.parentId;
       _$v = null;
     }
     return this;
@@ -102,6 +113,7 @@ class NoteCreateBuilder implements Builder<NoteCreate, NoteCreateBuilder> {
               title, r'NoteCreate', 'title'),
           contentAppflowy: BuiltValueNullFieldError.checkNotNull(
               contentAppflowy, r'NoteCreate', 'contentAppflowy'),
+          parentId: parentId,
         );
     replace(_$result);
     return _$result;

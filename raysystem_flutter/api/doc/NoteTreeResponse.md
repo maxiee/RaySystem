@@ -1,4 +1,4 @@
-# openapi.model.NoteUpdate
+# openapi.model.NoteTreeResponse
 
 ## Load the model package
 ```dart
@@ -8,9 +8,8 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**title** | **String** |  | 
-**contentAppflowy** | **String** |  | 
-**parentId** | **int** |  | [optional] 
+**total** | **int** |  | 
+**items** | [**BuiltList&lt;NoteTreeNode&gt;**](NoteTreeNode.md) |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

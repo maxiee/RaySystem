@@ -14,6 +14,7 @@ part 'note_response.g.dart';
 /// * [title]
 /// * [contentAppflowy]
 /// * [id]
+/// * [parentId]
 /// * [createdAt]
 /// * [updatedAt]
 @BuiltValue()
@@ -27,6 +28,9 @@ abstract class NoteResponse
 
   @BuiltValueField(wireName: r'id')
   int get id;
+
+  @BuiltValueField(wireName: r'parent_id')
+  int? get parentId;
 
   @BuiltValueField(wireName: r'created_at')
   DateTime get createdAt;
@@ -72,6 +76,13 @@ class _$NoteResponseSerializer implements PrimitiveSerializer<NoteResponse> {
       object.id,
       specifiedType: const FullType(int),
     );
+    if (object.parentId != null) {
+      yield r'parent_id';
+      yield serializers.serialize(
+        object.parentId,
+        specifiedType: const FullType.nullable(int),
+      );
+    }
     yield r'created_at';
     yield serializers.serialize(
       object.createdAt,
@@ -127,6 +138,14 @@ class _$NoteResponseSerializer implements PrimitiveSerializer<NoteResponse> {
             specifiedType: const FullType(int),
           ) as int;
           result.id = valueDes;
+          break;
+        case r'parent_id':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(int),
+          ) as int?;
+          if (valueDes == null) continue;
+          result.parentId = valueDes;
           break;
         case r'created_at':
           final valueDes = serializers.deserialize(

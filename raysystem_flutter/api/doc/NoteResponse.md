@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **title** | **String** |  | 
 **contentAppflowy** | **String** |  | 
 **id** | **int** |  | 
+**parentId** | **int** |  | [optional] 
 **createdAt** | [**DateTime**](DateTime.md) |  | 
 **updatedAt** | [**DateTime**](DateTime.md) |  | 
 

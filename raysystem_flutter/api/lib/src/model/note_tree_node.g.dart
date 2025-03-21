@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'note_response.dart';
+part of 'note_tree_node.dart';
 
 // **************************************************************************
 // BuiltValueGenerator
 // **************************************************************************
 
-class _$NoteResponse extends NoteResponse {
+class _$NoteTreeNode extends NoteTreeNode {
   @override
   final String title;
   @override
@@ -19,45 +19,51 @@ class _$NoteResponse extends NoteResponse {
   final DateTime createdAt;
   @override
   final DateTime updatedAt;
+  @override
+  final bool hasChildren;
 
-  factory _$NoteResponse([void Function(NoteResponseBuilder)? updates]) =>
-      (new NoteResponseBuilder()..update(updates))._build();
+  factory _$NoteTreeNode([void Function(NoteTreeNodeBuilder)? updates]) =>
+      (new NoteTreeNodeBuilder()..update(updates))._build();
 
-  _$NoteResponse._(
+  _$NoteTreeNode._(
       {required this.title,
       required this.contentAppflowy,
       required this.id,
       this.parentId,
       required this.createdAt,
-      required this.updatedAt})
+      required this.updatedAt,
+      required this.hasChildren})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(title, r'NoteResponse', 'title');
+    BuiltValueNullFieldError.checkNotNull(title, r'NoteTreeNode', 'title');
     BuiltValueNullFieldError.checkNotNull(
-        contentAppflowy, r'NoteResponse', 'contentAppflowy');
-    BuiltValueNullFieldError.checkNotNull(id, r'NoteResponse', 'id');
+        contentAppflowy, r'NoteTreeNode', 'contentAppflowy');
+    BuiltValueNullFieldError.checkNotNull(id, r'NoteTreeNode', 'id');
     BuiltValueNullFieldError.checkNotNull(
-        createdAt, r'NoteResponse', 'createdAt');
+        createdAt, r'NoteTreeNode', 'createdAt');
     BuiltValueNullFieldError.checkNotNull(
-        updatedAt, r'NoteResponse', 'updatedAt');
+        updatedAt, r'NoteTreeNode', 'updatedAt');
+    BuiltValueNullFieldError.checkNotNull(
+        hasChildren, r'NoteTreeNode', 'hasChildren');
   }
 
   @override
-  NoteResponse rebuild(void Function(NoteResponseBuilder) updates) =>
+  NoteTreeNode rebuild(void Function(NoteTreeNodeBuilder) updates) =>
       (toBuilder()..update(updates)).build();
 
   @override
-  NoteResponseBuilder toBuilder() => new NoteResponseBuilder()..replace(this);
+  NoteTreeNodeBuilder toBuilder() => new NoteTreeNodeBuilder()..replace(this);
 
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is NoteResponse &&
+    return other is NoteTreeNode &&
         title == other.title &&
         contentAppflowy == other.contentAppflowy &&
         id == other.id &&
         parentId == other.parentId &&
         createdAt == other.createdAt &&
-        updatedAt == other.updatedAt;
+        updatedAt == other.updatedAt &&
+        hasChildren == other.hasChildren;
   }
 
   @override
@@ -69,26 +75,28 @@ class _$NoteResponse extends NoteResponse {
     _$hash = $jc(_$hash, parentId.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, updatedAt.hashCode);
+    _$hash = $jc(_$hash, hasChildren.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'NoteResponse')
+    return (newBuiltValueToStringHelper(r'NoteTreeNode')
           ..add('title', title)
           ..add('contentAppflowy', contentAppflowy)
           ..add('id', id)
           ..add('parentId', parentId)
           ..add('createdAt', createdAt)
-          ..add('updatedAt', updatedAt))
+          ..add('updatedAt', updatedAt)
+          ..add('hasChildren', hasChildren))
         .toString();
   }
 }
 
-class NoteResponseBuilder
-    implements Builder<NoteResponse, NoteResponseBuilder> {
-  _$NoteResponse? _$v;
+class NoteTreeNodeBuilder
+    implements Builder<NoteTreeNode, NoteTreeNodeBuilder> {
+  _$NoteTreeNode? _$v;
 
   String? _title;
   String? get title => _$this._title;
@@ -115,11 +123,15 @@ class NoteResponseBuilder
   DateTime? get updatedAt => _$this._updatedAt;
   set updatedAt(DateTime? updatedAt) => _$this._updatedAt = updatedAt;
 
-  NoteResponseBuilder() {
-    NoteResponse._defaults(this);
+  bool? _hasChildren;
+  bool? get hasChildren => _$this._hasChildren;
+  set hasChildren(bool? hasChildren) => _$this._hasChildren = hasChildren;
+
+  NoteTreeNodeBuilder() {
+    NoteTreeNode._defaults(this);
   }
 
-  NoteResponseBuilder get _$this {
+  NoteTreeNodeBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
       _title = $v.title;
@@ -128,38 +140,41 @@ class NoteResponseBuilder
       _parentId = $v.parentId;
       _createdAt = $v.createdAt;
       _updatedAt = $v.updatedAt;
+      _hasChildren = $v.hasChildren;
       _$v = null;
     }
     return this;
   }
 
   @override
-  void replace(NoteResponse other) {
+  void replace(NoteTreeNode other) {
     ArgumentError.checkNotNull(other, 'other');
-    _$v = other as _$NoteResponse;
+    _$v = other as _$NoteTreeNode;
   }
 
   @override
-  void update(void Function(NoteResponseBuilder)? updates) {
+  void update(void Function(NoteTreeNodeBuilder)? updates) {
     if (updates != null) updates(this);
   }
 
   @override
-  NoteResponse build() => _build();
+  NoteTreeNode build() => _build();
 
-  _$NoteResponse _build() {
+  _$NoteTreeNode _build() {
     final _$result = _$v ??
-        new _$NoteResponse._(
+        new _$NoteTreeNode._(
           title: BuiltValueNullFieldError.checkNotNull(
-              title, r'NoteResponse', 'title'),
+              title, r'NoteTreeNode', 'title'),
           contentAppflowy: BuiltValueNullFieldError.checkNotNull(
-              contentAppflowy, r'NoteResponse', 'contentAppflowy'),
-          id: BuiltValueNullFieldError.checkNotNull(id, r'NoteResponse', 'id'),
+              contentAppflowy, r'NoteTreeNode', 'contentAppflowy'),
+          id: BuiltValueNullFieldError.checkNotNull(id, r'NoteTreeNode', 'id'),
           parentId: parentId,
           createdAt: BuiltValueNullFieldError.checkNotNull(
-              createdAt, r'NoteResponse', 'createdAt'),
+              createdAt, r'NoteTreeNode', 'createdAt'),
           updatedAt: BuiltValueNullFieldError.checkNotNull(
-              updatedAt, r'NoteResponse', 'updatedAt'),
+              updatedAt, r'NoteTreeNode', 'updatedAt'),
+          hasChildren: BuiltValueNullFieldError.checkNotNull(
+              hasChildren, r'NoteTreeNode', 'hasChildren'),
         );
     replace(_$result);
     return _$result;

@@ -11,6 +11,8 @@ doc/MemoryMetrics.md
 doc/NetworkMetrics.md
 doc/NoteCreate.md
 doc/NoteResponse.md
+doc/NoteTreeNode.md
+doc/NoteTreeResponse.md
 doc/NoteUpdate.md
 doc/NotesApi.md
 doc/NotesListResponse.md
@@ -43,6 +45,8 @@ lib/src/model/memory_metrics.dart
 lib/src/model/network_metrics.dart
 lib/src/model/note_create.dart
 lib/src/model/note_response.dart
+lib/src/model/note_tree_node.dart
+lib/src/model/note_tree_response.dart
 lib/src/model/note_update.dart
 lib/src/model/notes_list_response.dart
 lib/src/model/response_get_metrics_system_metrics_get.dart
@@ -55,8 +59,5 @@ lib/src/model/validation_error.dart
 lib/src/model/validation_error_loc_inner.dart
 lib/src/serializers.dart
 pubspec.yaml
-test/note_create_test.dart
-test/note_response_test.dart
-test/note_update_test.dart
-test/notes_api_test.dart
-test/notes_list_response_test.dart
+test/note_tree_node_test.dart
+test/note_tree_response_test.dart

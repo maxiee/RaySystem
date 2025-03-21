@@ -3,74 +3,69 @@
 //
 
 // ignore_for_file: unused_element
+import 'package:built_collection/built_collection.dart';
+import 'package:openapi/src/model/note_tree_node.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'note_create.g.dart';
+part 'note_tree_response.g.dart';
 
-/// NoteCreate
+/// NoteTreeResponse
 ///
 /// Properties:
-/// * [title]
-/// * [contentAppflowy]
-/// * [parentId]
+/// * [total]
+/// * [items]
 @BuiltValue()
-abstract class NoteCreate implements Built<NoteCreate, NoteCreateBuilder> {
-  @BuiltValueField(wireName: r'title')
-  String get title;
+abstract class NoteTreeResponse
+    implements Built<NoteTreeResponse, NoteTreeResponseBuilder> {
+  @BuiltValueField(wireName: r'total')
+  int get total;
 
-  @BuiltValueField(wireName: r'content_appflowy')
-  String get contentAppflowy;
+  @BuiltValueField(wireName: r'items')
+  BuiltList<NoteTreeNode> get items;
 
-  @BuiltValueField(wireName: r'parent_id')
-  int? get parentId;
+  NoteTreeResponse._();
 
-  NoteCreate._();
-
-  factory NoteCreate([void updates(NoteCreateBuilder b)]) = _$NoteCreate;
+  factory NoteTreeResponse([void updates(NoteTreeResponseBuilder b)]) =
+      _$NoteTreeResponse;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(NoteCreateBuilder b) => b;
+  static void _defaults(NoteTreeResponseBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<NoteCreate> get serializer => _$NoteCreateSerializer();
+  static Serializer<NoteTreeResponse> get serializer =>
+      _$NoteTreeResponseSerializer();
 }
 
-class _$NoteCreateSerializer implements PrimitiveSerializer<NoteCreate> {
+class _$NoteTreeResponseSerializer
+    implements PrimitiveSerializer<NoteTreeResponse> {
   @override
-  final Iterable<Type> types = const [NoteCreate, _$NoteCreate];
+  final Iterable<Type> types = const [NoteTreeResponse, _$NoteTreeResponse];
 
   @override
-  final String wireName = r'NoteCreate';
+  final String wireName = r'NoteTreeResponse';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    NoteCreate object, {
+    NoteTreeResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'title';
+    yield r'total';
     yield serializers.serialize(
-      object.title,
-      specifiedType: const FullType(String),
+      object.total,
+      specifiedType: const FullType(int),
     );
-    yield r'content_appflowy';
+    yield r'items';
     yield serializers.serialize(
-      object.contentAppflowy,
-      specifiedType: const FullType(String),
+      object.items,
+      specifiedType: const FullType(BuiltList, [FullType(NoteTreeNode)]),
     );
-    if (object.parentId != null) {
-      yield r'parent_id';
-      yield serializers.serialize(
-        object.parentId,
-        specifiedType: const FullType.nullable(int),
-      );
-    }
   }
 
   @override
   Object serialize(
     Serializers serializers,
-    NoteCreate object, {
+    NoteTreeResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -83,34 +78,26 @@ class _$NoteCreateSerializer implements PrimitiveSerializer<NoteCreate> {
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required NoteCreateBuilder result,
+    required NoteTreeResponseBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'title':
+        case r'total':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.title = valueDes;
+            specifiedType: const FullType(int),
+          ) as int;
+          result.total = valueDes;
           break;
-        case r'content_appflowy':
+        case r'items':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.contentAppflowy = valueDes;
-          break;
-        case r'parent_id':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType.nullable(int),
-          ) as int?;
-          if (valueDes == null) continue;
-          result.parentId = valueDes;
+            specifiedType: const FullType(BuiltList, [FullType(NoteTreeNode)]),
+          ) as BuiltList<NoteTreeNode>;
+          result.items.replace(valueDes);
           break;
         default:
           unhandled.add(key);
@@ -121,12 +108,12 @@ class _$NoteCreateSerializer implements PrimitiveSerializer<NoteCreate> {
   }
 
   @override
-  NoteCreate deserialize(
+  NoteTreeResponse deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = NoteCreateBuilder();
+    final result = NoteTreeResponseBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(
