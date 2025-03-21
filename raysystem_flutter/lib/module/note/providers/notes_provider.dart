@@ -196,15 +196,18 @@ class NotesProvider extends ChangeNotifier {
   }
 
   // Create a new note
-  Future<int?> createNote(
-      {required String title, required String contentAppflowy}) async {
+  Future<int?> createNote({
+      required String title, 
+      required String contentAppflowy,
+      int? parentId}) async {
     _status = NoteOperationStatus.loading;
     notifyListeners();
 
     try {
       final noteCreate = NoteCreate((b) => b
         ..title = title
-        ..contentAppflowy = contentAppflowy);
+        ..contentAppflowy = contentAppflowy
+        ..parentId = parentId);
 
       final response =
           await _notesApi.createNoteNotesPost(noteCreate: noteCreate);

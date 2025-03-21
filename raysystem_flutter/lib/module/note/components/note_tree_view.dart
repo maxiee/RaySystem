@@ -12,6 +12,9 @@ class NoteTreeViewClassic extends StatefulWidget {
   /// Callback when an item is selected
   final Function(NoteTreeItem)? onItemSelected;
 
+  /// Callback when add child note is requested
+  final Function(NoteTreeItem)? onAddChildNote;
+
   /// Flag to determine if the widget should load initial data itself
   final bool autoLoadInitialData;
 
@@ -22,15 +25,16 @@ class NoteTreeViewClassic extends StatefulWidget {
     Key? key,
     this.initialItems,
     this.onItemSelected,
+    this.onAddChildNote,
     this.autoLoadInitialData = true,
     this.treeService,
   }) : super(key: key);
 
   @override
-  State<NoteTreeViewClassic> createState() => _NoteTreeViewClassicState();
+  State<NoteTreeViewClassic> createState() => NoteTreeViewClassicState();
 }
 
-class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
+class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
   int? _selectedItemId;
 
   /// Items in the tree
@@ -163,6 +167,46 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
     }
   }
 
+  /// Refresh children for a specific note, ensuring it's loaded and expanded
+  Future<void> refreshChildren(int noteId) async {
+    // Find the note item
+    NoteTreeItem? item;
+    bool found = _findAndUpdateItem(_items, noteId, (foundItem) {
+      item = foundItem;
+    });
+
+    if (!found || item == null) return;
+
+    setState(() {
+      _loadingFolders.add(noteId);
+      // Ensure the item is marked as a folder and can be expanded
+      if (!item!.isFolder) {
+        _findAndUpdateItem(_items, noteId, (foundItem) {
+          foundItem.isFolder = true;
+        });
+      }
+      _hasChildrenCache[noteId] = true;
+    });
+
+    try {
+      final children = await _treeService.getChildrenFor(noteId);
+      
+      setState(() {
+        _findAndUpdateItem(_items, noteId, (foundItem) {
+          foundItem.isExpanded = true;
+          foundItem.children.clear();
+          foundItem.children.addAll(children);
+        });
+        _loadingFolders.remove(noteId);
+      });
+    } catch (e) {
+      setState(() {
+        _loadingFolders.remove(noteId);
+      });
+      debugPrint('Error refreshing children for $noteId: $e');
+    }
+  }
+
   void _toggleExpand(NoteTreeItem item) {
     if (!item.isFolder) return;
 
@@ -198,6 +242,35 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
     if (widget.onItemSelected != null) {
       widget.onItemSelected!(item);
     }
+  }
+
+  /// Show context menu for an item
+  void _showContextMenu(BuildContext context, NoteTreeItem item, Offset position) {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    
+    showMenu(
+      context: context,
+      position: RelativeRect.fromRect(
+        position & const Size(1, 1),
+        Offset.zero & overlay.size,
+      ),
+      items: [
+        PopupMenuItem(
+          value: 'add_child',
+          child: Row(
+            children: const [
+              Icon(Icons.add, size: 16),
+              SizedBox(width: 8),
+              Text('Add Child Note'),
+            ],
+          ),
+        ),
+      ],
+    ).then((value) {
+      if (value == 'add_child' && widget.onAddChildNote != null) {
+        widget.onAddChildNote!(item);
+      }
+    });
   }
 
   /// 在树结构中查找指定ID的节点并对其应用更新操作
@@ -282,153 +355,159 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
     // 判断当前节点是否有子节点（用于显示展开/折叠按钮）
     final hasChildren = item.isFolder && (_hasChildrenCache[item.id] ?? false);
 
-    return InkWell(
-      // 点击整个节点区域时触发选中事件
-      onTap: () => _selectItem(item),
-      child: Container(
-        height: 24, // 设置节点高度保持紧凑布局
-        // 选中状态时使用高亮背景色，否则透明
-        color:
-            isSelected ? Theme.of(context).highlightColor : Colors.transparent,
-        child: Stack(
-          children: [
-            // 绘制连接线部分
-            Positioned.fill(
-              child: Row(
-                children: [
-                  // 为每一级层级绘制对应的连接线
-                  ...List.generate(isLast.length, (index) {
-                    // 每一级层级的缩进宽度
-                    return SizedBox(
-                      width: 16,
-                      child: isLast[index]
-                          ? const SizedBox() // 如果是该级的最后一项，则不需要绘制垂直连接线
-                          : CustomPaint(
-                              size: const Size(16, 24),
-                              painter: DashedLinePainter(
-                                isVertical: true, // 垂直虚线
-                                dashWidth: 1, // 虚线段宽度
-                                dashSpace: 2, // 虚线间隔
-                                strokeWidth: 0.8, // 线条粗细
-                                color: Colors.grey[400]!, // 线条颜色
+    return GestureDetector(
+      // Handle right-click for context menu
+      onSecondaryTapDown: (details) {
+        _showContextMenu(context, item, details.globalPosition);
+      },
+      child: InkWell(
+        // 点击整个节点区域时触发选中事件
+        onTap: () => _selectItem(item),
+        child: Container(
+          height: 24, // 设置节点高度保持紧凑布局
+          // 选中状态时使用高亮背景色，否则透明
+          color:
+              isSelected ? Theme.of(context).highlightColor : Colors.transparent,
+          child: Stack(
+            children: [
+              // 绘制连接线部分
+              Positioned.fill(
+                child: Row(
+                  children: [
+                    // 为每一级层级绘制对应的连接线
+                    ...List.generate(isLast.length, (index) {
+                      // 每一级层级的缩进宽度
+                      return SizedBox(
+                        width: 16,
+                        child: isLast[index]
+                            ? const SizedBox() // 如果是该级的最后一项，则不需要绘制垂直连接线
+                            : CustomPaint(
+                                size: const Size(16, 24),
+                                painter: DashedLinePainter(
+                                  isVertical: true, // 垂直虚线
+                                  dashWidth: 1, // 虚线段宽度
+                                  dashSpace: 2, // 虚线间隔
+                                  strokeWidth: 0.8, // 线条粗细
+                                  color: Colors.grey[400]!, // 线条颜色
+                                ),
                               ),
-                            ),
-                    );
-                  }),
+                      );
+                    }),
 
-                  // 绘制分支连接线（水平+垂直组合）
-                  SizedBox(
-                    width: 16,
-                    child: CustomPaint(
-                      size: const Size(16, 24),
-                      painter: BranchLinePainter(
-                        isLastItem: isLastInLevel, // 是否为最后一项，决定了连接线的形状
-                        strokeWidth: 0.8, // 线条粗细
-                        color: Colors.grey[400]!, // 线条颜色
-                        isDashed: true, // 使用虚线样式
-                        dashWidth: 1, // 虚线段宽度
-                        dashSpace: 2, // 虚线间隔
+                    // 绘制分支连接线（水平+垂直组合）
+                    SizedBox(
+                      width: 16,
+                      child: CustomPaint(
+                        size: const Size(16, 24),
+                        painter: BranchLinePainter(
+                          isLastItem: isLastInLevel, // 是否为最后一项，决定了连接线的形状
+                          strokeWidth: 0.8, // 线条粗细
+                          color: Colors.grey[400]!, // 线条颜色
+                          isDashed: true, // 使用虚线样式
+                          dashWidth: 1, // 虚线段宽度
+                          dashSpace: 2, // 虚线间隔
+                        ),
                       ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // 绘制节点内容部分（文件夹/文件图标和名称）
+              Row(
+                children: [
+                  // 根据层级缩进的空间
+                  SizedBox(width: 16.0 * isLast.length),
+
+                  // 分支连接线的空间
+                  const SizedBox(width: 16),
+
+                  // 文件夹的展开/折叠按钮或加载指示器
+                  if (item.isFolder)
+                    GestureDetector(
+                      // 点击展开/折叠按钮时触发对应事件，如果正在加载则禁用点击
+                      onTap: isLoading ? null : () => _toggleExpand(item),
+                      child: Container(
+                        width: 16,
+                        height: 16,
+                        decoration: BoxDecoration(
+                          // 如果有子节点或正在加载，则显示边框
+                          border: Border.all(
+                            color: hasChildren || isLoading
+                                ? Colors.grey[400]!
+                                : Colors.transparent,
+                            width: 0.8,
+                          ),
+                        ),
+                        child: Center(
+                          child: isLoading
+                              ? SizedBox(
+                                  width: 10,
+                                  height: 10,
+                                  // 加载中显示旋转进度指示器
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 1.5,
+                                    color: Colors.grey[600],
+                                  ),
+                                )
+                              : hasChildren
+                                  ? Icon(
+                                      // 根据展开状态显示加号或减号图标
+                                      item.isExpanded ? Icons.remove : Icons.add,
+                                      size: 12.0,
+                                      color: Colors.grey[800],
+                                    )
+                                  : const SizedBox(), // 没有子节点时显示空白
+                        ),
+                      ),
+                    )
+                  else
+                    // 非文件夹项目显示水平虚线
+                    CustomPaint(
+                      size: const Size(16, 24),
+                      painter: DashedLinePainter(
+                        isVertical: false, // 水平虚线
+                        strokeWidth: 0.8,
+                        color: Colors.grey[400]!,
+                        dashWidth: 1,
+                        dashSpace: 2,
+                      ),
+                    ),
+
+                  const SizedBox(width: 4),
+
+                  // 节点图标
+                  Icon(
+                    // 使用节点提供的图标，或根据节点类型选择默认图标
+                    item.icon ??
+                        (item.isFolder
+                            ? (item.isExpanded ? Icons.folder_open : Icons.folder)
+                            : Icons.description),
+                    size: 16,
+                    color: item.isFolder
+                        ? Colors.amber[700]
+                        : Colors.blue[700], // 文件夹和文件使用不同颜色
+                  ),
+
+                  const SizedBox(width: 4),
+
+                  // 节点名称文本
+                  Expanded(
+                    child: Text(
+                      item.name,
+                      style: TextStyle(
+                        fontSize: 13,
+                        // 选中状态使用粗体显示
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
+                      ),
+                      overflow: TextOverflow.ellipsis, // 文本过长时显示省略号
                     ),
                   ),
                 ],
               ),
-            ),
-
-            // 绘制节点内容部分（文件夹/文件图标和名称）
-            Row(
-              children: [
-                // 根据层级缩进的空间
-                SizedBox(width: 16.0 * isLast.length),
-
-                // 分支连接线的空间
-                const SizedBox(width: 16),
-
-                // 文件夹的展开/折叠按钮或加载指示器
-                if (item.isFolder)
-                  GestureDetector(
-                    // 点击展开/折叠按钮时触发对应事件，如果正在加载则禁用点击
-                    onTap: isLoading ? null : () => _toggleExpand(item),
-                    child: Container(
-                      width: 16,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        // 如果有子节点或正在加载，则显示边框
-                        border: Border.all(
-                          color: hasChildren || isLoading
-                              ? Colors.grey[400]!
-                              : Colors.transparent,
-                          width: 0.8,
-                        ),
-                      ),
-                      child: Center(
-                        child: isLoading
-                            ? SizedBox(
-                                width: 10,
-                                height: 10,
-                                // 加载中显示旋转进度指示器
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 1.5,
-                                  color: Colors.grey[600],
-                                ),
-                              )
-                            : hasChildren
-                                ? Icon(
-                                    // 根据展开状态显示加号或减号图标
-                                    item.isExpanded ? Icons.remove : Icons.add,
-                                    size: 12.0,
-                                    color: Colors.grey[800],
-                                  )
-                                : const SizedBox(), // 没有子节点时显示空白
-                      ),
-                    ),
-                  )
-                else
-                  // 非文件夹项目显示水平虚线
-                  CustomPaint(
-                    size: const Size(16, 24),
-                    painter: DashedLinePainter(
-                      isVertical: false, // 水平虚线
-                      strokeWidth: 0.8,
-                      color: Colors.grey[400]!,
-                      dashWidth: 1,
-                      dashSpace: 2,
-                    ),
-                  ),
-
-                const SizedBox(width: 4),
-
-                // 节点图标
-                Icon(
-                  // 使用节点提供的图标，或根据节点类型选择默认图标
-                  item.icon ??
-                      (item.isFolder
-                          ? (item.isExpanded ? Icons.folder_open : Icons.folder)
-                          : Icons.description),
-                  size: 16,
-                  color: item.isFolder
-                      ? Colors.amber[700]
-                      : Colors.blue[700], // 文件夹和文件使用不同颜色
-                ),
-
-                const SizedBox(width: 4),
-
-                // 节点名称文本
-                Expanded(
-                  child: Text(
-                    item.name,
-                    style: TextStyle(
-                      fontSize: 13,
-                      // 选中状态使用粗体显示
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.normal,
-                    ),
-                    overflow: TextOverflow.ellipsis, // 文本过长时显示省略号
-                  ),
-                ),
-              ],
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

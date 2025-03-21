@@ -17,7 +17,8 @@ class NoteManager:
         """
         self.session = session or db_async_session()
     
-    async def create_note(self, title: str, content_appflowy: str, parent_id: Optional[int] = None) -> Note:
+    async def create_note(self, title: str, content_appflowy: str, parent_id: Optional[int] = None,
+                          session: Optional[AsyncSession] = None) -> Note:
         """
         Create a new note with the given title and content
         
@@ -29,15 +30,16 @@ class NoteManager:
         Returns:
             The newly created Note object
         """
-        async with self.session as session:
+        session_to_use = session or self.session
+        async with session_to_use as session:
             # If parent_id is provided, verify it exists
             if parent_id is not None:
-                parent_note = await self.get_note_by_id(parent_id)
+                parent_note = await self.get_note_by_id(parent_id, session)
                 if parent_note is None:
                     raise ValueError(f"Parent note with ID {parent_id} does not exist")
                 
                 # Check for circular reference (though this should be impossible for a new note)
-                if await self._would_create_cycle(None, parent_id):
+                if await self._would_create_cycle(None, parent_id, session):
                     raise ValueError("Cannot create note: would create circular reference")
             
             note = Note(
@@ -56,7 +58,8 @@ class NoteManager:
                           note_id: int, 
                           title: str, 
                           content_appflowy: str, 
-                          parent_id: Optional[int] = None) -> Optional[Note]:
+                          parent_id: Optional[int] = None,
+                          session: Optional[AsyncSession] = None) -> Optional[Note]:
         """
         Update an existing note
         
@@ -69,7 +72,8 @@ class NoteManager:
         Returns:
             Updated Note object or None if note doesn't exist
         """
-        async with self.session as session:
+        session_to_use = session or self.session
+        async with session_to_use:
             note = await self.get_note_by_id(note_id)
             if not note:
                 return None
@@ -91,7 +95,8 @@ class NoteManager:
             await session.refresh(note)
             return note
     
-    async def get_note_by_id(self, note_id: int) -> Optional[Note]:
+    async def get_note_by_id(self, note_id: int,
+                             session: Optional[AsyncSession] = None) -> Optional[Note]:
         """
         Retrieve a note by its ID
         
@@ -102,7 +107,8 @@ class NoteManager:
         Returns:
             Note object or None if not found
         """
-        async with self.session as session:
+        session_to_use = session or self.session
+        async with session_to_use as session:
             result = await session.execute(
                 select(Note)
                 .filter(Note.id == note_id)
@@ -110,7 +116,8 @@ class NoteManager:
             )
             return result.scalars().first()
     
-    async def delete_note(self, note_id: int) -> bool:
+    async def delete_note(self, note_id: int,
+                          session: Optional[AsyncSession] = None) -> bool:
         """
         Delete a note by its ID and reassign its children to the deleted note's parent.
         
@@ -126,7 +133,8 @@ class NoteManager:
         Returns:
             True if note was deleted, False if note wasn't found
         """
-        async with self.session as session:
+        session_to_use = session or self.session
+        async with session_to_use as session:
             # Get note with its children
             result = await session.execute(
                 select(Note)
@@ -158,7 +166,8 @@ class NoteManager:
             await session.commit()
             return True
     
-    async def search_notes_by_title(self, search_term: str, limit: int = 20, offset: int = 0) -> List[Note]:
+    async def search_notes_by_title(self, search_term: str, limit: int = 20, offset: int = 0,
+                                    session: Optional[AsyncSession] = None) -> List[Note]:
         """
         Search notes by title (fuzzy search)
         
@@ -171,7 +180,8 @@ class NoteManager:
         Returns:
             List of matching Note objects
         """
-        async with self.session as session:
+        session_to_use = session or self.session
+        async with session_to_use as session:
             result = await session.execute(
                 select(Note)
                 .filter(Note.title.ilike(f"%{search_term}%"))
@@ -277,7 +287,8 @@ class NoteManager:
             result = await session.execute(query)
             return result.scalar_one()
     
-    async def move_note(self, note_id: int, new_parent_id: Optional[int] = None) -> Optional[Note]:
+    async def move_note(self, note_id: int, new_parent_id: Optional[int] = None,
+                        session: Optional[AsyncSession] = None) -> Optional[Note]:
         """
         Move a note to a new parent
         
@@ -289,7 +300,8 @@ class NoteManager:
         Returns:
             Updated Note object or None if note doesn't exist
         """
-        async with self.session as session:
+        session_to_use = session or self.session
+        async with session_to_use as session:
             # Fetch the note directly within this session context
             result = await session.execute(
                 select(Note)
@@ -316,7 +328,8 @@ class NoteManager:
             await session.refresh(note)
             return note
     
-    async def get_note_path(self, note_id: int) -> List[Note]:
+    async def get_note_path(self, note_id: int,
+                            session: Optional[AsyncSession] = None) -> List[Note]:
         """
         Get the complete path from root to the specified note
         
@@ -328,9 +341,10 @@ class NoteManager:
             List of Note objects representing the path, starting from root
         """
         path = []
-        async with self.session as session:
+        session_to_use = session or self.session
+        async with session_to_use as session:
             # Start with the requested note
-            current = await self.get_note_by_id(note_id)
+            current = await self.get_note_by_id(note_id, session)
             if not current:
                 return []
             
@@ -339,7 +353,7 @@ class NoteManager:
             
             # Follow parent references up to the root
             while current.parent_id is not None:
-                parent = await self.get_note_by_id(current.parent_id)
+                parent = await self.get_note_by_id(current.parent_id, session)
                 if not parent:  # This shouldn't happen if DB integrity is maintained
                     break
                 
@@ -350,7 +364,8 @@ class NoteManager:
     
     async def _would_create_cycle(self, 
                                  note_id: Optional[int], 
-                                 parent_id: int) -> bool:
+                                 parent_id: int,
+                                 session: Optional[AsyncSession] = None) -> bool:
         """
         Check if setting parent_id for note_id would create a circular reference
         
@@ -386,7 +401,8 @@ class NoteManager:
                 return True
             
             # Get parent of the current note
-            result = await self.session.execute(
+            session_to_use = session or self.session
+            result = await session_to_use.execute(
                 select(Note.parent_id).filter(Note.id == current_id)
             )
             current_id = result.scalar_one_or_none()

@@ -9,7 +9,7 @@ class NoteTreeItem {
   final String name;
 
   /// Whether this is a folder (true) or a note (false)
-  final bool isFolder;
+  bool isFolder;
 
   /// Children items if this is a folder
   final List<NoteTreeItem> children;
