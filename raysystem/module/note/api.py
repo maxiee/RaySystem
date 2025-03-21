@@ -150,13 +150,14 @@ async def search_notes(
 async def get_child_notes(
     parent_id: Optional[int] = Query(None, description="Parent note ID, if None returns root notes"),
     limit: int = Query(50, description="Maximum number of notes to return"),
-    offset: int = Query(0, description="Number of notes to skip")
+    offset: int = Query(0, description="Number of notes to skip"),
+    session: AsyncSession = Depends(get_db_session)
 ):
     """
     Get child notes for a given parent_id.
     If parent_id is None, returns root-level notes (notes without a parent).
     """
-    notes = await kNoteManager.get_child_notes(parent_id, limit, offset)
+    notes = await kNoteManager.get_child_notes(parent_id, limit, offset, session)
     total = await kNoteManager.get_child_notes_count(parent_id)
     tree_nodes = convert_notes_to_tree_nodes(notes)
     return NoteTreeResponse(total=total, items=tree_nodes)

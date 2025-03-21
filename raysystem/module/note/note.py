@@ -221,7 +221,8 @@ class NoteManager:
     async def get_child_notes(self, 
                               parent_id: Optional[int] = None, 
                               limit: int = 50, 
-                              offset: int = 0) -> List[Note]:
+                              offset: int = 0,
+                              session: Optional[AsyncSession] = None) -> List[Note]:
         """
         Get child notes for a given parent ID
         
@@ -234,7 +235,8 @@ class NoteManager:
         Returns:
             List of child Note objects
         """
-        async with self.session as session:
+        session_to_use = session or self.session
+        async with session_to_use as session:
             query = select(Note).options(joinedload(Note.children))
             
             # If parent_id is None, get notes without parent (root notes)
