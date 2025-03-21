@@ -6,7 +6,7 @@ import 'note_tree_service.dart';
 /// Service to provide mock tree data with simulated network delays
 class MockNoteTreeService implements NoteTreeService {
   /// In-memory cache of the entire tree structure for mock data purposes
-  final Map<String, List<NoteTreeItem>> _mockTreeCache = {};
+  final Map<int?, List<NoteTreeItem>> _mockTreeCache = {};
 
   /// Flag to print debug info
   final bool _debug = true;
@@ -22,7 +22,7 @@ class MockNoteTreeService implements NoteTreeService {
     _logDebug('Initializing mock data with ${mockData.length} root items');
 
     // Cache root level items
-    _mockTreeCache['root'] = mockData
+    _mockTreeCache[null] = mockData
         .map((item) => item.copyWith(
               children: [], // Empty children array for lazy loading
             ))
@@ -67,7 +67,7 @@ class MockNoteTreeService implements NoteTreeService {
       return [];
     }
 
-    _logDebug('Returning ${_mockTreeCache['root']!.length} root items');
+    _logDebug('Returning ${_mockTreeCache[null]!.length} root items');
 
     // Return root level items without their children (for lazy loading)
     return _mockTreeCache['root']!
@@ -78,7 +78,7 @@ class MockNoteTreeService implements NoteTreeService {
   }
 
   @override
-  Future<List<NoteTreeItem>> getChildrenFor(String parentId) async {
+  Future<List<NoteTreeItem>> getChildrenFor(int? parentId) async {
     // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 500));
 
@@ -102,7 +102,7 @@ class MockNoteTreeService implements NoteTreeService {
   }
 
   @override
-  Future<bool> hasChildren(String folderId) async {
+  Future<bool> hasChildren(int? folderId) async {
     // Simulate a quick check
     await Future.delayed(const Duration(milliseconds: 100));
 

@@ -31,7 +31,7 @@ class NoteTreeViewClassic extends StatefulWidget {
 }
 
 class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
-  String? _selectedItemId;
+  int? _selectedItemId;
 
   /// Items in the tree
   late List<NoteTreeItem> _items;
@@ -40,13 +40,13 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
   late final NoteTreeService _treeService;
 
   /// Tracks which folders are currently loading their children
-  final Set<String> _loadingFolders = {};
+  final Set<int> _loadingFolders = {};
 
   /// Loading state for initial data
   bool _isInitialLoading = false;
 
   /// Cache to track which folders have children (to show expand button)
-  final Map<String, bool> _hasChildrenCache = {};
+  final Map<int, bool> _hasChildrenCache = {};
 
   @override
   void initState() {
@@ -208,7 +208,7 @@ class _NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
   ///
   /// 返回一个布尔值，表示是否找到并更新了节点
   bool _findAndUpdateItem(
-      List<NoteTreeItem> items, String id, Function(NoteTreeItem) update) {
+      List<NoteTreeItem> items, int id, Function(NoteTreeItem) update) {
     for (int i = 0; i < items.length; i++) {
       if (items[i].id == id) {
         // 找到匹配ID的节点，应用更新函数

@@ -252,7 +252,8 @@ class NoteManager:
             )
             return list(result.unique().scalars().all())
     
-    async def get_child_notes_count(self, parent_id: Optional[int] = None) -> int:
+    async def get_child_notes_count(self, parent_id: Optional[int] = None,
+                                    session: Optional[AsyncSession] = None) -> int:
         """
         Get count of child notes for a given parent ID
         
@@ -263,7 +264,8 @@ class NoteManager:
         Returns:
             Count of child notes
         """        
-        async with self.session as session:
+        session_to_use = session or self.session
+        async with session_to_use as session:
             query = select(func.count()).select_from(Note)
             
             # If parent_id is None, count notes without parent (root notes)

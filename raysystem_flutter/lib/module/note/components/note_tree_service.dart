@@ -11,10 +11,10 @@ abstract class NoteTreeService {
   Future<List<NoteTreeItem>> getInitialItems();
 
   /// Get children for a specific parent ID
-  Future<List<NoteTreeItem>> getChildrenFor(String parentId);
+  Future<List<NoteTreeItem>> getChildrenFor(int? parentId);
 
   /// Check if a folder has any children
-  Future<bool> hasChildren(String folderId);
+  Future<bool> hasChildren(int? folderId);
 
   /// Reset the cache (optional implementation)
   void resetCache() {}
@@ -43,8 +43,6 @@ abstract class NoteTreeService {
       notesApi: notesApi!,
       debug: debug,
       noteIcon: noteIcon,
-      folderIcon: folderIcon,
-      folderOpenIcon: folderOpenIcon,
     );
   }
 }
