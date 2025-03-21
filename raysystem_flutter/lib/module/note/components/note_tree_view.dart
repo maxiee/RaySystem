@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:raysystem_flutter/module/note/components/painters.dart';
 import 'note_tree_model.dart';
 import 'note_tree_service.dart';
-import 'mock_note_tree_service.dart';
+import '../api/mock_note_tree_service.dart';
 
 /// A widget that shows a classic tree view with connecting lines
 class NoteTreeViewClassic extends StatefulWidget {

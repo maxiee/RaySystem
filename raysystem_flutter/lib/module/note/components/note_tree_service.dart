@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:openapi/openapi.dart';
 
-import 'api_note_tree_service.dart';
-import 'mock_note_tree_service.dart';
+import '../api/api_note_tree_service.dart';
+import '../api/mock_note_tree_service.dart';
 import 'note_tree_model.dart';
 
 /// Abstract interface for note tree data services

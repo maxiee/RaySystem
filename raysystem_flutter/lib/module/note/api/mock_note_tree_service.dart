@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'note_tree_model.dart';
-import 'note_tree_service.dart';
+import '../components/note_tree_model.dart';
+import '../components/note_tree_service.dart';
 
 /// Service to provide mock tree data with simulated network delays
 class MockNoteTreeService implements NoteTreeService {

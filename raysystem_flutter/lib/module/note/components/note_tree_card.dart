@@ -4,7 +4,7 @@ import 'package:raysystem_flutter/module/note/components/note_tree_view.dart';
 import 'package:raysystem_flutter/module/note/components/note_tree_model.dart';
 import 'package:raysystem_flutter/module/note/providers/notes_provider.dart';
 import 'note_tree_service.dart';
-import 'mock_note_tree_service.dart';
+import '../api/mock_note_tree_service.dart';
 
 /// A card widget that displays a note tree explorer
 class NoteTreeCard extends StatefulWidget {
