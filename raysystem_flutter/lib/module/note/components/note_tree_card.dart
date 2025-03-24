@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:appflowy_editor/appflowy_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:raysystem_flutter/card/card_manager.dart';
@@ -90,7 +93,7 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
       // Create a new note with the parent ID set to the selected item's ID
       final newNoteId = await notesProvider.createNote(
         title: newNoteTitle,
-        contentAppflowy: '{"document":{"type":"page","children":[{"type":"paragraph","content":[{"type":"text","text":""}]}]}}',
+        contentAppflowy: jsonEncode(EditorState.blank().document.toJson()['document']),
         parentId: parentItem.id,
       );
 
