@@ -74,13 +74,13 @@ class NoteManager:
         """
         session_to_use = session or self.session
         async with session_to_use:
-            note = await self.get_note_by_id(note_id)
+            note = await self.get_note_by_id(note_id, session)
             if not note:
                 return None
             
             # Check if parent_id would create a circular reference
             if parent_id is not None and parent_id != note.parent_id:
-                if await self._would_create_cycle(note_id, parent_id):
+                if await self._would_create_cycle(note_id, parent_id, session):
                     raise ValueError("Cannot update note: would create circular reference")
                 
             note.title = title
@@ -107,6 +107,11 @@ class NoteManager:
         Returns:
             Note object or None if not found
         """
+        if session is not None:
+            # Use provided session directly without context manager
+            result = await session.execute(select(Note).filter(Note.id == note_id))
+            return result.scalars().first()
+
         session_to_use = session or self.session
         async with session_to_use as session:
             result = await session.execute(
