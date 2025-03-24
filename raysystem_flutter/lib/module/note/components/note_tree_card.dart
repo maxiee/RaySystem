@@ -104,9 +104,22 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
           parentItem.isFolder = true;
         }
 
+        // Make sure the note tree service's cache is reset to ensure fresh data
+        _noteTreeService.resetCache();
+
         // Refresh the children of the parent note to show the new child
         if (_treeViewKey.currentState != null) {
-          await _treeViewKey.currentState!.refreshChildren(parentItem.id);
+          try {
+            await _treeViewKey.currentState!.refreshChildren(parentItem.id);
+          } catch (e) {
+            debugPrint('Error refreshing children after create: $e');
+            
+            // Fallback: If specific refresh fails, try a full refresh
+            _fullRefresh();
+          }
+        } else {
+          // If no tree view state is available, do a full refresh
+          _fullRefresh();
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -125,6 +138,24 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
       }
       _showErrorSnackBar('Error creating note: ${e.toString()}');
     }
+  }
+  
+  // Helper method to perform a full tree refresh
+  Future<void> _fullRefresh() async {
+    setState(() {
+      _isRefreshing = true;
+    });
+    
+    // Reset the service cache to ensure fresh data
+    _noteTreeService.resetCache();
+    
+    // Brief delay to allow UI to update
+    await Future.delayed(const Duration(milliseconds: 300));
+    
+    // Rebuild tree view with fresh data
+    setState(() {
+      _isRefreshing = false;
+    });
   }
   
   // Handle deleting a note
@@ -351,21 +382,8 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
                   label: const Text('Refresh'),
                   onPressed: _isRefreshing
                       ? null
-                      : () {
-                          setState(() {
-                            _isRefreshing = true;
-
-                            // Reset the service cache
-                            _noteTreeService.resetCache();
-
-                            // We need to rebuild to create a new tree view with empty initial items
-                            Future.delayed(const Duration(milliseconds: 300),
-                                () {
-                              setState(() {
-                                _isRefreshing = false;
-                              });
-                            });
-                          });
+                      : () async {
+                          await _fullRefresh();
                         },
                 ),
               ],
