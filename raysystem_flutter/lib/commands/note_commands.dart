@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:raysystem_flutter/api/api.dart';
 import 'package:raysystem_flutter/card/card_manager.dart';
 import 'package:raysystem_flutter/commands/command.dart';
+import 'package:raysystem_flutter/module/note/api/api_note_tree_service.dart';
+import 'package:raysystem_flutter/module/note/components/note_tree_card.dart';
 import 'package:raysystem_flutter/module/note/providers/notes_provider.dart';
 import 'package:raysystem_flutter/card/note_card.dart';
 import 'package:raysystem_flutter/card/recent_notes_list_card.dart';
@@ -11,6 +14,21 @@ final noteCommands = Command(
   title: '笔记应用',
   icon: Icons.note,
   subCommands: [
+    Command(
+      command: 'note-tree-explorer',
+      title: '笔记目录树',
+      icon: Icons.account_tree,
+      callback: (context, cardManager) async {
+        cardManager.addCard(
+          SizedBox(
+            height: 400,
+            child: NoteTreeCard(
+              treeService: ApiNoteTreeService(notesApi: notesApi),
+            ),
+          ),
+        );
+      },
+    ),
     Command(
       command: 'note-add',
       title: '添加笔记',

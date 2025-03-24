@@ -127,22 +127,6 @@ final playgroundCommands = Command(
           ),
         );
       },
-    ),
-    // Add new command for note tree explorer
-    Command(
-      command: 'note-tree-explorer',
-      title: '笔记目录树',
-      icon: Icons.account_tree,
-      callback: (context, cardManager) async {
-        cardManager.addCard(
-          SizedBox(
-            height: 400,
-            child: NoteTreeCard(
-              treeService: ApiNoteTreeService(notesApi: notesApi),
-            ),
-          ),
-        );
-      },
-    ),
+    ),    
   ],
 );
