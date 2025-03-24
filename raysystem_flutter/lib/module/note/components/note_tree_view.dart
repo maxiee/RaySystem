@@ -17,6 +17,9 @@ class NoteTreeViewClassic extends StatefulWidget {
   
   /// Callback when a note is double-clicked
   final Function(NoteTreeItem)? onItemDoubleClicked;
+  
+  /// Callback when delete note is requested
+  final Function(NoteTreeItem)? onDeleteNote;
 
   /// Flag to determine if the widget should load initial data itself
   final bool autoLoadInitialData;
@@ -30,6 +33,7 @@ class NoteTreeViewClassic extends StatefulWidget {
     this.onItemSelected,
     this.onAddChildNote,
     this.onItemDoubleClicked,
+    this.onDeleteNote,
     this.autoLoadInitialData = true,
     this.treeService,
   }) : super(key: key);
@@ -193,13 +197,21 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
     });
 
     try {
+      // Force the service to fetch fresh data by passing a cache buster parameter
       final children = await _treeService.getChildrenFor(noteId);
       
       setState(() {
         _findAndUpdateItem(_items, noteId, (foundItem) {
           foundItem.isExpanded = true;
+          // Important: Replace the entire children array
           foundItem.children.clear();
           foundItem.children.addAll(children);
+          
+          // Update the hasChildren cache based on the latest data
+          _hasChildrenCache[noteId] = children.isNotEmpty;
+          
+          // For debugging
+          debugPrint('🔄 Refreshed folder $noteId with ${children.length} children');
         });
         _loadingFolders.remove(noteId);
       });
@@ -276,10 +288,22 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
             ],
           ),
         ),
+        PopupMenuItem(
+          value: 'delete_note',
+          child: Row(
+            children: const [
+              Icon(Icons.delete, size: 16, color: Colors.red),
+              SizedBox(width: 8),
+              Text('Delete Note', style: TextStyle(color: Colors.red)),
+            ],
+          ),
+        ),
       ],
     ).then((value) {
       if (value == 'add_child' && widget.onAddChildNote != null) {
         widget.onAddChildNote!(item);
+      } else if (value == 'delete_note' && widget.onDeleteNote != null) {
+        widget.onDeleteNote!(item);
       }
     });
   }
@@ -309,6 +333,53 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
     }
     // 在整个树中未找到指定ID的节点
     return false;
+  }
+
+  /// 找到一个笔记节点的父节点ID
+  /// 如果是根级别笔记，返回0
+  /// 如果找不到父节点，返回null
+  Future<int?> findParentId(int noteId) async {
+    // 首先检查是否为根级别笔记
+    bool isRootNote = false;
+    for (var rootItem in _items) {
+      if (rootItem.id == noteId) {
+        isRootNote = true;
+        break;
+      }
+    }
+    
+    if (isRootNote) {
+      return 0; // 根级别笔记返回0
+    }
+    
+    // 否则在树结构中搜索父节点
+    for (var rootItem in _items) {
+      int? parentId = _findParentIdInSubtree(rootItem, noteId);
+      if (parentId != null) {
+        return parentId;
+      }
+    }
+    
+    // 如果在树中找不到，返回null
+    return null;
+  }
+
+  /// 在子树中递归查找节点的父ID
+  int? _findParentIdInSubtree(NoteTreeItem parent, int childId) {
+    // 检查直接子节点
+    for (var child in parent.children) {
+      if (child.id == childId) {
+        return parent.id;
+      }
+      
+      // 递归检查孙子节点
+      int? foundId = _findParentIdInSubtree(child, childId);
+      if (foundId != null) {
+        return foundId;
+      }
+    }
+    
+    return null;
   }
 
   @override

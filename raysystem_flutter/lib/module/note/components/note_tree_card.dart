@@ -126,6 +126,106 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
       _showErrorSnackBar('Error creating note: ${e.toString()}');
     }
   }
+  
+  // Handle deleting a note
+  Future<void> _handleDeleteNote(NoteTreeItem item) async {
+    // Get the parent ID before deletion for refreshing later
+    final int? parentId = await _treeViewKey.currentState?.findParentId(item.id);
+    
+    // Confirm deletion
+    final bool confirmDelete = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Note'),
+          content: Text('Are you sure you want to delete "${item.name}"? This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('DELETE', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    ) ?? false;
+    
+    if (!confirmDelete) return;
+    
+    // Show loading indicator
+    _showLoadingDialog(context, 'Deleting note...');
+    
+    // Get the notes provider
+    final notesProvider = Provider.of<NotesProvider>(context, listen: false);
+    
+    try {
+      // Call API to delete the note
+      final success = await notesProvider.deleteNote(item.id);
+      
+      // Hide loading dialog
+      Navigator.of(context).pop();
+      
+      if (success) {
+        // Always force a cache reset to ensure fresh data
+        _noteTreeService.resetCache();
+        
+        // Refresh the parent to show updated child list
+        if (parentId != null && _treeViewKey.currentState != null) {
+          if (parentId == 0) {
+            // If it's a root note, refresh the entire tree
+            setState(() {
+              _isRefreshing = true;
+            });
+            
+            // Brief delay before refresh to allow UI to update
+            await Future.delayed(const Duration(milliseconds: 300));
+            
+            // Force recreate the tree view to get fresh data
+            setState(() {
+              _isRefreshing = false;
+            });
+          } else {
+            // For non-root notes, force a refresh of the parent
+            // First ensure the NoteTreeService cache is cleared for this parent
+            _noteTreeService.resetCache();
+            
+            // Then refresh the parent's children
+            await _treeViewKey.currentState!.refreshChildren(parentId);
+          }
+        } else {
+          // If we couldn't determine the parent, refresh everything
+          setState(() {
+            _isRefreshing = true;
+          });
+          
+          await Future.delayed(const Duration(milliseconds: 300));
+          
+          setState(() {
+            _isRefreshing = false;
+          });
+        }
+        
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Note "${item.name}" deleted successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        _showErrorSnackBar('Failed to delete note');
+      }
+    } catch (e) {
+      // Hide loading dialog if still showing
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      _showErrorSnackBar('Error deleting note: ${e.toString()}');
+    }
+  }
 
   // Show a dialog to get the title for the new note using FormManager
   Future<Map<String, dynamic>?> _showAddNoteDialog(BuildContext context) async {
@@ -225,6 +325,7 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
                   onItemSelected: _handleItemSelected,
                   onAddChildNote: _handleAddChildNote,
                   onItemDoubleClicked: _handleItemDoubleClicked,
+                  onDeleteNote: _handleDeleteNote,
                 ),
 
                 // Show an overlay loading indicator during refresh
