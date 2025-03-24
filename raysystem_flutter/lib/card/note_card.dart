@@ -162,7 +162,7 @@ class _NoteCardState extends State<NoteCard> {
 
     // Convert editor document to JSON string
     final contentJson = _editorState!.document.toJson();
-    final contentAppflowy = jsonEncode(contentJson);
+    final contentAppflowy = jsonEncode(contentJson['document']);
 
     try {
       bool success;
