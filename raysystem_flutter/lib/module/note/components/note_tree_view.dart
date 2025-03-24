@@ -84,6 +84,7 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
 
   /// Load initial/root data
   Future<void> _loadInitialData() async {
+    if (!mounted) return;
     setState(() {
       _isInitialLoading = true;
     });
@@ -96,11 +97,13 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
         _hasChildrenCache[item.id] = true;
       }
 
+      if (!mounted) return;
       setState(() {
         _items = initialItems;
         _isInitialLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isInitialLoading = false;
       });
@@ -111,8 +114,8 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
 
   /// Load children for a specific folder
   Future<void> _loadChildren(NoteTreeItem folder) async {
-    if (_loadingFolders.contains(folder.id)) {
-      return; // Already loading
+    if (_loadingFolders.contains(folder.id) || !mounted) {
+      return; // Already loading or widget unmounted
     }
 
     setState(() {
@@ -127,6 +130,7 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
         _hasChildrenCache[item.id] = true;
       }
 
+      if (!mounted) return;
       setState(() {
         // 在当前根级别项目列表中查找该文件夹的索引位置
         // Find item index in the current items list
@@ -166,6 +170,7 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
         _loadingFolders.remove(folder.id);
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         // 如果加载失败，仍然从加载中文件夹集合中移除此ID
         _loadingFolders.remove(folder.id);
@@ -183,7 +188,7 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
       item = foundItem;
     });
 
-    if (!found || item == null) return;
+    if (!found || item == null || !mounted) return;
 
     setState(() {
       _loadingFolders.add(noteId);
@@ -200,6 +205,7 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
       // Force the service to fetch fresh data by passing a cache buster parameter
       final children = await _treeService.getChildrenFor(noteId);
       
+      if (!mounted) return;
       setState(() {
         _findAndUpdateItem(_items, noteId, (foundItem) {
           foundItem.isExpanded = true;
@@ -216,6 +222,7 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
         _loadingFolders.remove(noteId);
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _loadingFolders.remove(noteId);
       });
