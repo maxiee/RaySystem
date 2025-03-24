@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:raysystem_flutter/card/card_manager.dart';
 import 'package:raysystem_flutter/card/note_card.dart';
+import 'package:raysystem_flutter/form/form_field.dart';
+import 'package:raysystem_flutter/form/form_manager.dart';
 import 'package:raysystem_flutter/module/note/components/note_tree_view.dart';
 import 'package:raysystem_flutter/module/note/components/note_tree_model.dart';
 import 'package:raysystem_flutter/module/note/providers/notes_provider.dart';
@@ -73,7 +75,10 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
     final notesProvider = Provider.of<NotesProvider>(context, listen: false);
 
     // Show dialog to get note title
-    final newNoteTitle = await _showAddNoteDialog(context);
+    final formResult = await _showAddNoteDialog(context);
+    
+    // Get the title from the form result
+    final newNoteTitle = formResult?['title'] as String?;
     
     // If user cancelled, return
     if (newNoteTitle == null || newNoteTitle.isEmpty) return;
@@ -122,42 +127,19 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
     }
   }
 
-  // Show a dialog to get the title for the new note
-  Future<String?> _showAddNoteDialog(BuildContext context) {
-    final controller = TextEditingController();
-    
-    return showDialog<String>(
+  // Show a dialog to get the title for the new note using FormManager
+  Future<Map<String, dynamic>?> _showAddNoteDialog(BuildContext context) async {
+    return FormManager.showForm(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Child Note'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(
-            labelText: 'Note Title',
-            hintText: 'Enter a title for the new note',
-          ),
-          onSubmitted: (value) {
-            if (value.isNotEmpty) {
-              Navigator.of(context).pop(value);
-            }
-          },
+      title: 'Add Child Note',
+      fields: [
+        RSFormField(
+          id: 'title',
+          label: 'Note Title',
+          type: FieldType.text,
+          defaultValue: '',
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('CANCEL'),
-          ),
-          TextButton(
-            onPressed: () {
-              if (controller.text.isNotEmpty) {
-                Navigator.of(context).pop(controller.text);
-              }
-            },
-            child: const Text('CREATE'),
-          ),
-        ],
-      ),
+      ],
     );
   }
 
