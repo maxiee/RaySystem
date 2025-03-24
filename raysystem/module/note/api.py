@@ -164,7 +164,7 @@ async def get_child_notes(
     Get child notes for a given parent_id.
     If parent_id is None, returns root-level notes (notes without a parent).
     """
-    if parent_id == -0:
+    if parent_id == 0:
         parent_id = None
     notes = await kNoteManager.get_child_notes(parent_id, limit, offset, session)
     total = await kNoteManager.get_child_notes_count(parent_id, session)
