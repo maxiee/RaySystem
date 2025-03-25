@@ -75,12 +75,13 @@ async def create_note(note: NoteCreate,
     Create a new note with title and AppFlowy editor content
     """
     print(note)
-    result = await kNoteManager.create_note(
-        note.title, 
-        note.content_appflowy,
-        note.parent_id,
-        session
-    )
+    async with session:
+        result = await kNoteManager.create_note(
+            note.title, 
+            note.content_appflowy,
+            note.parent_id,
+            session
+        )
     return NoteResponse.model_validate(result)
 
 @APP.get("/notes/{note_id}", response_model=NoteResponse, tags=["notes"])
@@ -89,7 +90,9 @@ async def get_note(note_id: int,
     """
     Get a specific note by ID
     """
-    note = await kNoteManager.get_note_by_id(note_id, session)
+    async with session:
+        note = await kNoteManager.get_note_by_id(note_id, session)
+    
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
     return NoteResponse.model_validate(note)
@@ -100,13 +103,15 @@ async def update_note(note_id: int, note: NoteUpdate,
     """
     Update an existing note
     """
-    updated_note = await kNoteManager.update_note(
-        note_id, 
-        note.title, 
-        note.content_appflowy,
-        note.parent_id,
-        session
-    )
+    async with session:
+        updated_note = await kNoteManager.update_note(
+            note_id, 
+            note.title, 
+            note.content_appflowy,
+            note.parent_id,
+            session
+        )
+    
     if not updated_note:
         raise HTTPException(status_code=404, detail="Note not found")
     return NoteResponse.model_validate(updated_note)
@@ -116,7 +121,9 @@ async def delete_note(note_id: int, session: AsyncSession = Depends(get_db_sessi
     """
     Delete a note by ID
     """
-    result = await kNoteManager.delete_note(note_id, session)
+    async with session:
+        result = await kNoteManager.delete_note(note_id, session)
+    
     if not result:
         raise HTTPException(status_code=404, detail="Note not found")
     return True
@@ -130,8 +137,10 @@ async def list_recent_notes(
     """
     List recently updated notes sorted by update time (newest first)
     """
-    notes = await kNoteManager.get_recently_updated_notes(limit, offset, session)
-    total = await kNoteManager.get_total_notes_count(session)
+    async with session:
+        notes = await kNoteManager.get_recently_updated_notes(limit, offset, session)
+        total = await kNoteManager.get_total_notes_count(session)
+    
     response_notes = convert_notes_to_response(notes)
     return NotesListResponse(total=total, items=response_notes)
 
@@ -145,11 +154,13 @@ async def search_notes(
     """
     Search notes by title (fuzzy search)
     """
-    notes = await kNoteManager.search_notes_by_title(q, limit, offset)
-    # We could optimize this by implementing a count query, but for simplicity 
-    # we'll just get all matched notes for now
-    total = len(notes) + offset if offset > 0 else len(notes) 
-    response_notes = convert_notes_to_response(notes, session)
+    async with session:
+        notes = await kNoteManager.search_notes_by_title(q, limit, offset, session)
+        # We could optimize this by implementing a count query, but for simplicity 
+        # we'll just get all matched notes for now
+        total = len(notes) + offset if offset > 0 else len(notes)
+    
+    response_notes = convert_notes_to_response(notes)
     return NotesListResponse(total=total, items=response_notes)
 
 # --- Tree-related endpoints ---
@@ -166,8 +177,11 @@ async def get_child_notes(
     """
     if parent_id == 0:
         parent_id = None
-    notes = await kNoteManager.get_child_notes(parent_id, limit, offset, session)
-    total = await kNoteManager.get_child_notes_count(parent_id, session)
+        
+    async with session:
+        notes = await kNoteManager.get_child_notes(parent_id, limit, offset, session)
+        total = await kNoteManager.get_child_notes_count(parent_id, session)
+    
     tree_nodes = convert_notes_to_tree_nodes(notes)
     return NoteTreeResponse(total=total, items=tree_nodes)
 
@@ -180,7 +194,9 @@ async def move_note(
     """
     Move a note to a new parent. If new_parent_id is None, the note becomes a root note.
     """
-    updated_note = await kNoteManager.move_note(note_id, new_parent_id, session)
+    async with session:
+        updated_note = await kNoteManager.move_note(note_id, new_parent_id, session)
+    
     if not updated_note:
         raise HTTPException(status_code=404, detail="Note not found")
     return NoteResponse.model_validate(updated_note)
@@ -190,7 +206,9 @@ async def get_note_path(note_id: int, session: AsyncSession = Depends(get_db_ses
     """
     Get the path from root to the specified note (breadcrumbs)
     """
-    path = await kNoteManager.get_note_path(note_id, session)
+    async with session:
+        path = await kNoteManager.get_note_path(note_id, session)
+    
     if not path:
         raise HTTPException(status_code=404, detail="Note not found")
     return [NoteResponse.model_validate(note) for note in path]
