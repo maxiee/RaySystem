@@ -5,7 +5,7 @@ import time
 from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from module.task_scheduler.model import ScheduledTask, TaskScheduleType, TaskTagSate
+from module.task_scheduler.model import ScheduledTask, TaskScheduleType, TaskTagState
 from module.task_scheduler.task_scheduler import RayScheduler
 from sqlalchemy import delete
 
@@ -327,7 +327,7 @@ class TestRayScheduler:
         scheduler.tasks[task2.id] = task2
         
         # 创建标签状态 - 任务刚执行过
-        tag_state = TaskTagSate(
+        tag_state = TaskTagState(
             tag="same_tag",
             last_run=datetime.now()
         )
