@@ -192,7 +192,7 @@ async def get_child_notes(
             .offset(offset)
         )
         result = await session.execute(query)
-        notes = list(result.scalars())  # Explicitly cast to a list of Note
+        notes = list(result.scalars().unique())  # Explicitly cast to a list of Note
         total = await kNoteManager.get_child_notes_count(parent_id, session)
 
     tree_nodes = convert_notes_to_tree_nodes(notes)
