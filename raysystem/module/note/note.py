@@ -4,7 +4,7 @@ from sqlalchemy import select, or_, desc, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from module.db.db import db_async_session
-from module.note.model import Note
+from module.note.model import Note, NoteTitle
 
 class NoteManager:
     """
@@ -44,14 +44,27 @@ class NoteManager:
             if await self._would_create_cycle(None, parent_id, session):
                 raise ValueError("Cannot create note: would create circular reference")
         
+        # Create the note object first without the title
         note = Note(
-            title=title,
             content_appflowy=content_appflowy,
             parent_id=parent_id,
             created_at=datetime.now(),
             updated_at=datetime.now()
         )
+        
+        # Add the note to the session and flush to get an ID
         session.add(note)
+        await session.flush()
+        
+        # Now create a NoteTitle for this note with the provided title
+        note_title = NoteTitle(
+            note_id=note.id,
+            title=title,
+            is_primary=True
+        )
+        session.add(note_title)
+        
+        # Commit the changes
         await session.commit()
         await session.refresh(note)
         return note
@@ -86,14 +99,34 @@ class NoteManager:
         if parent_id is not None and parent_id != note.parent_id:
             if await self._would_create_cycle(note_id, parent_id, session):
                 raise ValueError("Cannot update note: would create circular reference")
-            
-        note.title = title
+        
+        # Update content and parent_id
         note.content_appflowy = content_appflowy
         note.updated_at = datetime.now()
         
         # Only update parent_id if it's explicitly provided
         if parent_id != note.parent_id:  # Could be None or a different ID
             note.parent_id = parent_id
+        
+        # Update the title
+        # Check if there's a primary title
+        primary_title = None
+        for note_title in note.note_titles:
+            if note_title.is_primary:
+                primary_title = note_title
+                break
+        
+        if primary_title:
+            # Update existing primary title
+            primary_title.title = title
+        else:
+            # Create a new primary title if none exists
+            new_title = NoteTitle(
+                note_id=note.id,
+                title=title,
+                is_primary=True
+            )
+            session.add(new_title)
         
         await session.commit()
         await session.refresh(note)

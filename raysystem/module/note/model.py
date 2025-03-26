@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Integer, String, DateTime, ForeignKey, Boolean
+from sqlalchemy import Integer, String, DateTime, ForeignKey, Boolean, select, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 from sqlalchemy.ext.hybrid import hybrid_property
 from module.db.base import Base
@@ -61,10 +61,25 @@ class Note(Base):
     @hybrid_property
     def title(self):
         """Get primary title or first title as fallback"""
+        # During object initialization, note_titles might not be initialized yet
+        # or might be empty, so we need to handle this case
+        if not hasattr(self, 'note_titles') or not self.note_titles:
+            return ""
+            
         primary = next((t for t in self.note_titles if t.is_primary), None)
         if primary:
             return primary.title
         return self.note_titles[0].title if self.note_titles else ""
+    
+    @title.expression
+    def title(cls):
+        """SQLAlchemy expression for title property"""
+        # This is used for queries: Note.title == "some text"
+        # Get the primary title if it exists, otherwise get the first title
+        return select(NoteTitle.title).where(
+            (NoteTitle.note_id == cls.id) & 
+            (NoteTitle.is_primary == True)
+        ).scalar_subquery()
     
     def add_title(self, title_text, is_primary=False):
         """Add a new title to this note"""
