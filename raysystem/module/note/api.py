@@ -3,6 +3,8 @@ from typing import List, Optional, cast
 from pydantic import BaseModel
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
+from sqlalchemy import select
 from module.db.db import get_db_session
 from module.http.http import APP
 from module.note.note import kNoteManager
@@ -177,11 +179,22 @@ async def get_child_notes(
     """
     if parent_id == 0:
         parent_id = None
-        
+
     async with session:
-        notes = await kNoteManager.get_child_notes(parent_id, limit, offset, session)
+        query = (
+            select(Note)
+            .options(
+                joinedload(Note.children),
+                joinedload(Note.note_titles)  # Eager load note_titles relationship
+            )
+            .where(Note.parent_id == parent_id)
+            .limit(limit)
+            .offset(offset)
+        )
+        result = await session.execute(query)
+        notes = list(result.scalars())  # Explicitly cast to a list of Note
         total = await kNoteManager.get_child_notes_count(parent_id, session)
-    
+
     tree_nodes = convert_notes_to_tree_nodes(notes)
     return NoteTreeResponse(total=total, items=tree_nodes)
 
