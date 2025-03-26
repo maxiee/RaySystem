@@ -18,7 +18,7 @@ class NoteManager:
         pass
     
     async def create_note(self, title: str, content_appflowy: str, parent_id: Optional[int] = None,
-                          session: AsyncSession = None) -> Note:
+                          session: Optional[AsyncSession] = None) -> Note:
         """
         Create a new note with the given title and content
         
@@ -74,7 +74,7 @@ class NoteManager:
                           title: str, 
                           content_appflowy: str, 
                           parent_id: Optional[int] = None,
-                          session: AsyncSession = None) -> Optional[Note]:
+                          session: Optional[AsyncSession] = None) -> Optional[Note]:
         """
         Update an existing note
         
@@ -133,7 +133,7 @@ class NoteManager:
         return note
     
     async def get_note_by_id(self, note_id: int,
-                             session: AsyncSession = None) -> Optional[Note]:
+                             session: Optional[AsyncSession] = None) -> Optional[Note]:
         """
         Retrieve a note by its ID
         
@@ -155,7 +155,7 @@ class NoteManager:
         return result.scalars().first()
     
     async def delete_note(self, note_id: int,
-                          session: AsyncSession = None) -> bool:
+                          session: Optional[AsyncSession] = None) -> bool:
         """
         Delete a note by its ID and reassign its children to the deleted note's parent.
         
@@ -205,7 +205,7 @@ class NoteManager:
         return True
     
     async def search_notes_by_title(self, search_term: str, limit: int = 20, offset: int = 0,
-                                    session: AsyncSession = None) -> List[Note]:
+                                    session: Optional[AsyncSession] = None) -> List[Note]:
         """
         Search notes by title (fuzzy search)
         
@@ -231,7 +231,7 @@ class NoteManager:
         return list(result.scalars().all())
     
     async def get_recently_updated_notes(self, limit: int = 20, offset: int = 0,
-                                         session: AsyncSession = None) -> List[Note]:
+                                         session: Optional[AsyncSession] = None) -> List[Note]:
         """
         Get recently updated notes ordered by update time
         
@@ -254,7 +254,7 @@ class NoteManager:
         )
         return list(result.scalars().all())
     
-    async def get_total_notes_count(self, session: AsyncSession = None) -> int:
+    async def get_total_notes_count(self, session: Optional[AsyncSession] = None) -> int:
         """
         Get the total number of notes in the database
         
@@ -276,7 +276,7 @@ class NoteManager:
                               parent_id: Optional[int] = None, 
                               limit: int = 50, 
                               offset: int = 0,
-                              session: AsyncSession = None) -> List[Note]:
+                              session: Optional[AsyncSession] = None) -> List[Note]:
         """
         Get child notes for a given parent ID
         
@@ -308,7 +308,7 @@ class NoteManager:
         return list(result.unique().scalars().all())
     
     async def get_child_notes_count(self, parent_id: Optional[int] = None,
-                                    session: AsyncSession = None) -> int:
+                                    session: Optional[AsyncSession] = None) -> int:
         """
         Get count of child notes for a given parent ID
         
@@ -334,7 +334,7 @@ class NoteManager:
         return result.scalar_one()
     
     async def move_note(self, note_id: int, new_parent_id: Optional[int] = None,
-                        session: AsyncSession = None) -> Optional[Note]:
+                        session: Optional[AsyncSession] = None) -> Optional[Note]:
         """
         Move a note to a new parent
         
@@ -376,7 +376,7 @@ class NoteManager:
         return note
     
     async def get_note_path(self, note_id: int,
-                            session: AsyncSession = None) -> List[Note]:
+                            session: Optional[AsyncSession] = None) -> List[Note]:
         """
         Get the complete path from root to the specified note
         
@@ -414,7 +414,7 @@ class NoteManager:
     async def _would_create_cycle(self, 
                                  note_id: Optional[int], 
                                  parent_id: int,
-                                 session: AsyncSession = None) -> bool:
+                                 session: Optional[AsyncSession] = None) -> bool:
         """
         Check if setting parent_id for note_id would create a circular reference
         

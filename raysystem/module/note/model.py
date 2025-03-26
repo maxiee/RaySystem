@@ -72,7 +72,7 @@ class Note(Base):
         return self.note_titles[0].title if self.note_titles else ""
     
     @title.expression
-    def title(cls):
+    def title_expression(cls):
         """SQLAlchemy expression for title property"""
         # This is used for queries: Note.title == "some text"
         # Get the primary title if it exists, otherwise get the first title
