@@ -150,6 +150,7 @@ class NoteManager:
         result = await session.execute(
             select(Note)
             .filter(Note.id == note_id)
+            .options(joinedload(Note.note_titles))
             .options(joinedload(Note.children))
         )
         return result.scalars().first()
