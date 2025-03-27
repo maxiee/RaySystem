@@ -20,7 +20,7 @@ class SystemMetricsProvider extends ChangeNotifier {
 
   void _startPolling() {
     // Poll every 2 seconds
-    _timer = Timer.periodic(const Duration(seconds: 15), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 60), (timer) {
       fetchMetrics();
     });
     // Initial fetch
