@@ -11,6 +11,11 @@ import 'package:openapi/openapi.dart' as generatedAPI;
     skipIfSpecIsUnchanged: false)
 class API {}
 
+// 获取API Key，从环境变量获取
+String? getApiKey() {
+  return Platform.environment['RAY_SYSTEM_KEY'];
+}
+
 // 获取API基础URL，优先从环境变量获取，否则使用默认地址
 String getBaseUrl() {
   return Platform.environment['RAYSYSTEM_API_BASE_URL'] ??
@@ -19,8 +24,28 @@ String getBaseUrl() {
 
 final api = generatedAPI.Openapi(
   basePathOverride: getBaseUrl(),
+  dio: (() {
+    final dio = generatedAPI.Openapi(
+      basePathOverride: getBaseUrl(),
+    ).dio;
+    final apiKey = getApiKey();
+    if (apiKey != null) {
+      dio.options.headers['X-API-Key'] = apiKey;
+    }
+    return dio;
+  })(),
 ).getDefaultApi();
 
 final notesApi = generatedAPI.Openapi(
   basePathOverride: getBaseUrl(),
+  dio: (() {
+    final dio = generatedAPI.Openapi(
+      basePathOverride: getBaseUrl(),
+    ).dio;
+    final apiKey = getApiKey();
+    if (apiKey != null) {
+      dio.options.headers['X-API-Key'] = apiKey;
+    }
+    return dio;
+  })(),
 ).getNotesApi();
