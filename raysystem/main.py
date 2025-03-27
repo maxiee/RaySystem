@@ -103,9 +103,11 @@ async def shutdown_event():
 
 def main():
     # 使用 FastAPI 的 add_middleware 方法添加中间件
-    # 注意中间件的执行顺序：先添加的后执行，因此先验证 API KEY，再记录请求
-    APP.add_middleware(RequestIPLoggerMiddleware)
+    # 注意中间件的执行顺序：先添加的后执行
+    # 修改顺序：先添加 APIKeyMiddleware, 再添加 RequestIPLoggerMiddleware
+    # 这样可以确保先记录所有请求，包括 401 的请求，然后再进行 API KEY 校验
     APP.add_middleware(APIKeyMiddleware)
+    APP.add_middleware(RequestIPLoggerMiddleware)
     
     init_config()
     init_fs_module()
