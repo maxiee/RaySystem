@@ -209,15 +209,14 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
         // Refresh the parent to show updated child list
         if (parentId != null && _treeViewKey.currentState != null) {
           if (parentId == 0) {
-            // If it's a root note, refresh the entire tree
+            // If it's a root note, properly refresh the entire tree
             setState(() {
               _isRefreshing = true;
             });
             
-            // Brief delay before refresh to allow UI to update
-            await Future.delayed(const Duration(milliseconds: 300));
+            // Force completely reload initial data from the server
+            await _treeViewKey.currentState!.loadInitialData();
             
-            // Force recreate the tree view to get fresh data
             setState(() {
               _isRefreshing = false;
             });
@@ -235,7 +234,8 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
             _isRefreshing = true;
           });
           
-          await Future.delayed(const Duration(milliseconds: 300));
+          // Force reload initial data
+          await _treeViewKey.currentState!.loadInitialData();
           
           setState(() {
             _isRefreshing = false;

@@ -111,6 +111,11 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
       debugPrint('Error loading initial data: $e');
     }
   }
+  
+  /// Public method to load initial data that can be called by parent widget
+  Future<void> loadInitialData() async {
+    await _loadInitialData();
+  }
 
   /// Load children for a specific folder
   Future<void> _loadChildren(NoteTreeItem folder) async {
