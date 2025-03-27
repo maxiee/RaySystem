@@ -33,6 +33,11 @@ async def verify_api_key(request: Request, call_next):
     if request.url.path in exclude_paths:
         return await call_next(request)
     
+    # 对来自于 127.0.0.1 的请求不校验 API Key
+    client_host = request.client.host if request.client else None
+    if client_host == "127.0.0.1":
+        return await call_next(request)
+    
     api_key = get_api_key()
     
     # 从请求头中获取API密钥
@@ -43,7 +48,7 @@ async def verify_api_key(request: Request, call_next):
         return JSONResponse(
             status_code=401,
             content={"message": "Invalid or missing API key"}
-        )
+        )    
 
 @APP.get("/")
 async def root():
