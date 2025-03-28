@@ -310,7 +310,7 @@ class _NoteCardState extends State<NoteCard> {
                             padding: EdgeInsets.zero,
                             textStyleConfiguration: TextStyleConfiguration(
                               text: TextStyle(
-                                fontFamily: 'LXGW WenKai Mono',
+                                fontFamily: 'LXGW WenKai',
                                 fontSize: 16,
                                 color: Theme.of(context)
                                     .textTheme
@@ -331,7 +331,7 @@ class _NoteCardState extends State<NoteCard> {
                           padding: EdgeInsets.zero,
                           textStyleConfiguration: TextStyleConfiguration(
                             text: TextStyle(
-                              fontFamily: 'LXGW WenKai Mono',
+                              fontFamily: 'LXGW WenKai',
                               fontSize: 16,
                               color:
                                   Theme.of(context).textTheme.bodyMedium?.color,
