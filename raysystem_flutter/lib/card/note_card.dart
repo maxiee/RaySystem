@@ -299,9 +299,15 @@ class _NoteCardState extends State<NoteCard> {
                           editorScrollController: _editorScrollController,
                           editable: widget.isEditable,
                           shrinkWrap: false,
-                          // 添加自定义样式设置，增大编辑器宽度
+                          // 自定义样式设置，使用 LXGW WenKai Mono 字体
                           editorStyle: const EditorStyle.desktop(
                             padding: EdgeInsets.zero,
+                            textStyleConfiguration: TextStyleConfiguration(
+                              text: TextStyle(
+                                fontFamily: 'LXGW WenKai Mono',
+                                fontSize: 16,
+                              ),
+                            ),
                           ),
                         ),
                       )
@@ -310,9 +316,15 @@ class _NoteCardState extends State<NoteCard> {
                         editorScrollController: _editorScrollController,
                         editable: widget.isEditable,
                         shrinkWrap: false,
-                        // 添加自定义样式设置，增大编辑器宽度
+                        // 自定义样式设置，使用 LXGW WenKai Mono 字体
                         editorStyle: const EditorStyle.desktop(
                           padding: EdgeInsets.zero,
+                          textStyleConfiguration: TextStyleConfiguration(
+                            text: TextStyle(
+                              fontFamily: 'LXGW WenKai Mono',
+                              fontSize: 16,
+                            ),
+                          ),
                         ),
                       )
                 : const Center(child: CircularProgressIndicator()),
