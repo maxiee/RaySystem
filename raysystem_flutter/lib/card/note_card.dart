@@ -272,39 +272,51 @@ class _NoteCardState extends State<NoteCard> {
         ),
         const Divider(),
         Expanded(
-          child: _editorState != null && _editorScrollController != null
-              ? widget.isEditable
-                  ? FloatingToolbar(
-                      items: [
-                        paragraphItem,
-                        ...headingItems,
-                        ...markdownFormatItems,
-                        quoteItem,
-                        bulletedListItem,
-                        numberedListItem,
-                        linkItem,
-                        buildTextColorItem(),
-                        buildHighlightColorItem(),
-                        ...textDirectionItems,
-                        ...alignmentItems
-                      ],
-                      textDirection: TextDirection.ltr,
-                      editorState: _editorState!,
-                      editorScrollController: _editorScrollController!,
-                      child: AppFlowyEditor(
+          child: Padding(
+            // 减少水平方向的内边距，让编辑区域更宽
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: _editorState != null && _editorScrollController != null
+                ? widget.isEditable
+                    ? FloatingToolbar(
+                        items: [
+                          paragraphItem,
+                          ...headingItems,
+                          ...markdownFormatItems,
+                          quoteItem,
+                          bulletedListItem,
+                          numberedListItem,
+                          linkItem,
+                          buildTextColorItem(),
+                          buildHighlightColorItem(),
+                          ...textDirectionItems,
+                          ...alignmentItems
+                        ],
+                        textDirection: TextDirection.ltr,
+                        editorState: _editorState!,
+                        editorScrollController: _editorScrollController!,
+                        child: AppFlowyEditor(
+                          editorState: _editorState!,
+                          editorScrollController: _editorScrollController,
+                          editable: widget.isEditable,
+                          shrinkWrap: false,
+                          // 添加自定义样式设置，增大编辑器宽度
+                          editorStyle: const EditorStyle.desktop(
+                            padding: EdgeInsets.zero,
+                          ),
+                        ),
+                      )
+                    : AppFlowyEditor(
                         editorState: _editorState!,
                         editorScrollController: _editorScrollController,
                         editable: widget.isEditable,
                         shrinkWrap: false,
-                      ),
-                    )
-                  : AppFlowyEditor(
-                      editorState: _editorState!,
-                      editorScrollController: _editorScrollController,
-                      editable: widget.isEditable,
-                      shrinkWrap: false,
-                    )
-              : const Center(child: CircularProgressIndicator()),
+                        // 添加自定义样式设置，增大编辑器宽度
+                        editorStyle: const EditorStyle.desktop(
+                          padding: EdgeInsets.zero,
+                        ),
+                      )
+                : const Center(child: CircularProgressIndicator()),
+          ),
         ),
         if (widget.isEditable)
           Padding(
