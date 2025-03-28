@@ -190,14 +190,20 @@ class _NoteCardState extends State<NoteCard> {
           throw StateError("Cannot update note: note ID is null");
         }
 
-        // Update existing note
+        // Fetch the current note to get its parent ID if we don't already have it
+        final currentNote = notesProvider.getNoteById(_currentNoteId!);
+        final parentId = currentNote?.note.parentId;
+
+        // Update existing note, passing the parent ID to preserve the relationship
         success = await notesProvider.updateNote(
           noteId: _currentNoteId!,
           title: finalTitle,
           contentAppflowy: contentAppflowy,
+          parentId: parentId, // Preserve parent-child relationship
         );
 
-        debugPrint('Note updated with ID: $_currentNoteId');
+        debugPrint(
+            'Note updated with ID: $_currentNoteId, parentId: $parentId');
       }
 
       if (mounted) {

@@ -196,8 +196,8 @@ class NotesProvider extends ChangeNotifier {
   }
 
   // Create a new note
-  Future<int?> createNote({
-      required String title, 
+  Future<int?> createNote(
+      {required String title,
       required String contentAppflowy,
       int? parentId}) async {
     _status = NoteOperationStatus.loading;
@@ -242,7 +242,8 @@ class NotesProvider extends ChangeNotifier {
   Future<bool> updateNote(
       {required int noteId,
       required String title,
-      required String contentAppflowy}) async {
+      required String contentAppflowy,
+      int? parentId}) async {
     // Set the specific note to loading state
     if (_notes.containsKey(noteId)) {
       _notes[noteId] = _notes[noteId]!.copyWith(
@@ -253,9 +254,15 @@ class NotesProvider extends ChangeNotifier {
     }
 
     try {
+      // If parentId is not provided, try to get it from the existing note
+      if (parentId == null && _notes.containsKey(noteId)) {
+        parentId = _notes[noteId]!.note.parentId;
+      }
+
       final noteUpdate = NoteUpdate((b) => b
         ..title = title
-        ..contentAppflowy = contentAppflowy);
+        ..contentAppflowy = contentAppflowy
+        ..parentId = parentId);
 
       final response = await _notesApi.updateNoteNotesNoteIdPut(
         noteId: noteId,
