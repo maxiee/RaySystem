@@ -300,12 +300,16 @@ class _NoteCardState extends State<NoteCard> {
                           editable: widget.isEditable,
                           shrinkWrap: false,
                           // 自定义样式设置，使用 LXGW WenKai Mono 字体
-                          editorStyle: const EditorStyle.desktop(
+                          editorStyle: EditorStyle.desktop(
                             padding: EdgeInsets.zero,
                             textStyleConfiguration: TextStyleConfiguration(
                               text: TextStyle(
                                 fontFamily: 'LXGW WenKai Mono',
                                 fontSize: 16,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.color,
                               ),
                             ),
                           ),
@@ -317,12 +321,14 @@ class _NoteCardState extends State<NoteCard> {
                         editable: widget.isEditable,
                         shrinkWrap: false,
                         // 自定义样式设置，使用 LXGW WenKai Mono 字体
-                        editorStyle: const EditorStyle.desktop(
+                        editorStyle: EditorStyle.desktop(
                           padding: EdgeInsets.zero,
                           textStyleConfiguration: TextStyleConfiguration(
                             text: TextStyle(
                               fontFamily: 'LXGW WenKai Mono',
                               fontSize: 16,
+                              color:
+                                  Theme.of(context).textTheme.bodyMedium?.color,
                             ),
                           ),
                         ),
