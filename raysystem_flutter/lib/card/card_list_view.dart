@@ -91,52 +91,49 @@ class RayCard extends StatelessWidget {
       elevation: elevation ?? 1,
       margin: margin ?? const EdgeInsets.all(8),
       color: color ?? theme.cardColor,
-      child: Padding(
-        padding: padding ?? const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Title bar with leading and trailing actions
-            if (title != null ||
-                leadingActions != null ||
-                trailingActions != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Row(
-                  children: [
-                    // Left section - leading actions
-                    if (leadingActions != null) ...[
-                      ...leadingActions!,
-                      const SizedBox(width: 8),
-                    ],
-
-                    // Middle section - title
-                    if (title != null) Expanded(child: Center(child: title!)),
-
-                    // Right section - trailing actions
-                    if (trailingActions != null) ...[
-                      if (title != null) const SizedBox(width: 8),
-                      ...trailingActions!,
-                    ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Title bar with leading and trailing actions
+          if (title != null ||
+              leadingActions != null ||
+              trailingActions != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                children: [
+                  // Left section - leading actions
+                  if (leadingActions != null) ...[
+                    ...leadingActions!,
+                    const SizedBox(width: 8),
                   ],
-                ),
+      
+                  // Middle section - title
+                  if (title != null) Expanded(child: Center(child: title!)),
+      
+                  // Right section - trailing actions
+                  if (trailingActions != null) ...[
+                    if (title != null) const SizedBox(width: 8),
+                    ...trailingActions!,
+                  ],
+                ],
               ),
-
-            // Content area
-            content,
-
-            // Footer actions
-            if (footerActions != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: footerActions!,
-                ),
+            ),
+      
+          // Content area
+          content,
+      
+          // Footer actions
+          if (footerActions != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: footerActions!,
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }

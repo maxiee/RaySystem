@@ -308,92 +308,88 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(8.0),
-      elevation: 3.0,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
-              border: Border(
-                bottom: BorderSide(
-                  color: Theme.of(context).dividerColor,
-                  width: 1.0,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Header
+        Container(
+          padding: const EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor.withOpacity(0.1),
+            border: Border(
+              bottom: BorderSide(
+                color: Theme.of(context).dividerColor,
+                width: 1.0,
               ),
             ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.folder,
-                  color: Theme.of(context).primaryColor,
-                ),
-                const SizedBox(width: 8.0),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.folder,
+                color: Theme.of(context).primaryColor,
+              ),
+              const SizedBox(width: 8.0),
+              Text(
+                'Notes Explorer',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const Spacer(),
+              if (_selectedItem != null)
                 Text(
-                  'Notes Explorer',
-                  style: Theme.of(context).textTheme.titleMedium,
+                  'Selected: ${_selectedItem!.name}',
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
-                const Spacer(),
-                if (_selectedItem != null)
-                  Text(
-                    'Selected: ${_selectedItem!.name}',
-                    style: Theme.of(context).textTheme.bodySmall,
+            ],
+          ),
+        ),
+    
+        // Tree View
+        Expanded(
+          child: Stack(
+            children: [
+              NoteTreeViewClassic(
+                key: _treeViewKey,
+                // Pass the abstract service to the tree view
+                treeService: _noteTreeService,
+                autoLoadInitialData: true,
+                onItemSelected: _handleItemSelected,
+                onAddChildNote: _handleAddChildNote,
+                onItemDoubleClicked: _handleItemDoubleClicked,
+                onDeleteNote: _handleDeleteNote,
+              ),
+    
+              // Show an overlay loading indicator during refresh
+              if (_isRefreshing)
+                Container(
+                  color: Colors.black12,
+                  child: const Center(
+                    child: CircularProgressIndicator(),
                   ),
-              ],
-            ),
-          ),
-
-          // Tree View
-          Expanded(
-            child: Stack(
-              children: [
-                NoteTreeViewClassic(
-                  key: _treeViewKey,
-                  // Pass the abstract service to the tree view
-                  treeService: _noteTreeService,
-                  autoLoadInitialData: true,
-                  onItemSelected: _handleItemSelected,
-                  onAddChildNote: _handleAddChildNote,
-                  onItemDoubleClicked: _handleItemDoubleClicked,
-                  onDeleteNote: _handleDeleteNote,
                 ),
-
-                // Show an overlay loading indicator during refresh
-                if (_isRefreshing)
-                  Container(
-                    color: Colors.black12,
-                    child: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  ),
-              ],
-            ),
+            ],
           ),
-
-          // Actions bar
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.refresh, size: 16),
-                  label: const Text('Refresh'),
-                  onPressed: _isRefreshing
-                      ? null
-                      : () async {
-                          await _fullRefresh();
-                        },
-                ),
-              ],
-            ),
+        ),
+    
+        // Actions bar
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton.icon(
+                icon: const Icon(Icons.refresh, size: 16),
+                label: const Text('Refresh'),
+                onPressed: _isRefreshing
+                    ? null
+                    : () async {
+                        await _fullRefresh();
+                      },
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

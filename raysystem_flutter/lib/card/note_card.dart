@@ -238,13 +238,9 @@ class _NoteCardState extends State<NoteCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(8.0),
-      elevation: 3.0,
-      child: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _buildNoteContent(),
-    );
+    return _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : _buildNoteContent();
   }
 
   Widget _buildNoteContent() {
@@ -263,18 +259,15 @@ class _NoteCardState extends State<NoteCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-          child: TextField(
-            controller: _titleController,
-            decoration: const InputDecoration(
-              hintText: 'Note Title',
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
-            ),
-            style: Theme.of(context).textTheme.headlineSmall,
-            readOnly: !widget.isEditable,
+        TextField(
+          controller: _titleController,
+          decoration: const InputDecoration(
+            hintText: 'Note Title',
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
           ),
+          style: Theme.of(context).textTheme.headlineSmall,
+          readOnly: !widget.isEditable,
         ),
         const Divider(),
         Expanded(

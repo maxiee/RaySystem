@@ -19,12 +19,9 @@ class CardManager with ChangeNotifier {
     // 使用 UniqueKey 确保卡片在列表中的唯一性
     _cards.add(
       RepaintBoundary(
-        child: Card(
+        child: Container(
           key: UniqueKey(),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SizedBox(width: double.infinity, child: cardWidget),
-          ),
+          child: SizedBox(width: double.infinity, child: cardWidget),
         ),
       ),
     );
