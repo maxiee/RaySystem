@@ -1,0 +1,20 @@
+import 'package:flutter/material.dart';
+import 'package:openapi/openapi.dart';
+
+import 'api_note_tree_service.dart';
+import '../model/note_tree_model.dart';
+
+/// Abstract interface for note tree data services
+abstract class NoteTreeService {
+  /// Get initial/root level items
+  Future<List<NoteTreeItem>> getInitialItems();
+
+  /// Get children for a specific parent ID
+  Future<List<NoteTreeItem>> getChildrenFor(int? parentId);
+
+  /// Check if a folder has any children
+  Future<bool> hasChildren(int? folderId);
+
+  /// Reset the cache (optional implementation)
+  void resetCache() {}
+}
