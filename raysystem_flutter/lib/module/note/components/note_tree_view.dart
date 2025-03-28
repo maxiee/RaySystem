@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:raysystem_flutter/module/note/components/painters.dart';
-import 'note_tree_model.dart';
+import '../model/note_tree_model.dart';
 import 'note_tree_service.dart';
-import '../api/mock_note_tree_service.dart';
 
 /// A widget that shows a classic tree view with connecting lines
 class NoteTreeViewClassic extends StatefulWidget {
@@ -25,7 +24,7 @@ class NoteTreeViewClassic extends StatefulWidget {
   final bool autoLoadInitialData;
 
   /// Service to load tree data (optional, will create a mock one if not provided)
-  final NoteTreeService? treeService;
+  final NoteTreeService treeService;
 
   const NoteTreeViewClassic({
     Key? key,
@@ -35,7 +34,7 @@ class NoteTreeViewClassic extends StatefulWidget {
     this.onItemDoubleClicked,
     this.onDeleteNote,
     this.autoLoadInitialData = true,
-    this.treeService,
+    required this.treeService,
   }) : super(key: key);
 
   @override
@@ -63,7 +62,7 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
   @override
   void initState() {
     super.initState();
-    _treeService = widget.treeService ?? MockNoteTreeService();
+    _treeService = widget.treeService;
     _items = widget.initialItems ?? [];
 
     if (widget.autoLoadInitialData && _items.isEmpty) {

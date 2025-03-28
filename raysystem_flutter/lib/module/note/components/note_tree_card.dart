@@ -8,24 +8,23 @@ import 'package:raysystem_flutter/card/note_card.dart';
 import 'package:raysystem_flutter/form/form_field.dart';
 import 'package:raysystem_flutter/form/form_manager.dart';
 import 'package:raysystem_flutter/module/note/components/note_tree_view.dart';
-import 'package:raysystem_flutter/module/note/components/note_tree_model.dart';
+import 'package:raysystem_flutter/module/note/model/note_tree_model.dart';
 import 'package:raysystem_flutter/module/note/providers/notes_provider.dart';
 import 'note_tree_service.dart';
-import '../api/mock_note_tree_service.dart';
 
 /// A card widget that displays a note tree explorer
 class NoteTreeCard extends StatefulWidget {
   /// Optional tree service to use instead of the default mock service
-  final NoteTreeService? treeService;
+  final NoteTreeService treeService;
   
   /// 卡片管理器，用于添加新卡片
   final CardManager? cardManager;
 
   const NoteTreeCard({
-    Key? key,
-    this.treeService,
+    super.key,
+    required this.treeService,
     this.cardManager,
-  }) : super(key: key);
+  });
 
   @override
   State<NoteTreeCard> createState() => _NoteTreeCardState();
@@ -46,7 +45,7 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
   @override
   void initState() {
     super.initState();
-    _noteTreeService = widget.treeService ?? MockNoteTreeService();
+    _noteTreeService = widget.treeService;
   }
 
   void _handleItemSelected(NoteTreeItem item) {

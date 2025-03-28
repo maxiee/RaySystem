@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:openapi/openapi.dart';
 
 import '../api/api_note_tree_service.dart';
-import '../api/mock_note_tree_service.dart';
-import 'note_tree_model.dart';
+import '../model/note_tree_model.dart';
 
 /// Abstract interface for note tree data services
 abstract class NoteTreeService {
@@ -26,17 +25,12 @@ abstract class NoteTreeService {
   /// 
   /// [debug] enables debug logging in both implementations
   static NoteTreeService create({
-    required bool useMock,
     NotesApi? notesApi,
     bool debug = false,
     IconData noteIcon = Icons.description,
     IconData folderIcon = Icons.folder,
     IconData folderOpenIcon = Icons.folder_open,
   }) {
-    if (useMock) {
-      return MockNoteTreeService();
-    }
-    
     assert(notesApi != null, 'notesApi must be provided when useMock is false');
     
     return ApiNoteTreeService(
