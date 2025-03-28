@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:openapi/openapi.dart';
 import 'dart:collection';
 
+import 'package:raysystem_flutter/api/api.dart';
+
 enum NoteOperationStatus {
   idle,
   loading,
@@ -45,7 +47,6 @@ class NoteState {
 
 /// Provider that manages multiple notes and handles communication with the NotesApi
 class NotesProvider extends ChangeNotifier {
-  final NotesApi _notesApi;
 
   // Store notes by their IDs for quick access
   final Map<int, NoteState> _notes = {};
@@ -61,8 +62,6 @@ class NotesProvider extends ChangeNotifier {
 
   // For search
   final List<int> _recentNoteIds = [];
-
-  NotesProvider({required NotesApi notesApi}) : _notesApi = notesApi;
 
   // Getters
   NoteOperationStatus get status => _status;
@@ -117,7 +116,7 @@ class NotesProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _notesApi.listRecentNotesNotesGet(
+      final response = await notesApi.listRecentNotesNotesGet(
         limit: _currentLimit,
         offset: _currentOffset,
       );
@@ -161,7 +160,7 @@ class NotesProvider extends ChangeNotifier {
     }
 
     try {
-      final response = await _notesApi.getNoteNotesNoteIdGet(noteId: noteId);
+      final response = await notesApi.getNoteNotesNoteIdGet(noteId: noteId);
       final fetchedNote = response.data;
 
       if (fetchedNote != null) {
@@ -210,7 +209,7 @@ class NotesProvider extends ChangeNotifier {
         ..parentId = parentId);
 
       final response =
-          await _notesApi.createNoteNotesPost(noteCreate: noteCreate);
+          await notesApi.createNoteNotesPost(noteCreate: noteCreate);
       final createdNote = response.data;
 
       if (createdNote != null) {
@@ -264,7 +263,7 @@ class NotesProvider extends ChangeNotifier {
         ..contentAppflowy = contentAppflowy
         ..parentId = parentId);
 
-      final response = await _notesApi.updateNoteNotesNoteIdPut(
+      final response = await notesApi.updateNoteNotesNoteIdPut(
         noteId: noteId,
         noteUpdate: noteUpdate,
       );
@@ -315,7 +314,7 @@ class NotesProvider extends ChangeNotifier {
 
     try {
       final response =
-          await _notesApi.deleteNoteNotesNoteIdDelete(noteId: noteId);
+          await notesApi.deleteNoteNotesNoteIdDelete(noteId: noteId);
       final success = response.data ?? false;
 
       if (success) {
@@ -348,7 +347,7 @@ class NotesProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _notesApi.searchNotesNotesSearchGet(
+      final response = await notesApi.searchNotesNotesSearchGet(
         q: query,
         limit: _currentLimit,
         offset: 0,
