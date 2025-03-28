@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:openapi/openapi.dart';
 import '../model/note_tree_model.dart';
-import '../components/note_tree_service.dart';
+import 'note_tree_service.dart';
 
 /// Implementation of NoteTreeService that uses the API client to fetch real note data
 class ApiNoteTreeService implements NoteTreeService {
