@@ -40,8 +40,9 @@ async def create_note(
         note_created = await kNoteManager.create_note(
             note.titles, note.content_appflowy, note.parent_id, session
         )
+        new_note = await kNoteManager.get_note_by_id(note_created.id, session)
 
-    return NoteResponse.model_validate(note_created)
+    return NoteResponse.model_validate(new_note)
 
 
 @APP.get("/notes/{note_id}", response_model=NoteResponse, tags=["notes"])
