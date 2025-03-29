@@ -1,4 +1,4 @@
-import '../model/note_tree_model.dart';
+import '../../model/note_tree_model.dart';
 
 /// Abstract interface for note tree data services
 abstract class NoteTreeService {

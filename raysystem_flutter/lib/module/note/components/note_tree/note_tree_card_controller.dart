@@ -6,7 +6,7 @@ import 'package:raysystem_flutter/card/card_manager.dart';
 import 'package:raysystem_flutter/module/note/components/note/note_card.dart';
 import 'package:raysystem_flutter/form/form_field.dart';
 import 'package:raysystem_flutter/form/form_manager.dart';
-import 'package:raysystem_flutter/module/note/api/note_tree_service.dart';
+import 'package:raysystem_flutter/module/note/api/note_tree/note_tree_service.dart';
 import 'package:raysystem_flutter/module/note/components/note_tree/note_tree_view.dart';
 import 'package:raysystem_flutter/module/note/model/note_tree_model.dart';
 import 'package:raysystem_flutter/module/note/providers/notes_provider.dart';
