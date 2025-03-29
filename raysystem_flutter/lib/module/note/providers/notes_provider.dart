@@ -64,7 +64,6 @@ class NotesProvider extends ChangeNotifier {
   final List<int> _recentNoteIds = [];
 
   // Getters
-  NoteOperationStatus get status => _status;
   String? get errorMessage => _errorMessage;
   bool get isLoading => _status == NoteOperationStatus.loading;
   bool get hasError => _status == NoteOperationStatus.error;
