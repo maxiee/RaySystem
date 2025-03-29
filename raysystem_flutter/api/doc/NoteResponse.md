@@ -8,10 +8,11 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**title** | **String** |  | 
 **contentAppflowy** | **String** |  | 
-**id** | **int** |  | 
 **parentId** | **int** |  | [optional] 
+**id** | **int** |  | 
+**noteTitles** | [**BuiltList&lt;NoteTitleResponse&gt;**](NoteTitleResponse.md) |  | 
+**hasChildren** | **bool** |  | 
 **createdAt** | [**DateTime**](DateTime.md) |  | 
 **updatedAt** | [**DateTime**](DateTime.md) |  | 
 

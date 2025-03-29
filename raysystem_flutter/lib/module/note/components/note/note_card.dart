@@ -92,7 +92,7 @@ class _NoteCardState extends State<NoteCard> {
   }
 
   void _updateUIFromNote(NoteResponse note) {
-    _titleController.text = note.title;
+    _titleController.text = note.noteTitles.first.title;
 
     // Convert AppFlowy JSON string to editor document
     try {
@@ -162,12 +162,19 @@ class _NoteCardState extends State<NoteCard> {
         final parentId = originNote.parentId;
 
         // Update existing note, passing the parent ID to preserve the relationship
-        success = await _noteService.updateNote(
+        final updatedNote = await _noteService.updateNote(
           noteId: originNote.id,
-          title: finalTitle,
           contentAppflowy: contentAppflowy,
           parentId: parentId, // Preserve parent-child relationship
         );
+
+        success = updatedNote != null;
+
+        if (success && mounted) {
+          setState(() {
+            originNote = updatedNote;
+          });
+        }
 
         debugPrint(
             'Note updated with ID: ${originNote.id}, parentId: $parentId');

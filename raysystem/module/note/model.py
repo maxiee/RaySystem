@@ -58,29 +58,6 @@ class Note(Base):
         DateTime, default=datetime.now, onupdate=datetime.now
     )
 
-    @hybrid_property
-    def title(self):
-        """Get primary title or first title as fallback"""
-        # During object initialization, note_titles might not be initialized yet
-        # or might be empty, so we need to handle this case
-        if not hasattr(self, 'note_titles') or not self.note_titles:
-            return ""
-            
-        primary = next((t for t in self.note_titles if t.is_primary), None)
-        if primary:
-            return primary.title
-        return self.note_titles[0].title if self.note_titles else ""
-    
-    @title.expression
-    def title_expression(cls):
-        """SQLAlchemy expression for title property"""
-        # This is used for queries: Note.title == "some text"
-        # Get the primary title if it exists, otherwise get the first title
-        return select(NoteTitle.title).where(
-            (NoteTitle.note_id == cls.id) & 
-            (NoteTitle.is_primary == True)
-        ).scalar_subquery()
-    
     def add_title(self, title_text, is_primary=False):
         """Add a new title to this note"""
         # If this will be primary, update other titles
@@ -88,21 +65,17 @@ class Note(Base):
             for title in self.note_titles:
                 if title.is_primary:
                     title.is_primary = False
-        
+
         # Create new title
-        new_title = NoteTitle(
-            note=self,
-            title=title_text,
-            is_primary=is_primary
-        )
+        new_title = NoteTitle(note=self, title=title_text, is_primary=is_primary)
         self.note_titles.append(new_title)
         return new_title
-    
+
     def get_all_titles(self):
         """Get all title texts for this note"""
         return [title.title for title in self.note_titles]
-    
+
     def set_primary_title(self, title_id):
         """Set a specific title as primary"""
         for title in self.note_titles:
-            title.is_primary = (title.id == title_id)
+            title.is_primary = title.id == title_id

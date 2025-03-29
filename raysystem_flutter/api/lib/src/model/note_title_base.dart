@@ -3,78 +3,84 @@
 //
 
 // ignore_for_file: unused_element
-import 'package:openapi/src/model/note_title_create.dart';
-import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'note_create.g.dart';
+part 'note_title_base.g.dart';
 
-/// NoteCreate
+/// NoteTitleBase
 ///
 /// Properties:
-/// * [contentAppflowy]
-/// * [parentId]
-/// * [titles]
+/// * [id]
+/// * [title]
+/// * [isPrimary]
+/// * [createdAt]
 @BuiltValue()
-abstract class NoteCreate implements Built<NoteCreate, NoteCreateBuilder> {
-  @BuiltValueField(wireName: r'content_appflowy')
-  String get contentAppflowy;
+abstract class NoteTitleBase
+    implements Built<NoteTitleBase, NoteTitleBaseBuilder> {
+  @BuiltValueField(wireName: r'id')
+  int get id;
 
-  @BuiltValueField(wireName: r'parent_id')
-  int? get parentId;
+  @BuiltValueField(wireName: r'title')
+  String get title;
 
-  @BuiltValueField(wireName: r'titles')
-  BuiltList<NoteTitleCreate>? get titles;
+  @BuiltValueField(wireName: r'is_primary')
+  bool get isPrimary;
 
-  NoteCreate._();
+  @BuiltValueField(wireName: r'created_at')
+  DateTime get createdAt;
 
-  factory NoteCreate([void updates(NoteCreateBuilder b)]) = _$NoteCreate;
+  NoteTitleBase._();
+
+  factory NoteTitleBase([void updates(NoteTitleBaseBuilder b)]) =
+      _$NoteTitleBase;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(NoteCreateBuilder b) => b..titles = ListBuilder();
+  static void _defaults(NoteTitleBaseBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<NoteCreate> get serializer => _$NoteCreateSerializer();
+  static Serializer<NoteTitleBase> get serializer =>
+      _$NoteTitleBaseSerializer();
 }
 
-class _$NoteCreateSerializer implements PrimitiveSerializer<NoteCreate> {
+class _$NoteTitleBaseSerializer implements PrimitiveSerializer<NoteTitleBase> {
   @override
-  final Iterable<Type> types = const [NoteCreate, _$NoteCreate];
+  final Iterable<Type> types = const [NoteTitleBase, _$NoteTitleBase];
 
   @override
-  final String wireName = r'NoteCreate';
+  final String wireName = r'NoteTitleBase';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    NoteCreate object, {
+    NoteTitleBase object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'content_appflowy';
+    yield r'id';
     yield serializers.serialize(
-      object.contentAppflowy,
+      object.id,
+      specifiedType: const FullType(int),
+    );
+    yield r'title';
+    yield serializers.serialize(
+      object.title,
       specifiedType: const FullType(String),
     );
-    if (object.parentId != null) {
-      yield r'parent_id';
-      yield serializers.serialize(
-        object.parentId,
-        specifiedType: const FullType.nullable(int),
-      );
-    }
-    if (object.titles != null) {
-      yield r'titles';
-      yield serializers.serialize(
-        object.titles,
-        specifiedType: const FullType(BuiltList, [FullType(NoteTitleCreate)]),
-      );
-    }
+    yield r'is_primary';
+    yield serializers.serialize(
+      object.isPrimary,
+      specifiedType: const FullType(bool),
+    );
+    yield r'created_at';
+    yield serializers.serialize(
+      object.createdAt,
+      specifiedType: const FullType(DateTime),
+    );
   }
 
   @override
   Object serialize(
     Serializers serializers,
-    NoteCreate object, {
+    NoteTitleBase object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -87,35 +93,40 @@ class _$NoteCreateSerializer implements PrimitiveSerializer<NoteCreate> {
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required NoteCreateBuilder result,
+    required NoteTitleBaseBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'content_appflowy':
+        case r'id':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(int),
+          ) as int;
+          result.id = valueDes;
+          break;
+        case r'title':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.contentAppflowy = valueDes;
+          result.title = valueDes;
           break;
-        case r'parent_id':
+        case r'is_primary':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(int),
-          ) as int?;
-          if (valueDes == null) continue;
-          result.parentId = valueDes;
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.isPrimary = valueDes;
           break;
-        case r'titles':
+        case r'created_at':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType:
-                const FullType(BuiltList, [FullType(NoteTitleCreate)]),
-          ) as BuiltList<NoteTitleCreate>;
-          result.titles.replace(valueDes);
+            specifiedType: const FullType(DateTime),
+          ) as DateTime;
+          result.createdAt = valueDes;
           break;
         default:
           unhandled.add(key);
@@ -126,12 +137,12 @@ class _$NoteCreateSerializer implements PrimitiveSerializer<NoteCreate> {
   }
 
   @override
-  NoteCreate deserialize(
+  NoteTitleBase deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = NoteCreateBuilder();
+    final result = NoteTitleBaseBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

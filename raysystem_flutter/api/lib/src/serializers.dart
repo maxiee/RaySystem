@@ -23,7 +23,9 @@ import 'package:openapi/src/model/memory_metrics.dart';
 import 'package:openapi/src/model/network_metrics.dart';
 import 'package:openapi/src/model/note_create.dart';
 import 'package:openapi/src/model/note_response.dart';
-import 'package:openapi/src/model/note_tree_node.dart';
+import 'package:openapi/src/model/note_title_create.dart';
+import 'package:openapi/src/model/note_title_response.dart';
+import 'package:openapi/src/model/note_title_update.dart';
 import 'package:openapi/src/model/note_tree_response.dart';
 import 'package:openapi/src/model/note_update.dart';
 import 'package:openapi/src/model/notes_list_response.dart';
@@ -48,7 +50,9 @@ part 'serializers.g.dart';
   NetworkMetrics,
   NoteCreate,
   NoteResponse,
-  NoteTreeNode,
+  NoteTitleCreate,
+  NoteTitleResponse,
+  NoteTitleUpdate,
   NoteTreeResponse,
   NoteUpdate,
   NotesListResponse,
@@ -62,6 +66,10 @@ part 'serializers.g.dart';
   ValidationErrorLocInner,
 ])
 Serializers serializers = (_$serializers.toBuilder()
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(NoteTitleResponse)]),
+        () => ListBuilder<NoteTitleResponse>(),
+      )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(NoteResponse)]),
         () => ListBuilder<NoteResponse>(),

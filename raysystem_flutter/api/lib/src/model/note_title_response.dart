@@ -3,80 +3,73 @@
 //
 
 // ignore_for_file: unused_element
-import 'package:built_collection/built_collection.dart';
-import 'package:openapi/src/model/note_title_response.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'note_response.g.dart';
+part 'note_title_response.g.dart';
 
-/// NoteResponse
+/// NoteTitleResponse
 ///
 /// Properties:
-/// * [contentAppflowy]
-/// * [parentId]
+/// * [title]
+/// * [isPrimary]
 /// * [id]
-/// * [noteTitles]
-/// * [hasChildren]
+/// * [noteId]
 /// * [createdAt]
-/// * [updatedAt]
 @BuiltValue()
-abstract class NoteResponse
-    implements Built<NoteResponse, NoteResponseBuilder> {
-  @BuiltValueField(wireName: r'content_appflowy')
-  String get contentAppflowy;
+abstract class NoteTitleResponse
+    implements Built<NoteTitleResponse, NoteTitleResponseBuilder> {
+  @BuiltValueField(wireName: r'title')
+  String get title;
 
-  @BuiltValueField(wireName: r'parent_id')
-  int? get parentId;
+  @BuiltValueField(wireName: r'is_primary')
+  bool? get isPrimary;
 
   @BuiltValueField(wireName: r'id')
   int get id;
 
-  @BuiltValueField(wireName: r'note_titles')
-  BuiltList<NoteTitleResponse> get noteTitles;
-
-  @BuiltValueField(wireName: r'has_children')
-  bool get hasChildren;
+  @BuiltValueField(wireName: r'note_id')
+  int get noteId;
 
   @BuiltValueField(wireName: r'created_at')
   DateTime get createdAt;
 
-  @BuiltValueField(wireName: r'updated_at')
-  DateTime get updatedAt;
+  NoteTitleResponse._();
 
-  NoteResponse._();
-
-  factory NoteResponse([void updates(NoteResponseBuilder b)]) = _$NoteResponse;
+  factory NoteTitleResponse([void updates(NoteTitleResponseBuilder b)]) =
+      _$NoteTitleResponse;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(NoteResponseBuilder b) => b;
+  static void _defaults(NoteTitleResponseBuilder b) => b..isPrimary = false;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<NoteResponse> get serializer => _$NoteResponseSerializer();
+  static Serializer<NoteTitleResponse> get serializer =>
+      _$NoteTitleResponseSerializer();
 }
 
-class _$NoteResponseSerializer implements PrimitiveSerializer<NoteResponse> {
+class _$NoteTitleResponseSerializer
+    implements PrimitiveSerializer<NoteTitleResponse> {
   @override
-  final Iterable<Type> types = const [NoteResponse, _$NoteResponse];
+  final Iterable<Type> types = const [NoteTitleResponse, _$NoteTitleResponse];
 
   @override
-  final String wireName = r'NoteResponse';
+  final String wireName = r'NoteTitleResponse';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    NoteResponse object, {
+    NoteTitleResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'content_appflowy';
+    yield r'title';
     yield serializers.serialize(
-      object.contentAppflowy,
+      object.title,
       specifiedType: const FullType(String),
     );
-    if (object.parentId != null) {
-      yield r'parent_id';
+    if (object.isPrimary != null) {
+      yield r'is_primary';
       yield serializers.serialize(
-        object.parentId,
-        specifiedType: const FullType.nullable(int),
+        object.isPrimary,
+        specifiedType: const FullType(bool),
       );
     }
     yield r'id';
@@ -84,24 +77,14 @@ class _$NoteResponseSerializer implements PrimitiveSerializer<NoteResponse> {
       object.id,
       specifiedType: const FullType(int),
     );
-    yield r'note_titles';
+    yield r'note_id';
     yield serializers.serialize(
-      object.noteTitles,
-      specifiedType: const FullType(BuiltList, [FullType(NoteTitleResponse)]),
-    );
-    yield r'has_children';
-    yield serializers.serialize(
-      object.hasChildren,
-      specifiedType: const FullType(bool),
+      object.noteId,
+      specifiedType: const FullType(int),
     );
     yield r'created_at';
     yield serializers.serialize(
       object.createdAt,
-      specifiedType: const FullType(DateTime),
-    );
-    yield r'updated_at';
-    yield serializers.serialize(
-      object.updatedAt,
       specifiedType: const FullType(DateTime),
     );
   }
@@ -109,7 +92,7 @@ class _$NoteResponseSerializer implements PrimitiveSerializer<NoteResponse> {
   @override
   Object serialize(
     Serializers serializers,
-    NoteResponse object, {
+    NoteTitleResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -122,27 +105,26 @@ class _$NoteResponseSerializer implements PrimitiveSerializer<NoteResponse> {
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required NoteResponseBuilder result,
+    required NoteTitleResponseBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'content_appflowy':
+        case r'title':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(String),
           ) as String;
-          result.contentAppflowy = valueDes;
+          result.title = valueDes;
           break;
-        case r'parent_id':
+        case r'is_primary':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(int),
-          ) as int?;
-          if (valueDes == null) continue;
-          result.parentId = valueDes;
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.isPrimary = valueDes;
           break;
         case r'id':
           final valueDes = serializers.deserialize(
@@ -151,20 +133,12 @@ class _$NoteResponseSerializer implements PrimitiveSerializer<NoteResponse> {
           ) as int;
           result.id = valueDes;
           break;
-        case r'note_titles':
+        case r'note_id':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType:
-                const FullType(BuiltList, [FullType(NoteTitleResponse)]),
-          ) as BuiltList<NoteTitleResponse>;
-          result.noteTitles.replace(valueDes);
-          break;
-        case r'has_children':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(bool),
-          ) as bool;
-          result.hasChildren = valueDes;
+            specifiedType: const FullType(int),
+          ) as int;
+          result.noteId = valueDes;
           break;
         case r'created_at':
           final valueDes = serializers.deserialize(
@@ -172,13 +146,6 @@ class _$NoteResponseSerializer implements PrimitiveSerializer<NoteResponse> {
             specifiedType: const FullType(DateTime),
           ) as DateTime;
           result.createdAt = valueDes;
-          break;
-        case r'updated_at':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(DateTime),
-          ) as DateTime;
-          result.updatedAt = valueDes;
           break;
         default:
           unhandled.add(key);
@@ -189,12 +156,12 @@ class _$NoteResponseSerializer implements PrimitiveSerializer<NoteResponse> {
   }
 
   @override
-  NoteResponse deserialize(
+  NoteTitleResponse deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = NoteResponseBuilder();
+    final result = NoteTitleResponseBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

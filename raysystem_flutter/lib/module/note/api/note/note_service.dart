@@ -10,10 +10,7 @@ abstract class NoteService {
 
   // Update an existing note
   Future<NoteResponse?> updateNote(
-      {required int noteId,
-      required String title,
-      required String contentAppflowy,
-      int? parentId});
+      {required int noteId, required String contentAppflowy, int? parentId});
 
   // Delete a note
   Future<bool> deleteNote(int noteId);

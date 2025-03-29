@@ -10,7 +10,7 @@ class _$NoteTreeResponse extends NoteTreeResponse {
   @override
   final int total;
   @override
-  final BuiltList<NoteTreeNode> items;
+  final BuiltList<NoteResponse> items;
 
   factory _$NoteTreeResponse(
           [void Function(NoteTreeResponseBuilder)? updates]) =>
@@ -63,10 +63,10 @@ class NoteTreeResponseBuilder
   int? get total => _$this._total;
   set total(int? total) => _$this._total = total;
 
-  ListBuilder<NoteTreeNode>? _items;
-  ListBuilder<NoteTreeNode> get items =>
-      _$this._items ??= new ListBuilder<NoteTreeNode>();
-  set items(ListBuilder<NoteTreeNode>? items) => _$this._items = items;
+  ListBuilder<NoteResponse>? _items;
+  ListBuilder<NoteResponse> get items =>
+      _$this._items ??= new ListBuilder<NoteResponse>();
+  set items(ListBuilder<NoteResponse>? items) => _$this._items = items;
 
   NoteTreeResponseBuilder() {
     NoteTreeResponse._defaults(this);

@@ -248,7 +248,7 @@ class _SearchResultsList extends StatelessWidget {
 
             return ListTile(
               title: Text(
-                note.title,
+                note.noteTitles.first.title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

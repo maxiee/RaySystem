@@ -11,14 +11,10 @@ part 'note_update.g.dart';
 /// NoteUpdate
 ///
 /// Properties:
-/// * [title]
 /// * [contentAppflowy]
 /// * [parentId]
 @BuiltValue()
 abstract class NoteUpdate implements Built<NoteUpdate, NoteUpdateBuilder> {
-  @BuiltValueField(wireName: r'title')
-  String get title;
-
   @BuiltValueField(wireName: r'content_appflowy')
   String get contentAppflowy;
 
@@ -48,11 +44,6 @@ class _$NoteUpdateSerializer implements PrimitiveSerializer<NoteUpdate> {
     NoteUpdate object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'title';
-    yield serializers.serialize(
-      object.title,
-      specifiedType: const FullType(String),
-    );
     yield r'content_appflowy';
     yield serializers.serialize(
       object.contentAppflowy,
@@ -90,13 +81,6 @@ class _$NoteUpdateSerializer implements PrimitiveSerializer<NoteUpdate> {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'title':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.title = valueDes;
-          break;
         case r'content_appflowy':
           final valueDes = serializers.deserialize(
             value,

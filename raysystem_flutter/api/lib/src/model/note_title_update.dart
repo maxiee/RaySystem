@@ -3,69 +3,69 @@
 //
 
 // ignore_for_file: unused_element
-import 'package:built_collection/built_collection.dart';
-import 'package:openapi/src/model/note_response.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'note_tree_response.g.dart';
+part 'note_title_update.g.dart';
 
-/// NoteTreeResponse
+/// NoteTitleUpdate
 ///
 /// Properties:
-/// * [total]
-/// * [items]
+/// * [title]
+/// * [isPrimary]
 @BuiltValue()
-abstract class NoteTreeResponse
-    implements Built<NoteTreeResponse, NoteTreeResponseBuilder> {
-  @BuiltValueField(wireName: r'total')
-  int get total;
+abstract class NoteTitleUpdate
+    implements Built<NoteTitleUpdate, NoteTitleUpdateBuilder> {
+  @BuiltValueField(wireName: r'title')
+  String get title;
 
-  @BuiltValueField(wireName: r'items')
-  BuiltList<NoteResponse> get items;
+  @BuiltValueField(wireName: r'is_primary')
+  bool? get isPrimary;
 
-  NoteTreeResponse._();
+  NoteTitleUpdate._();
 
-  factory NoteTreeResponse([void updates(NoteTreeResponseBuilder b)]) =
-      _$NoteTreeResponse;
+  factory NoteTitleUpdate([void updates(NoteTitleUpdateBuilder b)]) =
+      _$NoteTitleUpdate;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(NoteTreeResponseBuilder b) => b;
+  static void _defaults(NoteTitleUpdateBuilder b) => b..isPrimary = false;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<NoteTreeResponse> get serializer =>
-      _$NoteTreeResponseSerializer();
+  static Serializer<NoteTitleUpdate> get serializer =>
+      _$NoteTitleUpdateSerializer();
 }
 
-class _$NoteTreeResponseSerializer
-    implements PrimitiveSerializer<NoteTreeResponse> {
+class _$NoteTitleUpdateSerializer
+    implements PrimitiveSerializer<NoteTitleUpdate> {
   @override
-  final Iterable<Type> types = const [NoteTreeResponse, _$NoteTreeResponse];
+  final Iterable<Type> types = const [NoteTitleUpdate, _$NoteTitleUpdate];
 
   @override
-  final String wireName = r'NoteTreeResponse';
+  final String wireName = r'NoteTitleUpdate';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    NoteTreeResponse object, {
+    NoteTitleUpdate object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'total';
+    yield r'title';
     yield serializers.serialize(
-      object.total,
-      specifiedType: const FullType(int),
+      object.title,
+      specifiedType: const FullType(String),
     );
-    yield r'items';
-    yield serializers.serialize(
-      object.items,
-      specifiedType: const FullType(BuiltList, [FullType(NoteResponse)]),
-    );
+    if (object.isPrimary != null) {
+      yield r'is_primary';
+      yield serializers.serialize(
+        object.isPrimary,
+        specifiedType: const FullType(bool),
+      );
+    }
   }
 
   @override
   Object serialize(
     Serializers serializers,
-    NoteTreeResponse object, {
+    NoteTitleUpdate object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object,
@@ -78,26 +78,26 @@ class _$NoteTreeResponseSerializer
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required NoteTreeResponseBuilder result,
+    required NoteTitleUpdateBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'total':
+        case r'title':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(int),
-          ) as int;
-          result.total = valueDes;
+            specifiedType: const FullType(String),
+          ) as String;
+          result.title = valueDes;
           break;
-        case r'items':
+        case r'is_primary':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(NoteResponse)]),
-          ) as BuiltList<NoteResponse>;
-          result.items.replace(valueDes);
+            specifiedType: const FullType(bool),
+          ) as bool;
+          result.isPrimary = valueDes;
           break;
         default:
           unhandled.add(key);
@@ -108,12 +108,12 @@ class _$NoteTreeResponseSerializer
   }
 
   @override
-  NoteTreeResponse deserialize(
+  NoteTitleUpdate deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = NoteTreeResponseBuilder();
+    final result = NoteTitleUpdateBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

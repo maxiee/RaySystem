@@ -8,19 +8,17 @@ part of 'note_create.dart';
 
 class _$NoteCreate extends NoteCreate {
   @override
-  final String title;
-  @override
   final String contentAppflowy;
   @override
   final int? parentId;
+  @override
+  final BuiltList<NoteTitleCreate>? titles;
 
   factory _$NoteCreate([void Function(NoteCreateBuilder)? updates]) =>
       (new NoteCreateBuilder()..update(updates))._build();
 
-  _$NoteCreate._(
-      {required this.title, required this.contentAppflowy, this.parentId})
+  _$NoteCreate._({required this.contentAppflowy, this.parentId, this.titles})
       : super._() {
-    BuiltValueNullFieldError.checkNotNull(title, r'NoteCreate', 'title');
     BuiltValueNullFieldError.checkNotNull(
         contentAppflowy, r'NoteCreate', 'contentAppflowy');
   }
@@ -36,17 +34,17 @@ class _$NoteCreate extends NoteCreate {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is NoteCreate &&
-        title == other.title &&
         contentAppflowy == other.contentAppflowy &&
-        parentId == other.parentId;
+        parentId == other.parentId &&
+        titles == other.titles;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, title.hashCode);
     _$hash = $jc(_$hash, contentAppflowy.hashCode);
     _$hash = $jc(_$hash, parentId.hashCode);
+    _$hash = $jc(_$hash, titles.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -54,19 +52,15 @@ class _$NoteCreate extends NoteCreate {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'NoteCreate')
-          ..add('title', title)
           ..add('contentAppflowy', contentAppflowy)
-          ..add('parentId', parentId))
+          ..add('parentId', parentId)
+          ..add('titles', titles))
         .toString();
   }
 }
 
 class NoteCreateBuilder implements Builder<NoteCreate, NoteCreateBuilder> {
   _$NoteCreate? _$v;
-
-  String? _title;
-  String? get title => _$this._title;
-  set title(String? title) => _$this._title = title;
 
   String? _contentAppflowy;
   String? get contentAppflowy => _$this._contentAppflowy;
@@ -77,6 +71,11 @@ class NoteCreateBuilder implements Builder<NoteCreate, NoteCreateBuilder> {
   int? get parentId => _$this._parentId;
   set parentId(int? parentId) => _$this._parentId = parentId;
 
+  ListBuilder<NoteTitleCreate>? _titles;
+  ListBuilder<NoteTitleCreate> get titles =>
+      _$this._titles ??= new ListBuilder<NoteTitleCreate>();
+  set titles(ListBuilder<NoteTitleCreate>? titles) => _$this._titles = titles;
+
   NoteCreateBuilder() {
     NoteCreate._defaults(this);
   }
@@ -84,9 +83,9 @@ class NoteCreateBuilder implements Builder<NoteCreate, NoteCreateBuilder> {
   NoteCreateBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _title = $v.title;
       _contentAppflowy = $v.contentAppflowy;
       _parentId = $v.parentId;
+      _titles = $v.titles?.toBuilder();
       _$v = null;
     }
     return this;
@@ -107,14 +106,26 @@ class NoteCreateBuilder implements Builder<NoteCreate, NoteCreateBuilder> {
   NoteCreate build() => _build();
 
   _$NoteCreate _build() {
-    final _$result = _$v ??
-        new _$NoteCreate._(
-          title: BuiltValueNullFieldError.checkNotNull(
-              title, r'NoteCreate', 'title'),
-          contentAppflowy: BuiltValueNullFieldError.checkNotNull(
-              contentAppflowy, r'NoteCreate', 'contentAppflowy'),
-          parentId: parentId,
-        );
+    _$NoteCreate _$result;
+    try {
+      _$result = _$v ??
+          new _$NoteCreate._(
+            contentAppflowy: BuiltValueNullFieldError.checkNotNull(
+                contentAppflowy, r'NoteCreate', 'contentAppflowy'),
+            parentId: parentId,
+            titles: _titles?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'titles';
+        _titles?.build();
+      } catch (e) {
+        throw new BuiltValueNestedFieldError(
+            r'NoteCreate', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

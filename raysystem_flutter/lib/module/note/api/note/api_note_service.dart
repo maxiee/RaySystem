@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:openapi/openapi.dart';
 import 'package:raysystem_flutter/api/api.dart';
 import 'package:raysystem_flutter/module/note/api/note/note_service.dart';
+import 'package:built_collection/built_collection.dart';
 
 class ApiNoteService implements NoteService {
   @override
@@ -29,7 +30,11 @@ class ApiNoteService implements NoteService {
       int? parentId}) async {
     try {
       final noteCreate = NoteCreate((b) => b
-        ..title = title
+        ..titles = ListBuilder([
+          NoteTitleCreate((b) => b
+            ..title = title
+            ..isPrimary = true)
+        ])
         ..contentAppflowy = contentAppflowy
         ..parentId = parentId);
 
@@ -63,12 +68,10 @@ class ApiNoteService implements NoteService {
   @override
   Future<NoteResponse?> updateNote(
       {required int noteId,
-      required String title,
       required String contentAppflowy,
       int? parentId}) async {
     try {
       final noteUpdate = NoteUpdate((b) => b
-        ..title = title
         ..contentAppflowy = contentAppflowy
         ..parentId = parentId);
 

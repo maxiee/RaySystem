@@ -111,7 +111,7 @@ No authorization required
 
 Get Child Notes
 
-Get child notes for a given parent_id. If parent_id is None, returns root-level notes (notes without a parent).
+Get child notes for a given parent_id. If parent_id is None, returns root-level notes (notes without a parent). If parent_id is 0, it's treated as None (for easier frontend handling).
 
 ### Example
 ```dart

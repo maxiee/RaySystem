@@ -16,7 +16,9 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..add(NetworkMetrics.serializer)
       ..add(NoteCreate.serializer)
       ..add(NoteResponse.serializer)
-      ..add(NoteTreeNode.serializer)
+      ..add(NoteTitleCreate.serializer)
+      ..add(NoteTitleResponse.serializer)
+      ..add(NoteTitleUpdate.serializer)
       ..add(NoteTreeResponse.serializer)
       ..add(NoteUpdate.serializer)
       ..add(NotesListResponse.serializer)
@@ -38,8 +40,14 @@ Serializers _$serializers = (new Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(NoteResponse)]),
           () => new ListBuilder<NoteResponse>())
       ..addBuilderFactory(
-          const FullType(BuiltList, const [const FullType(NoteTreeNode)]),
-          () => new ListBuilder<NoteTreeNode>())
+          const FullType(BuiltList, const [const FullType(NoteResponse)]),
+          () => new ListBuilder<NoteResponse>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(NoteTitleCreate)]),
+          () => new ListBuilder<NoteTitleCreate>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(NoteTitleResponse)]),
+          () => new ListBuilder<NoteTitleResponse>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(ValidationError)]),
           () => new ListBuilder<ValidationError>())

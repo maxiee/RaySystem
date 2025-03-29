@@ -194,7 +194,7 @@ class NotesApi {
   }
 
   /// Get Child Notes
-  /// Get child notes for a given parent_id. If parent_id is None, returns root-level notes (notes without a parent).
+  /// Get child notes for a given parent_id. If parent_id is None, returns root-level notes (notes without a parent). If parent_id is 0, it&#39;s treated as None (for easier frontend handling).
   ///
   /// Parameters:
   /// * [parentId] - Parent note ID, if None returns root notes

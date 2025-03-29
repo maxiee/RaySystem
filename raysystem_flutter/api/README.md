@@ -76,6 +76,10 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**readSitesSitesGet**](doc/DefaultApi.md#readsitessitesget) | **GET** /sites/ | Read Sites
 [*DefaultApi*](doc/DefaultApi.md) | [**recognizeTextOcrRecognizePost**](doc/DefaultApi.md#recognizetextocrrecognizepost) | **POST** /ocr/recognize | Recognize Text
 [*DefaultApi*](doc/DefaultApi.md) | [**rootGet**](doc/DefaultApi.md#rootget) | **GET** / | Root
+[*NoteTitlesApi*](doc/NoteTitlesApi.md) | [**addNoteTitleNotesNoteIdTitlesPost**](doc/NoteTitlesApi.md#addnotetitlenotesnoteidtitlespost) | **POST** /notes/{note_id}/titles | Add Note Title
+[*NoteTitlesApi*](doc/NoteTitlesApi.md) | [**deleteNoteTitleNotesTitlesTitleIdDelete**](doc/NoteTitlesApi.md#deletenotetitlenotestitlestitleiddelete) | **DELETE** /notes/titles/{title_id} | Delete Note Title
+[*NoteTitlesApi*](doc/NoteTitlesApi.md) | [**getNoteTitlesNotesNoteIdTitlesGet**](doc/NoteTitlesApi.md#getnotetitlesnotesnoteidtitlesget) | **GET** /notes/{note_id}/titles | Get Note Titles
+[*NoteTitlesApi*](doc/NoteTitlesApi.md) | [**updateNoteTitleNotesTitlesTitleIdPut**](doc/NoteTitlesApi.md#updatenotetitlenotestitlestitleidput) | **PUT** /notes/titles/{title_id} | Update Note Title
 [*NotesApi*](doc/NotesApi.md) | [**createNoteNotesPost**](doc/NotesApi.md#createnotenotespost) | **POST** /notes/ | Create Note
 [*NotesApi*](doc/NotesApi.md) | [**deleteNoteNotesNoteIdDelete**](doc/NotesApi.md#deletenotenotesnoteiddelete) | **DELETE** /notes/{note_id} | Delete Note
 [*NotesApi*](doc/NotesApi.md) | [**getChildNotesNotesTreeChildrenGet**](doc/NotesApi.md#getchildnotesnotestreechildrenget) | **GET** /notes/tree/children | Get Child Notes
@@ -98,7 +102,9 @@ Class | Method | HTTP request | Description
  - [NetworkMetrics](doc/NetworkMetrics.md)
  - [NoteCreate](doc/NoteCreate.md)
  - [NoteResponse](doc/NoteResponse.md)
- - [NoteTreeNode](doc/NoteTreeNode.md)
+ - [NoteTitleCreate](doc/NoteTitleCreate.md)
+ - [NoteTitleResponse](doc/NoteTitleResponse.md)
+ - [NoteTitleUpdate](doc/NoteTitleUpdate.md)
  - [NoteTreeResponse](doc/NoteTreeResponse.md)
  - [NoteUpdate](doc/NoteUpdate.md)
  - [NotesListResponse](doc/NotesListResponse.md)

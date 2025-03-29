@@ -142,7 +142,7 @@ class _RecentNotesListCardState extends State<RecentNotesListCard> {
 
             return ListTile(
               title: Text(
-                note.title,
+                note.noteTitles.first.title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

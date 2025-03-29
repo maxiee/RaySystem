@@ -8,8 +8,6 @@ part of 'note_update.dart';
 
 class _$NoteUpdate extends NoteUpdate {
   @override
-  final String title;
-  @override
   final String contentAppflowy;
   @override
   final int? parentId;
@@ -17,10 +15,7 @@ class _$NoteUpdate extends NoteUpdate {
   factory _$NoteUpdate([void Function(NoteUpdateBuilder)? updates]) =>
       (new NoteUpdateBuilder()..update(updates))._build();
 
-  _$NoteUpdate._(
-      {required this.title, required this.contentAppflowy, this.parentId})
-      : super._() {
-    BuiltValueNullFieldError.checkNotNull(title, r'NoteUpdate', 'title');
+  _$NoteUpdate._({required this.contentAppflowy, this.parentId}) : super._() {
     BuiltValueNullFieldError.checkNotNull(
         contentAppflowy, r'NoteUpdate', 'contentAppflowy');
   }
@@ -36,7 +31,6 @@ class _$NoteUpdate extends NoteUpdate {
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
     return other is NoteUpdate &&
-        title == other.title &&
         contentAppflowy == other.contentAppflowy &&
         parentId == other.parentId;
   }
@@ -44,7 +38,6 @@ class _$NoteUpdate extends NoteUpdate {
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, title.hashCode);
     _$hash = $jc(_$hash, contentAppflowy.hashCode);
     _$hash = $jc(_$hash, parentId.hashCode);
     _$hash = $jf(_$hash);
@@ -54,7 +47,6 @@ class _$NoteUpdate extends NoteUpdate {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'NoteUpdate')
-          ..add('title', title)
           ..add('contentAppflowy', contentAppflowy)
           ..add('parentId', parentId))
         .toString();
@@ -63,10 +55,6 @@ class _$NoteUpdate extends NoteUpdate {
 
 class NoteUpdateBuilder implements Builder<NoteUpdate, NoteUpdateBuilder> {
   _$NoteUpdate? _$v;
-
-  String? _title;
-  String? get title => _$this._title;
-  set title(String? title) => _$this._title = title;
 
   String? _contentAppflowy;
   String? get contentAppflowy => _$this._contentAppflowy;
@@ -84,7 +72,6 @@ class NoteUpdateBuilder implements Builder<NoteUpdate, NoteUpdateBuilder> {
   NoteUpdateBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _title = $v.title;
       _contentAppflowy = $v.contentAppflowy;
       _parentId = $v.parentId;
       _$v = null;
@@ -109,8 +96,6 @@ class NoteUpdateBuilder implements Builder<NoteUpdate, NoteUpdateBuilder> {
   _$NoteUpdate _build() {
     final _$result = _$v ??
         new _$NoteUpdate._(
-          title: BuiltValueNullFieldError.checkNotNull(
-              title, r'NoteUpdate', 'title'),
           contentAppflowy: BuiltValueNullFieldError.checkNotNull(
               contentAppflowy, r'NoteUpdate', 'contentAppflowy'),
           parentId: parentId,
