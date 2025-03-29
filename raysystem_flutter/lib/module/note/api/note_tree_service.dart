@@ -1,7 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:openapi/openapi.dart';
-
-import 'api_note_tree_service.dart';
 import '../model/note_tree_model.dart';
 
 /// Abstract interface for note tree data services
