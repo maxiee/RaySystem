@@ -47,7 +47,6 @@ class NoteState {
 
 /// Provider that manages multiple notes and handles communication with the NotesApi
 class NotesProvider extends ChangeNotifier {
-
   // Store notes by their IDs for quick access
   final Map<int, NoteState> _notes = {};
 
@@ -147,50 +146,6 @@ class NotesProvider extends ChangeNotifier {
   // Load more notes (pagination)
   Future<void> loadMoreNotes() async {
     await loadRecentNotes();
-  }
-
-  // Get a specific note by ID
-  Future<void> fetchNote(int noteId) async {
-    // Update status for this specific note if it exists
-    if (_notes.containsKey(noteId)) {
-      _notes[noteId] =
-          _notes[noteId]!.copyWith(status: NoteOperationStatus.loading);
-      notifyListeners();
-    }
-
-    try {
-      final response = await notesApi.getNoteNotesNoteIdGet(noteId: noteId);
-      final fetchedNote = response.data;
-
-      if (fetchedNote != null) {
-        _notes[noteId] = NoteState(
-          note: fetchedNote,
-          status: NoteOperationStatus.success,
-        );
-
-        // Update recent notes list
-        if (!_recentNoteIds.contains(noteId)) {
-          _recentNoteIds.insert(0, noteId);
-        } else {
-          // Move to top if already exists
-          _recentNoteIds.remove(noteId);
-          _recentNoteIds.insert(0, noteId);
-        }
-      }
-    } catch (e) {
-      if (_notes.containsKey(noteId)) {
-        _notes[noteId] = _notes[noteId]!.copyWith(
-          status: NoteOperationStatus.error,
-          errorMessage: 'Failed to fetch note: ${e.toString()}',
-        );
-      } else {
-        _errorMessage = 'Failed to fetch note: ${e.toString()}';
-        _status = NoteOperationStatus.error;
-      }
-      debugPrint('Error fetching note $noteId: ${e.toString()}');
-    } finally {
-      notifyListeners();
-    }
   }
 
   // Create a new note

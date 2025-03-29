@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:appflowy_editor/appflowy_editor.dart';
 import 'package:openapi/openapi.dart';
+import 'package:raysystem_flutter/module/note/api/note/api_note_service.dart';
 import '../../providers/notes_provider.dart';
 
 class NoteCard extends StatefulWidget {
@@ -21,6 +22,8 @@ class NoteCard extends StatefulWidget {
 }
 
 class _NoteCardState extends State<NoteCard> {
+  final ApiNoteService _noteService = ApiNoteService();
+
   late TextEditingController _titleController;
   EditorState? _editorState;
   EditorScrollController? _editorScrollController;
@@ -67,57 +70,24 @@ class _NoteCardState extends State<NoteCard> {
       _isLoading = true;
     });
 
-    NotesProvider? notesProvider;
-    try {
-      notesProvider = Provider.of<NotesProvider>(context, listen: false);
-    } catch (e) {
-      // 如果在获取 Provider 时出错（例如组件被卸载），则提前返回
-      debugPrint('Error accessing NotesProvider: ${e.toString()}');
-      return;
-    }
-
-    // 检查是否已经有笔记在提供者中
-    final existingNote = notesProvider.getNoteById(_currentNoteId!);
-    if (existingNote != null) {
-      if (mounted) {
-        _updateUIFromNote(existingNote.note);
-        setState(() {
-          _isLoading = false;
-        });
-      }
-      return;
-    }
-
     // 如果没有现有笔记，则从 API 获取
-    try {
-      await notesProvider.fetchNote(_currentNoteId!);
+    final loadedNote = await _noteService.fetchNote(
+      _currentNoteId!,
+    );
 
-      // 再次检查组件是否还挂载
-      if (!mounted) return;
+    // 再次检查组件是否还挂载
+    if (!mounted) return;
 
-      // 检查笔记是否加载成功
-      final loadedNote = notesProvider.getNoteById(_currentNoteId!);
-      if (loadedNote != null) {
-        _updateUIFromNote(loadedNote.note);
-      } else {
-        setState(() {
-          _errorMessage = '加载笔记失败';
-        });
-      }
-    } catch (e) {
-      // 捕获任何异常并显示错误消息
-      if (mounted) {
-        setState(() {
-          _errorMessage = '加载笔记出错: ${e.toString()}';
-        });
-      }
-    } finally {
-      // 最后检查一次组件是否挂载
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (loadedNote != null) {
+      _updateUIFromNote(loadedNote);
+    } else {
+      setState(() {
+        _errorMessage = '加载笔记失败';
+      });
     }
   }
 
