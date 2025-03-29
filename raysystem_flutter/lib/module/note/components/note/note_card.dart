@@ -1,11 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:appflowy_editor/appflowy_editor.dart';
 import 'package:openapi/openapi.dart';
 import 'package:raysystem_flutter/module/note/api/note/api_note_service.dart';
-import '../../providers/notes_provider.dart';
 
 class NoteCard extends StatefulWidget {
   final int? noteId; // Null for a new note
@@ -32,15 +30,13 @@ class _NoteCardState extends State<NoteCard> {
   bool _isSaving = false;
   String? _errorMessage;
 
-  // 保存笔记 ID，用于在创建后的更新操作
-  int? _currentNoteId;
+  late NoteResponse originNote;
 
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController();
     _isNew = widget.noteId == null;
-    _currentNoteId = widget.noteId; // 初始化为传入的 ID
 
     // Load note if editing an existing one
     if (!_isNew) {
@@ -61,7 +57,7 @@ class _NoteCardState extends State<NoteCard> {
   }
 
   void _loadNote() async {
-    if (_currentNoteId == null) return;
+    if (widget.noteId == null) return;
 
     // 确保组件仍然挂载
     if (!mounted) return;
@@ -72,8 +68,12 @@ class _NoteCardState extends State<NoteCard> {
 
     // 如果没有现有笔记，则从 API 获取
     final loadedNote = await _noteService.fetchNote(
-      _currentNoteId!,
+      widget.noteId!,
     );
+
+    setState(() {
+      originNote = loadedNote!;
+    });
 
     // 再次检查组件是否还挂载
     if (!mounted) return;
@@ -124,7 +124,6 @@ class _NoteCardState extends State<NoteCard> {
       _isSaving = true;
     });
 
-    final notesProvider = Provider.of<NotesProvider>(context, listen: false);
     final title = _titleController.text.trim();
 
     // If title is empty, use a default title
@@ -138,42 +137,40 @@ class _NoteCardState extends State<NoteCard> {
       bool success;
       if (_isNew) {
         // Create new note
-        final noteId = await notesProvider.createNote(
+        final note = await _noteService.createNote(
           title: finalTitle,
           contentAppflowy: contentAppflowy,
         );
 
-        success = noteId != null;
+        success = note != null;
 
         if (success && mounted) {
           // 保存返回的笔记 ID，用于后续更新操作
           setState(() {
-            _currentNoteId = noteId;
+            originNote = note;
             _isNew = false; // 标记为不再是新笔记
           });
 
-          debugPrint('Note created with ID: $_currentNoteId');
+          debugPrint('Note created with ID: ${originNote.id}');
         }
       } else {
         // 确保我们有有效的笔记 ID 用于更新
-        if (_currentNoteId == null) {
+        if (widget.noteId == null) {
           throw StateError("Cannot update note: note ID is null");
         }
 
-        // Fetch the current note to get its parent ID if we don't already have it
-        final currentNote = notesProvider.getNoteById(_currentNoteId!);
-        final parentId = currentNote?.note.parentId;
+        final parentId = originNote.parentId;
 
         // Update existing note, passing the parent ID to preserve the relationship
-        success = await notesProvider.updateNote(
-          noteId: _currentNoteId!,
+        success = await _noteService.updateNote(
+          noteId: originNote.id,
           title: finalTitle,
           contentAppflowy: contentAppflowy,
           parentId: parentId, // Preserve parent-child relationship
         );
 
         debugPrint(
-            'Note updated with ID: $_currentNoteId, parentId: $parentId');
+            'Note updated with ID: ${originNote.id}, parentId: $parentId');
       }
 
       if (mounted) {

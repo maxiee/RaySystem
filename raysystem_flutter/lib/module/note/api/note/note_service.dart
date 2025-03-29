@@ -5,11 +5,11 @@ abstract class NoteService {
   Future<NoteResponse?> fetchNote(int noteId);
 
   // Create a new note
-  Future<int?> createNote(
+  Future<NoteResponse?> createNote(
       {required String title, required String contentAppflowy, int? parentId});
 
   // Update an existing note
-  Future<bool> updateNote(
+  Future<NoteResponse?> updateNote(
       {required int noteId,
       required String title,
       required String contentAppflowy,

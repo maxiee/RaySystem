@@ -23,10 +23,29 @@ class ApiNoteService implements NoteService {
   }
 
   @override
-  Future<int?> createNote(
-      {required String title, required String contentAppflowy, int? parentId}) {
-    // TODO: implement createNote
-    throw UnimplementedError();
+  Future<NoteResponse?> createNote(
+      {required String title,
+      required String contentAppflowy,
+      int? parentId}) async {
+    try {
+      final noteCreate = NoteCreate((b) => b
+        ..title = title
+        ..contentAppflowy = contentAppflowy
+        ..parentId = parentId);
+
+      final response =
+          await notesApi.createNoteNotesPost(noteCreate: noteCreate);
+      if (response.statusCode == 200) {
+        // Parse the response body
+        return response.data;
+      } else {
+        // Handle error
+        debugPrint('Error creating note: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error creating note: $e');
+    }
+    return null;
   }
 
   @override
@@ -42,12 +61,31 @@ class ApiNoteService implements NoteService {
   }
 
   @override
-  Future<bool> updateNote(
+  Future<NoteResponse?> updateNote(
       {required int noteId,
       required String title,
       required String contentAppflowy,
-      int? parentId}) {
-    // TODO: implement updateNote
-    throw UnimplementedError();
+      int? parentId}) async {
+    try {
+      final noteUpdate = NoteUpdate((b) => b
+        ..title = title
+        ..contentAppflowy = contentAppflowy
+        ..parentId = parentId);
+
+      final response = await notesApi.updateNoteNotesNoteIdPut(
+        noteId: noteId,
+        noteUpdate: noteUpdate,
+      );
+      if (response.statusCode == 200) {
+        // Parse the response body
+        return response.data;
+      } else {
+        // Handle error
+        debugPrint('Error updating note: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error updating note: $e');
+    }
+    return null;
   }
 }
