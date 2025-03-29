@@ -20,9 +20,8 @@ def get_ip_logger():
     
     # Avoid adding handlers multiple times
     if not ip_logger.handlers:
-        # Get current date for the log filename
-        current_date = datetime.now().strftime('%Y-%m-%d')
-        log_file = os.path.join(logs_dir, f'ip_log_{current_date}.log')
+        # Use a fixed base filename without date
+        log_file = os.path.join(logs_dir, 'ip_log.log')
         
         # Create a handler that creates a new log file each day at midnight
         file_handler = TimedRotatingFileHandler(
@@ -32,6 +31,9 @@ def get_ip_logger():
             backupCount=30,  # Keep logs for 30 days
             utc=False
         )
+        
+        # Set the suffix for rotated files to include date
+        file_handler.suffix = '%Y-%m-%d'
         
         # Set the format for the log entries
         formatter = logging.Formatter('%(asctime)s - %(message)s')
