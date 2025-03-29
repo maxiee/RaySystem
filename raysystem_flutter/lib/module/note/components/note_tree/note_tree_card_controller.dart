@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:appflowy_editor/appflowy_editor.dart';
 import 'package:provider/provider.dart';
 import 'package:raysystem_flutter/card/card_manager.dart';
-import 'package:raysystem_flutter/card/note_card.dart';
+import 'package:raysystem_flutter/module/note/components/note/note_card.dart';
 import 'package:raysystem_flutter/form/form_field.dart';
 import 'package:raysystem_flutter/form/form_manager.dart';
 import 'package:raysystem_flutter/module/note/api/note_tree_service.dart';

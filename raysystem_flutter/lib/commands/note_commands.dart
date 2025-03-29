@@ -6,7 +6,7 @@ import 'package:raysystem_flutter/commands/command.dart';
 import 'package:raysystem_flutter/module/note/api/api_note_tree_service.dart';
 import 'package:raysystem_flutter/module/note/components/note_tree/note_tree_card.dart';
 import 'package:raysystem_flutter/module/note/providers/notes_provider.dart';
-import 'package:raysystem_flutter/card/note_card.dart';
+import 'package:raysystem_flutter/module/note/components/note/note_card.dart';
 import 'package:raysystem_flutter/card/recent_notes_list_card.dart';
 
 final noteCommands = Command(
