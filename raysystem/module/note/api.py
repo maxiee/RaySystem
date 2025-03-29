@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException, Query, Depends
 from typing import List, Optional, cast
 from pydantic import BaseModel
-from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from sqlalchemy import select
@@ -9,78 +8,25 @@ from module.db.db import get_db_session
 from module.http.http import APP
 from module.note.note import kNoteManager
 from module.note.model import Note
-
-# --- Schema definitions ---
-
-
-class NoteBase(BaseModel):
-    title: str
-    content_appflowy: str
-
-
-class NoteCreate(NoteBase):
-    parent_id: Optional[int] = None
-
-
-class NoteUpdate(NoteBase):
-    parent_id: Optional[int] = None
-
-
-class NoteResponse(NoteBase):
-    id: int
-    parent_id: Optional[int] = None
-    created_at: datetime
-    updated_at: datetime
-
-    class Config:
-        from_attributes = True
-
-
-class NoteTreeNode(NoteResponse):
-    has_children: bool
-
-
-class NotesListResponse(BaseModel):
-    total: int
-    items: List[NoteResponse]
-
-
-class NoteTreeResponse(BaseModel):
-    total: int
-    items: List[NoteTreeNode]
+from module.note.schema import (
+    NoteCreate,
+    NoteResponse,
+    NoteTitleCreate,
+    NoteTitleResponse,
+    NoteTitleUpdate,
+    NoteTreeResponse,
+    NoteUpdate,
+    NotesListResponse,
+)
 
 
 # Helper function to convert SQLAlchemy Note objects to NoteResponse Pydantic models
 def convert_notes_to_response(notes: List[Note]) -> List[NoteResponse]:
-    return [NoteResponse.model_validate(note) for note in notes]
-
-
-# Helper function to convert SQLAlchemy Note objects to NoteTreeNode Pydantic models
-def convert_notes_to_tree_nodes(
-    notes: List[Note], with_has_children: bool = True
-) -> List[NoteTreeNode]:
-    result = []
-    for note in notes:
-        # Use the has_children field from the database directly
-        has_children = note.has_children
-        # Only calculate if needed and with_has_children flag is True (for backward compatibility)
-        if with_has_children and not hasattr(note, "has_children"):
-            has_children = len(note.children) > 0
-
-        tree_node = NoteTreeNode(
-            id=note.id,
-            title=note.title,
-            content_appflowy=note.content_appflowy,
-            parent_id=note.parent_id,
-            created_at=note.created_at,
-            updated_at=note.updated_at,
-            has_children=has_children,
-        )
-        result.append(tree_node)
-    return result
-
-
-# --- API endpoints ---
+    """
+    Convert a list of SQLAlchemy Note objects to Pydantic NoteResponse models
+    """
+    # 这里使用了 SQLAlchemy 的 from_attributes 来将 SQLAlchemy 对象转换为 Pydantic 模型
+    return [NoteResponse.model_validate(note, from_attributes=True) for note in notes]
 
 
 @APP.post("/notes/", response_model=NoteResponse, tags=["notes"])
@@ -90,15 +36,12 @@ async def create_note(
     """
     Create a new note with title and AppFlowy editor content
     """
-    print(note)
     async with session:
-        result = await kNoteManager.create_note(
-            note.title, note.content_appflowy, note.parent_id, session
+        note_created = await kNoteManager.create_note(
+            note.titles, note.content_appflowy, note.parent_id, session
         )
-        # Convert to response model while session is still open to prevent DetachedInstanceError
-        response = NoteResponse.model_validate(result)
 
-    return response
+    return NoteResponse.model_validate(note_created)
 
 
 @APP.get("/notes/{note_id}", response_model=NoteResponse, tags=["notes"])
@@ -123,7 +66,7 @@ async def update_note(
     """
     async with session:
         updated_note = await kNoteManager.update_note(
-            note_id, note.title, note.content_appflowy, note.parent_id, session
+            note_id, note.content_appflowy, note.parent_id, session
         )
 
     if not updated_note:
@@ -181,6 +124,93 @@ async def search_notes(
     return NotesListResponse(total=total, items=response_notes)
 
 
+# --- Title management endpoints ---
+
+
+@APP.post(
+    "/notes/{note_id}/titles", response_model=NoteTitleResponse, tags=["note-titles"]
+)
+async def add_note_title(
+    note_id: int,
+    title_data: NoteTitleCreate,
+    session: AsyncSession = Depends(get_db_session),
+):
+    """
+    Add a new title to a note
+    """
+    async with session:
+        new_title = await kNoteManager.add_title_to_note(
+            note_id, title_data.title, title_data.is_primary, session
+        )
+
+    if not new_title:
+        raise HTTPException(status_code=404, detail="Note not found")
+    return NoteTitleResponse.model_validate(new_title)
+
+
+@APP.put(
+    "/notes/titles/{title_id}", response_model=NoteTitleResponse, tags=["note-titles"]
+)
+async def update_note_title(
+    title_id: int,
+    title_data: NoteTitleUpdate,
+    session: AsyncSession = Depends(get_db_session),
+):
+    """
+    Update an existing note title
+    """
+    async with session:
+        updated_title = await kNoteManager.update_note_title(
+            title_id, title_data.title, title_data.is_primary, session
+        )
+
+    if not updated_title:
+        raise HTTPException(status_code=404, detail="Note title not found")
+    return NoteTitleResponse.model_validate(updated_title)
+
+
+@APP.delete("/notes/titles/{title_id}", response_model=bool, tags=["note-titles"])
+async def delete_note_title(
+    title_id: int, session: AsyncSession = Depends(get_db_session)
+):
+    """
+    Delete a note title
+
+    Note: Cannot delete a note's only title or its primary title
+    """
+    async with session:
+        result = await kNoteManager.delete_note_title(title_id, session)
+
+    if result is False:
+        raise HTTPException(
+            status_code=400, detail="Cannot delete note's only title or primary title"
+        )
+    return True
+
+
+@APP.get(
+    "/notes/{note_id}/titles",
+    response_model=List[NoteTitleResponse],
+    tags=["note-titles"],
+)
+async def get_note_titles(
+    note_id: int, session: AsyncSession = Depends(get_db_session)
+):
+    """
+    Get all titles for a note
+    """
+    async with session:
+        note = await kNoteManager.get_note_by_id(note_id, session)
+
+    if not note:
+        raise HTTPException(status_code=404, detail="Note not found")
+
+    return [
+        NoteTitleResponse.model_validate(title, from_attributes=True)
+        for title in note.note_titles
+    ]
+
+
 # --- Tree-related endpoints ---
 @APP.get("/notes/tree/children", response_model=NoteTreeResponse, tags=["notes"])
 async def get_child_notes(
@@ -194,27 +224,18 @@ async def get_child_notes(
     """
     Get child notes for a given parent_id.
     If parent_id is None, returns root-level notes (notes without a parent).
+    If parent_id is 0, it's treated as None (for easier frontend handling).
     """
+    # 将 parent_id = 0 转换为 None (便于前端处理)
     if parent_id == 0:
         parent_id = None
 
     async with session:
-        query = (
-            select(Note)
-            .options(
-                joinedload(Note.children),
-                joinedload(Note.note_titles),  # Eager load note_titles relationship
-            )
-            .where(Note.parent_id == parent_id)
-            .limit(limit)
-            .offset(offset)
-        )
-        result = await session.execute(query)
-        notes = list(result.scalars().unique())  # Explicitly cast to a list of Note
+        notes = await kNoteManager.get_child_notes(parent_id, limit, offset, session)
         total = await kNoteManager.get_child_notes_count(parent_id, session)
 
-    tree_nodes = convert_notes_to_tree_nodes(notes)
-    return NoteTreeResponse(total=total, items=tree_nodes)
+    response_notes = convert_notes_to_response(notes)
+    return NoteTreeResponse(total=total, items=response_notes)
 
 
 @APP.post("/notes/{note_id}/move", response_model=NoteResponse, tags=["notes"])
