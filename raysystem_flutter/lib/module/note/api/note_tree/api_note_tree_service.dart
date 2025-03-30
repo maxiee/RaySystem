@@ -105,7 +105,7 @@ class ApiNoteTreeService implements NoteTreeService {
       final hasChildren = node.hasChildren;
       return NoteTreeItem(
         id: node.id,
-        name: node.noteTitles.first.title,
+        name: node.noteTitles.isNotEmpty ? node.noteTitles.first.title : '',
         isFolder:
             hasChildren, // A note with children can be expanded like a folder
         level: level,
