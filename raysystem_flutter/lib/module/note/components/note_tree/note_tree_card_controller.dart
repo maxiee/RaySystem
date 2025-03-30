@@ -40,12 +40,9 @@ class NoteTreeCardController {
 
     // Add new note card to the card flow
     manager.addCard(
-      SizedBox(
-        height: 400,
-        child: NoteCard(
-          noteId: item.id,
-          isEditable: true,
-        ),
+      NoteCard(
+        noteId: item.id,
+        isEditable: true,
       ),
     );
   }

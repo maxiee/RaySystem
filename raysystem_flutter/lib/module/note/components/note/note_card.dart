@@ -424,42 +424,65 @@ class _NoteCardState extends State<NoteCard> {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // Primary title area with UI enhancements
-        _buildPrimaryTitleSection(),
+    return SizedBox(
+      height: MediaQuery.of(context).size.height - 200,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Primary title area with UI enhancements
+          _buildPrimaryTitleSection(),
 
-        // Secondary titles section (collapsible)
-        if (!_isNew && widget.isEditable) _buildSecondaryTitlesSection(),
+          // Secondary titles section (collapsible)
+          if (!_isNew && widget.isEditable) _buildSecondaryTitlesSection(),
 
-        const Divider(),
+          const Divider(),
 
-        // Editor area
-        Expanded(
-          child: Padding(
-            // 减少水平方向的内边距，让编辑区域更宽
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: _editorState != null && _editorScrollController != null
-                ? widget.isEditable
-                    ? FloatingToolbar(
-                        items: [
-                          paragraphItem,
-                          ...headingItems,
-                          ...markdownFormatItems,
-                          quoteItem,
-                          bulletedListItem,
-                          numberedListItem,
-                          linkItem,
-                          buildTextColorItem(),
-                          buildHighlightColorItem(),
-                          ...textDirectionItems,
-                          ...alignmentItems
-                        ],
-                        textDirection: TextDirection.ltr,
-                        editorState: _editorState!,
-                        editorScrollController: _editorScrollController!,
-                        child: AppFlowyEditor(
+          // Editor area
+          Expanded(
+            child: Padding(
+              // 减少水平方向的内边距，让编辑区域更宽
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: _editorState != null && _editorScrollController != null
+                  ? widget.isEditable
+                      ? FloatingToolbar(
+                          items: [
+                            paragraphItem,
+                            ...headingItems,
+                            ...markdownFormatItems,
+                            quoteItem,
+                            bulletedListItem,
+                            numberedListItem,
+                            linkItem,
+                            buildTextColorItem(),
+                            buildHighlightColorItem(),
+                            ...textDirectionItems,
+                            ...alignmentItems
+                          ],
+                          textDirection: TextDirection.ltr,
+                          editorState: _editorState!,
+                          editorScrollController: _editorScrollController!,
+                          child: AppFlowyEditor(
+                            editorState: _editorState!,
+                            editorScrollController: _editorScrollController,
+                            editable: widget.isEditable,
+                            shrinkWrap: false,
+                            // 自定义样式设置，使用 LXGW WenKai Mono 字体
+                            editorStyle: EditorStyle.desktop(
+                              padding: EdgeInsets.zero,
+                              textStyleConfiguration: TextStyleConfiguration(
+                                text: TextStyle(
+                                  fontFamily: 'LXGW WenKai',
+                                  fontSize: 16,
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.color,
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      : AppFlowyEditor(
                           editorState: _editorState!,
                           editorScrollController: _editorScrollController,
                           editable: widget.isEditable,
@@ -478,41 +501,23 @@ class _NoteCardState extends State<NoteCard> {
                               ),
                             ),
                           ),
-                        ),
-                      )
-                    : AppFlowyEditor(
-                        editorState: _editorState!,
-                        editorScrollController: _editorScrollController,
-                        editable: widget.isEditable,
-                        shrinkWrap: false,
-                        // 自定义样式设置，使用 LXGW WenKai Mono 字体
-                        editorStyle: EditorStyle.desktop(
-                          padding: EdgeInsets.zero,
-                          textStyleConfiguration: TextStyleConfiguration(
-                            text: TextStyle(
-                              fontFamily: 'LXGW WenKai',
-                              fontSize: 16,
-                              color:
-                                  Theme.of(context).textTheme.bodyMedium?.color,
-                            ),
-                          ),
-                        ),
-                      )
-                : const Center(child: CircularProgressIndicator()),
-          ),
-        ),
-        // Save button
-        if (widget.isEditable)
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: _isSaving ? null : _saveNote,
-              child: _isSaving
-                  ? const CircularProgressIndicator.adaptive()
-                  : Text(_isNew ? '创建笔记' : '更新笔记'),
+                        )
+                  : const Center(child: CircularProgressIndicator()),
             ),
           ),
-      ],
+          // Save button
+          if (widget.isEditable)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: _isSaving ? null : _saveNote,
+                child: _isSaving
+                    ? const CircularProgressIndicator.adaptive()
+                    : Text(_isNew ? '创建笔记' : '更新笔记'),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
