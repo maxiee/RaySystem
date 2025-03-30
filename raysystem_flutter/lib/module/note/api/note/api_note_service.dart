@@ -91,4 +91,83 @@ class ApiNoteService implements NoteService {
     }
     return null;
   }
+
+  // Get all titles for a note
+  Future<List<NoteTitleResponse>?> getNoteTitles(int noteId) async {
+    try {
+      final response =
+          await notesTitleApi.getNoteTitlesNotesNoteIdTitlesGet(noteId: noteId);
+      if (response.statusCode == 200) {
+        return response.data?.toList();
+      } else {
+        debugPrint('Error fetching note titles: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error fetching note titles: $e');
+    }
+    return null;
+  }
+
+  // Add a new title to a note
+  Future<NoteTitleResponse?> addNoteTitle(
+      int noteId, String title, bool isPrimary) async {
+    try {
+      final titleCreate = NoteTitleCreate((b) => b
+        ..title = title
+        ..isPrimary = isPrimary);
+
+      final response = await notesTitleApi.addNoteTitleNotesNoteIdTitlesPost(
+        noteId: noteId,
+        noteTitleCreate: titleCreate,
+      );
+
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        debugPrint('Error adding note title: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error adding note title: $e');
+    }
+    return null;
+  }
+
+  // Update an existing title
+  Future<NoteTitleResponse?> updateNoteTitle(
+      int titleId, String title, bool isPrimary) async {
+    try {
+      final titleUpdate = NoteTitleUpdate((b) => b
+        ..title = title
+        ..isPrimary = isPrimary);
+
+      final response = await notesTitleApi.updateNoteTitleNotesTitlesTitleIdPut(
+        titleId: titleId,
+        noteTitleUpdate: titleUpdate,
+      );
+
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        debugPrint('Error updating note title: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('Error updating note title: $e');
+    }
+    return null;
+  }
+
+  // Delete a title
+  Future<bool> deleteNoteTitle(int titleId) async {
+    try {
+      final response =
+          await notesTitleApi.deleteNoteTitleNotesTitlesTitleIdDelete(
+        titleId: titleId,
+      );
+
+      return response.statusCode == 200 && response.data == true;
+    } catch (e) {
+      debugPrint('Error deleting note title: $e');
+      return false;
+    }
+  }
 }

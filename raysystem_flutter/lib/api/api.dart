@@ -1,4 +1,4 @@
-// Openapi Generator last run: : 2025-03-29T19:58:42.314625
+// Openapi Generator last run: : 2025-03-30T22:52:22.321240
 import 'dart:io';
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
 import 'package:openapi/openapi.dart' as generatedAPI;
@@ -49,3 +49,17 @@ final notesApi = generatedAPI.Openapi(
     return dio;
   })(),
 ).getNotesApi();
+
+final notesTitleApi = generatedAPI.Openapi(
+  basePathOverride: getBaseUrl(),
+  dio: (() {
+    final dio = generatedAPI.Openapi(
+      basePathOverride: getBaseUrl(),
+    ).dio;
+    final apiKey = getApiKey();
+    if (apiKey != null) {
+      dio.options.headers['X-API-Key'] = apiKey;
+    }
+    return dio;
+  })(),
+).getNoteTitlesApi();
