@@ -92,11 +92,15 @@ class _NoteCardState extends State<NoteCard> {
   }
 
   void _updateUIFromNote(NoteResponse note) {
-    final primaryTitle = note.noteTitles.firstWhere(
-        (title) => title.isPrimary ?? false,
-        orElse: () => note.noteTitles.first);
+    if (note.noteTitles.isEmpty) {
+      _primaryTitleController.text = '未命名笔记';
+    } else {
+      final primaryTitle = note.noteTitles.firstWhere(
+          (title) => title.isPrimary ?? false,
+          orElse: () => note.noteTitles.first);
 
-    _primaryTitleController.text = primaryTitle.title;
+      _primaryTitleController.text = primaryTitle.title;
+    }
 
     // Convert AppFlowy JSON string to editor document
     try {
