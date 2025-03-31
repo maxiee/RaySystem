@@ -97,8 +97,9 @@ class RayCard extends StatelessWidget {
           if (title != null ||
               leadingActions != null ||
               trailingActions != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
+            Container(
+              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
               child: Row(
                 children: [
                   if (title == null && leadingActions == null)

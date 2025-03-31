@@ -8,7 +8,7 @@ import '../../api/note_tree/note_tree_service.dart';
 class NoteTreeCard extends StatefulWidget {
   /// Optional tree service to use instead of the default mock service
   final NoteTreeService treeService;
-  
+
   /// 卡片管理器，用于添加新卡片
   final CardManager? cardManager;
 
@@ -41,39 +41,6 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Header
-        Container(
-          padding: const EdgeInsets.all(8.0),
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor.withOpacity(0.1),
-            border: Border(
-              bottom: BorderSide(
-                color: Theme.of(context).dividerColor,
-                width: 1.0,
-              ),
-            ),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.folder,
-                color: Theme.of(context).primaryColor,
-              ),
-              const SizedBox(width: 8.0),
-              Text(
-                'Notes Explorer',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const Spacer(),
-              if (_controller.selectedItem != null)
-                Text(
-                  'Selected: ${_controller.selectedItem!.name}',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-            ],
-          ),
-        ),
-    
         // Tree View
         Expanded(
           child: Stack(
@@ -88,10 +55,11 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
                   });
                 },
                 onAddChildNote: _controller.handleAddChildNote,
-                onItemDoubleClicked: (item) => _controller.handleItemDoubleClicked(item, widget.cardManager),
+                onItemDoubleClicked: (item) => _controller
+                    .handleItemDoubleClicked(item, widget.cardManager),
                 onDeleteNote: _controller.handleDeleteNote,
               ),
-    
+
               // Show loading indicator during refresh
               if (_controller.isRefreshing)
                 Container(
@@ -103,7 +71,7 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
             ],
           ),
         ),
-    
+
         // Actions bar
         Padding(
           padding: const EdgeInsets.all(8.0),
