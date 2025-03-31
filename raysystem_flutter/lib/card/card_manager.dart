@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:raysystem_flutter/card/card_list_view.dart';
 
 class CardManager with ChangeNotifier {
   final List<Widget> _cards = [];
@@ -9,7 +10,17 @@ class CardManager with ChangeNotifier {
   List<Widget> get cards => List.unmodifiable(_cards);
 
   // 添加新卡片
-  void addCard(Widget cardWidget) {
+  void addCard(
+    Widget cardContent, {
+    Widget? title,
+    List<Widget>? leadingActions,
+    List<Widget>? trailingActions,
+    List<Widget>? footerActions,
+    Color? color,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    double? elevation,
+  }) {
     if (_cards.length >= _maxCards) {
       // 移除最早的一条
       _cards.removeAt(0);
@@ -21,7 +32,20 @@ class CardManager with ChangeNotifier {
       RepaintBoundary(
         child: Container(
           key: UniqueKey(),
-          child: SizedBox(width: double.infinity, child: cardWidget),
+          child: SizedBox(
+            width: double.infinity,
+            child: RayCard(
+              content: cardContent,
+              title: title,
+              leadingActions: leadingActions,
+              trailingActions: trailingActions,
+              footerActions: footerActions,
+              color: color,
+              padding: padding,
+              margin: margin,
+              elevation: elevation,
+            ),
+          ),
         ),
       ),
     );

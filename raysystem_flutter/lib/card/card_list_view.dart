@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'package:provider/provider.dart';
 import 'package:raysystem_flutter/card/card_manager.dart';
 
@@ -19,9 +18,8 @@ class CardListView extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           // 使用 KeepAliveWrapper 包装卡片
           child: KeepAliveWrapper(
-            child: RayCard(
-              content: cardManager.cards[index],
-            ),
+            // 直接使用 CardManager 提供的卡片
+            child: cardManager.cards[index],
           ),
         );
       },
@@ -108,10 +106,10 @@ class RayCard extends StatelessWidget {
                     ...leadingActions!,
                     const SizedBox(width: 8),
                   ],
-      
+
                   // Middle section - title
                   if (title != null) Expanded(child: Center(child: title!)),
-      
+
                   // Right section - trailing actions
                   if (trailingActions != null) ...[
                     if (title != null) const SizedBox(width: 8),
@@ -120,10 +118,10 @@ class RayCard extends StatelessWidget {
                 ],
               ),
             ),
-      
+
           // Content area
           content,
-      
+
           // Footer actions
           if (footerActions != null)
             Padding(
