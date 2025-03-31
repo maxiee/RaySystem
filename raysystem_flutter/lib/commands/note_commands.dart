@@ -20,13 +20,13 @@ final noteCommands = Command(
       icon: Icons.account_tree,
       callback: (context, cardManager) async {
         cardManager.addCard(
-          SizedBox(
-            height: 400,
-            child: NoteTreeCard(
-              treeService: ApiNoteTreeService(notesApi: notesApi),
+            SizedBox(
+              height: 400,
+              child: NoteTreeCard(
+                treeService: ApiNoteTreeService(notesApi: notesApi),
+              ),
             ),
-          ),
-        );
+            title: Text('笔记目录树'));
       },
     ),
     Command(
