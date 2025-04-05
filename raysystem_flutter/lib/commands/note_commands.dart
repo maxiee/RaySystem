@@ -38,10 +38,7 @@ final noteCommands = Command(
         cardManager.addCard(
           SizedBox(
             height: 400,
-            child: NoteCard(
-              // No ID means creating a new note
-              isEditable: true,
-            ),
+            child: NoteCard(),
           ),
         );
       },
@@ -64,7 +61,6 @@ final noteCommands = Command(
                     height: 400,
                     child: NoteCard(
                       noteId: noteId,
-                      isEditable: true,
                     ),
                   ),
                 );
@@ -152,7 +148,6 @@ void _performSearch(
               height: 400,
               child: NoteCard(
                 noteId: noteId,
-                isEditable: true,
               ),
             ),
           );

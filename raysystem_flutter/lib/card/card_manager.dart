@@ -4,6 +4,8 @@ import 'package:raysystem_flutter/card/card_list_view.dart';
 class CardManager with ChangeNotifier {
   final List<Widget> _cards = [];
   final int _maxCards;
+  // 存储 key 到卡片索引的映射，用于快速查找
+  final Map<Key, int> _keyToIndexMap = {};
 
   CardManager({int maxCards = 20}) : _maxCards = maxCards;
 
@@ -22,8 +24,16 @@ class CardManager with ChangeNotifier {
     double? elevation,
   }) {
     if (_cards.length >= _maxCards) {
-      // 移除最早的一条
+      // 移除最早的一条，同时也要更新映射
+      final firstCardWidget = _cards[0];
+      // 找到第一张卡片的 key
+      final firstCardKey = _findKeyInWidget(firstCardWidget);
+      if (firstCardKey != null) {
+        _keyToIndexMap.remove(firstCardKey);
+      }
       _cards.removeAt(0);
+      // 更新所有剩余卡片的索引
+      _updateIndices();
     }
 
     // 使用 UniqueKey 确保卡片在列表中的唯一性
@@ -59,37 +69,58 @@ class CardManager with ChangeNotifier {
     );
 
     _cards.add(card);
+    // 存储 key 到索引的映射
+    _keyToIndexMap[cardKey] = _cards.length - 1;
+
     notifyListeners();
   }
 
   // 根据索引移除卡片
   void removeCard(int index) {
     if (index >= 0 && index < _cards.length) {
+      final cardWidget = _cards[index];
+      final cardKey = _findKeyInWidget(cardWidget);
+      if (cardKey != null) {
+        _keyToIndexMap.remove(cardKey);
+      }
       _cards.removeAt(index);
+      // 更新索引映射
+      _updateIndices();
       notifyListeners();
     }
   }
 
   // 根据 key 移除卡片
   void removeCardByKey(Key key) {
-    // 遍历查找具有指定 key 的卡片
-    for (int i = 0; i < _cards.length; i++) {
-      if (_findKeyInWidget(_cards[i]) == key) {
-        _cards.removeAt(i);
-        notifyListeners();
-        break;
-      }
+    final index = _keyToIndexMap[key];
+    if (index != null) {
+      _cards.removeAt(index);
+      _keyToIndexMap.remove(key);
+      // 更新索引映射
+      _updateIndices();
+      notifyListeners();
     }
   }
 
   // 清空所有卡片
   void clearCards() {
     _cards.clear();
+    _keyToIndexMap.clear();
     notifyListeners();
   }
 
   // 获取当前卡片数量
   int get cardCount => _cards.length;
+
+  // 更新所有卡片的索引映射
+  void _updateIndices() {
+    for (int i = 0; i < _cards.length; i++) {
+      final key = _findKeyInWidget(_cards[i]);
+      if (key != null) {
+        _keyToIndexMap[key] = i;
+      }
+    }
+  }
 
   // 在 Widget 中查找 key
   Key? _findKeyInWidget(Widget widget) {

@@ -2,17 +2,17 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:appflowy_editor/appflowy_editor.dart';
+import 'package:flutter/services.dart';
 import 'package:openapi/openapi.dart';
+import 'package:raysystem_flutter/module/editor/blocks/code/plugin.dart';
 import 'package:raysystem_flutter/module/note/api/note/api_note_service.dart';
 
 class NoteCard extends StatefulWidget {
   final int? noteId; // Null for a new note
-  final bool isEditable;
 
   const NoteCard({
     super.key,
     this.noteId,
-    this.isEditable = true,
   });
 
   @override
@@ -437,7 +437,7 @@ class _NoteCardState extends State<NoteCard> {
           _buildPrimaryTitleSection(),
 
           // Secondary titles section (collapsible)
-          if (!_isNew && widget.isEditable) _buildSecondaryTitlesSection(),
+          if (!_isNew) _buildSecondaryTitlesSection(),
 
           const Divider(),
 
@@ -447,79 +447,96 @@ class _NoteCardState extends State<NoteCard> {
               // 减少水平方向的内边距，让编辑区域更宽
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: _editorState != null && _editorScrollController != null
-                  ? widget.isEditable
-                      ? FloatingToolbar(
-                          items: [
-                            paragraphItem,
-                            ...headingItems,
-                            ...markdownFormatItems,
-                            quoteItem,
-                            bulletedListItem,
-                            numberedListItem,
-                            linkItem,
-                            buildTextColorItem(),
-                            buildHighlightColorItem(),
-                            ...textDirectionItems,
-                            ...alignmentItems
-                          ],
-                          textDirection: TextDirection.ltr,
-                          editorState: _editorState!,
-                          editorScrollController: _editorScrollController!,
-                          child: AppFlowyEditor(
-                            editorState: _editorState!,
-                            editorScrollController: _editorScrollController,
-                            editable: widget.isEditable,
-                            shrinkWrap: false,
-                            // 自定义样式设置，使用 LXGW WenKai Mono 字体
-                            editorStyle: EditorStyle.desktop(
-                              padding: EdgeInsets.zero,
-                              textStyleConfiguration: TextStyleConfiguration(
-                                text: TextStyle(
-                                  fontFamily: 'LXGW WenKai',
-                                  fontSize: 16,
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
-                                      ?.color,
+                  ? FloatingToolbar(
+                      items: [
+                        paragraphItem,
+                        ...headingItems,
+                        ...markdownFormatItems,
+                        quoteItem,
+                        codeBlockToolbarItem,
+                        bulletedListItem,
+                        numberedListItem,
+                        linkItem,
+                        buildTextColorItem(),
+                        buildHighlightColorItem(),
+                        ...textDirectionItems,
+                        ...alignmentItems
+                      ],
+                      textDirection: TextDirection.ltr,
+                      editorState: _editorState!,
+                      editorScrollController: _editorScrollController!,
+                      child: AppFlowyEditor(
+                        editorState: _editorState!,
+                        editorScrollController: _editorScrollController,
+                        characterShortcutEvents: [
+                          ...codeBlockCharacterEvents,
+                          ...standardCharacterShortcutEvents
+                        ],
+                        commandShortcutEvents: [
+                          ...codeBlockCommands(),
+                          ...standardCommandShortcutEvents.where(
+                            (event) =>
+                                event !=
+                                pasteCommand, // remove standard paste command
+                          )
+                        ],
+                        blockComponentBuilders: {
+                          ...standardBlockComponentBuilderMap,
+                          CodeBlockKeys.type: CodeBlockComponentBuilder(
+                              configuration: BlockComponentConfiguration(
+                                textStyle: (Node node, {TextSpan? textSpan}) =>
+                                    const TextStyle(
+                                  fontFamily: 'RobotoMono',
+                                  fontSize: 14,
+                                  height: 1.5,
                                 ),
                               ),
+                              styleBuilder: () => CodeBlockStyle(
+                                    backgroundColor:
+                                        Theme.of(context).brightness ==
+                                                Brightness.light
+                                            ? Colors.grey[200]!
+                                            : Colors.grey[800]!,
+                                    foregroundColor:
+                                        Theme.of(context).brightness ==
+                                                Brightness.light
+                                            ? Colors.blue
+                                            : Colors.blue[800]!,
+                                  ),
+                              actions: CodeBlockActions(
+                                onCopy: (code) => Clipboard.setData(
+                                    ClipboardData(text: code)),
+                              )),
+                        },
+                        editable: true,
+                        shrinkWrap: false,
+                        // 自定义样式设置，使用 LXGW WenKai Mono 字体
+                        editorStyle: EditorStyle.desktop(
+                          padding: EdgeInsets.zero,
+                          textStyleConfiguration: TextStyleConfiguration(
+                            text: TextStyle(
+                              fontFamily: 'LXGW WenKai',
+                              fontSize: 16,
+                              color:
+                                  Theme.of(context).textTheme.bodyMedium?.color,
                             ),
                           ),
-                        )
-                      : AppFlowyEditor(
-                          editorState: _editorState!,
-                          editorScrollController: _editorScrollController,
-                          editable: widget.isEditable,
-                          shrinkWrap: false,
-                          // 自定义样式设置，使用 LXGW WenKai Mono 字体
-                          editorStyle: EditorStyle.desktop(
-                            padding: EdgeInsets.zero,
-                            textStyleConfiguration: TextStyleConfiguration(
-                              text: TextStyle(
-                                fontFamily: 'LXGW WenKai',
-                                fontSize: 16,
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.color,
-                              ),
-                            ),
-                          ),
-                        )
+                        ),
+                      ),
+                    )
                   : const Center(child: CircularProgressIndicator()),
             ),
           ),
           // Save button
-          if (widget.isEditable)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: _isSaving ? null : _saveNote,
-                child: _isSaving
-                    ? const CircularProgressIndicator.adaptive()
-                    : Text(_isNew ? '创建笔记' : '更新笔记'),
-              ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: _isSaving ? null : _saveNote,
+              child: _isSaving
+                  ? const CircularProgressIndicator.adaptive()
+                  : Text(_isNew ? '创建笔记' : '更新笔记'),
             ),
+          ),
         ],
       ),
     );
@@ -560,7 +577,6 @@ class _NoteCardState extends State<NoteCard> {
                 contentPadding: EdgeInsets.zero,
               ),
               style: Theme.of(context).textTheme.headlineSmall,
-              readOnly: !widget.isEditable,
             ),
           ),
         ],

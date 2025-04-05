@@ -42,7 +42,6 @@ class NoteTreeCardController {
     manager.addCard(
       NoteCard(
         noteId: item.id,
-        isEditable: true,
       ),
     );
   }

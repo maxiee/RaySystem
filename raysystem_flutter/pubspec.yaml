@@ -42,6 +42,7 @@ dependencies:
   appflowy_editor: ^5.1.0
   openapi:
     path: ./api
+  highlight: ^0.7.0
 
 dev_dependencies:
   flutter_test:
