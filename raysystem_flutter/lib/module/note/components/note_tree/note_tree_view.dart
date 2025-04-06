@@ -13,10 +13,10 @@ class NoteTreeViewClassic extends StatefulWidget {
 
   /// Callback when add child note is requested
   final Function(NoteTreeItem)? onAddChildNote;
-  
+
   /// Callback when a note is double-clicked
   final Function(NoteTreeItem)? onItemDoubleClicked;
-  
+
   /// Callback when delete note is requested
   final Function(NoteTreeItem)? onDeleteNote;
 
@@ -96,9 +96,12 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
         _hasChildrenCache[item.id] = true;
       }
 
+      // 对笔记进行排序: 文件夹优先显示，然后是普通笔记
+      final sortedItems = _sortItems(initialItems);
+
       if (!mounted) return;
       setState(() {
-        _items = initialItems;
+        _items = sortedItems;
         _isInitialLoading = false;
       });
     } catch (e) {
@@ -110,7 +113,7 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
       debugPrint('Error loading initial data: $e');
     }
   }
-  
+
   /// Public method to load initial data that can be called by parent widget
   Future<void> loadInitialData() async {
     await _loadInitialData();
@@ -134,6 +137,9 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
         _hasChildrenCache[item.id] = true;
       }
 
+      // 对子项进行排序：文件夹优先
+      final sortedChildren = _sortItems(children);
+
       if (!mounted) return;
       setState(() {
         // 在当前根级别项目列表中查找该文件夹的索引位置
@@ -149,11 +155,11 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
         // 如果文件夹直接位于根级别(即_items数组中)
         // If found directly in the root level
         if (folderIndex != -1) {
-          // 使用copyWith方法创建一个新对象，设置isExpanded为true并添加children
+          // 使用copyWith方法创建一个新对象，设置isExpanded为true并添加排序后的children
           // Update with new version that has the children
           _items[folderIndex] = _items[folderIndex].copyWith(
             isExpanded: true,
-            children: children,
+            children: sortedChildren,
           );
         } else {
           // 如果文件夹不在根级别，则在整个树中查找并更新它
@@ -161,13 +167,13 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
           _findAndUpdateItem(_items, folder.id, (foundItem) {
             // 直接更新原始引用的字段
             foundItem.isExpanded = true;
-            // 重要：直接替换children数组
+            // 重要：直接替换children数组，使用排序后的结果
             foundItem.children.clear();
-            foundItem.children.addAll(children);
+            foundItem.children.addAll(sortedChildren);
 
             // For debugging
             debugPrint(
-                '📂 Updated folder ${folder.id} with ${children.length} children');
+                '📂 Updated folder ${folder.id} with ${sortedChildren.length} children');
           });
         }
         // 完成加载，从加载中文件夹集合中移除此ID
@@ -208,7 +214,7 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
     try {
       // Force the service to fetch fresh data by passing a cache buster parameter
       final children = await _treeService.getChildrenFor(noteId);
-      
+
       if (!mounted) return;
       setState(() {
         _findAndUpdateItem(_items, noteId, (foundItem) {
@@ -216,12 +222,13 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
           // Important: Replace the entire children array
           foundItem.children.clear();
           foundItem.children.addAll(children);
-          
+
           // Update the hasChildren cache based on the latest data
           _hasChildrenCache[noteId] = children.isNotEmpty;
-          
+
           // For debugging
-          debugPrint('🔄 Refreshed folder $noteId with ${children.length} children');
+          debugPrint(
+              '🔄 Refreshed folder $noteId with ${children.length} children');
         });
         _loadingFolders.remove(noteId);
       });
@@ -270,7 +277,7 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
       widget.onItemSelected!(item);
     }
   }
-  
+
   // 处理双击事件
   void _handleDoubleClick(NoteTreeItem item) {
     if (widget.onItemDoubleClicked != null) {
@@ -279,9 +286,11 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
   }
 
   /// Show context menu for an item
-  void _showContextMenu(BuildContext context, NoteTreeItem item, Offset position) {
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-    
+  void _showContextMenu(
+      BuildContext context, NoteTreeItem item, Offset position) {
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+
     showMenu(
       context: context,
       position: RelativeRect.fromRect(
@@ -358,11 +367,11 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
         break;
       }
     }
-    
+
     if (isRootNote) {
       return 0; // 根级别笔记返回0
     }
-    
+
     // 否则在树结构中搜索父节点
     for (var rootItem in _items) {
       int? parentId = _findParentIdInSubtree(rootItem, noteId);
@@ -370,7 +379,7 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
         return parentId;
       }
     }
-    
+
     // 如果在树中找不到，返回null
     return null;
   }
@@ -382,15 +391,29 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
       if (child.id == childId) {
         return parent.id;
       }
-      
+
       // 递归检查孙子节点
       int? foundId = _findParentIdInSubtree(child, childId);
       if (foundId != null) {
         return foundId;
       }
     }
-    
+
     return null;
+  }
+
+  /// 对笔记进行排序: 文件夹优先显示，然后是普通笔记
+  List<NoteTreeItem> _sortItems(List<NoteTreeItem> items) {
+    // 将项目分为两组：文件夹和普通笔记
+    final folders = items.where((item) => item.isFolder).toList();
+    final notes = items.where((item) => !item.isFolder).toList();
+
+    // 按更新时间排序每个组内的项目（可选）
+    folders.sort((a, b) => a.name.compareTo(b.name)); // 文件夹按名称字母顺序排序
+    notes.sort((a, b) => a.name.compareTo(b.name)); // 普通笔记按名称字母顺序排序
+
+    // 返回合并后的列表，文件夹在前，普通笔记在后
+    return [...folders, ...notes];
   }
 
   @override
@@ -461,8 +484,9 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
         child: Container(
           height: 24, // 设置节点高度保持紧凑布局
           // 选中状态时使用高亮背景色，否则透明
-          color:
-              isSelected ? Theme.of(context).highlightColor : Colors.transparent,
+          color: isSelected
+              ? Theme.of(context).highlightColor
+              : Colors.transparent,
           child: Stack(
             children: [
               // 绘制连接线部分
@@ -548,7 +572,9 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
                               : hasChildren
                                   ? Icon(
                                       // 根据展开状态显示加号或减号图标
-                                      item.isExpanded ? Icons.remove : Icons.add,
+                                      item.isExpanded
+                                          ? Icons.remove
+                                          : Icons.add,
                                       size: 12.0,
                                       color: Colors.grey[800],
                                     )
@@ -576,7 +602,9 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
                     // 使用节点提供的图标，或根据节点类型选择默认图标
                     item.icon ??
                         (item.isFolder
-                            ? (item.isExpanded ? Icons.folder_open : Icons.folder)
+                            ? (item.isExpanded
+                                ? Icons.folder_open
+                                : Icons.folder)
                             : Icons.description),
                     size: 16,
                     color: item.isFolder
