@@ -16,7 +16,7 @@ List<CommandShortcutEvent> codeBlockCommands({
       insertNewParagraphNextToCodeBlockCommand(
         localizations.codeBlockNewParagraph,
       ),
-      // pasteInCodeblock(localizations.codeBlockPasteText),
+      pasteInCodeblock(localizations.codeBlockPasteText),
       selectAllInCodeBlockCommand(localizations.codeBlockSelectAll),
       tabToInsertSpacesInCodeBlockCommand(localizations.codeBlockIndentLines),
       tabToDeleteSpacesInCodeBlockCommand(localizations.codeBlockOutdentLines),
