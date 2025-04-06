@@ -7,61 +7,13 @@ import 'package:highlight/highlight.dart' as highlight;
 import 'package:highlight/languages/all.dart';
 import 'package:provider/provider.dart';
 import 'package:raysystem_flutter/module/editor/blocks/code/code_block_actions.dart';
+import 'package:raysystem_flutter/module/editor/blocks/code/code_block_constants.dart';
 import 'package:raysystem_flutter/module/editor/blocks/code/code_block_localization.dart';
 import 'package:raysystem_flutter/module/editor/blocks/code/code_block_style.dart';
 import 'package:raysystem_flutter/utils/string_ext.dart';
 import 'package:universal_platform/universal_platform.dart';
 
 import 'code_block_themes.dart';
-
-final allCodeBlockLanguages = [
-  'Assembly',
-  'Bash',
-  'BASIC',
-  'C',
-  'C#',
-  'CPP',
-  'Clojure',
-  'CS',
-  'CSS',
-  'Dart',
-  'Delphi',
-  'DockerFile',
-  'Elixir',
-  'Elm',
-  'Erlang',
-  'Fortran',
-  'Go',
-  'GraphQL',
-  'Haskell',
-  'HTML',
-  'Java',
-  'JavaScript',
-  'JSON',
-  'Kotlin',
-  'LaTeX',
-  'Lisp',
-  'Lua',
-  'Markdown',
-  'MATLAB',
-  'Objective-C',
-  'OCaml',
-  'Perl',
-  'PHP',
-  'PowerShell',
-  'Python',
-  'R',
-  'Ruby',
-  'Rust',
-  'Scala',
-  'Shell',
-  'SQL',
-  'Swift',
-  'TypeScript',
-  'Visual Basic',
-  'XML',
-  'YAML',
-];
 
 final defaultCodeBlockSupportedLanguages = allCodeBlockLanguages
     .map((e) => e.toLowerCase())
