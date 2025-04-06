@@ -69,9 +69,10 @@ class CustomAppFlowyEditor extends StatelessWidget {
         ],
         commandShortcutEvents: [
           ...codeBlockCommands(),
-          ...standardCommandShortcutEvents.where(
-            (event) => event != pasteCommand, // remove standard paste command
-          )
+          ...standardCommandShortcutEvents
+          // ...standardCommandShortcutEvents.where(
+          //   (event) => event != pasteCommand, // remove standard paste command
+          // )
         ],
         blockComponentBuilders: {
           ...standardBlockComponentBuilderMap,
