@@ -470,7 +470,18 @@ class _NoteCardState extends State<NoteCard> {
                         editorScrollController: _editorScrollController,
                         characterShortcutEvents: [
                           ...codeBlockCharacterEvents,
-                          ...standardCharacterShortcutEvents
+                          customSlashCommand([
+                            ...standardSelectionMenuItems,
+                            codeBlockItem('Code Block', Icons.code),
+                          ]),
+                          ...standardCharacterShortcutEvents.where(
+                            (event) {
+                              if (event == slashCommand) {
+                                return false; // remove standard slash command
+                              }
+                              return true;
+                            },
+                          ).toList(),
                         ],
                         commandShortcutEvents: [
                           ...codeBlockCommands(),
