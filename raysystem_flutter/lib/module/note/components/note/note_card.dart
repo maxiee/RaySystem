@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:appflowy_editor/appflowy_editor.dart';
 import 'package:flutter/services.dart';
 import 'package:openapi/openapi.dart';
-import 'package:raysystem_flutter/module/editor/blocks/code/plugin.dart';
+import 'package:raysystem_flutter/module/editor/editor.dart';
 import 'package:raysystem_flutter/module/note/api/note/api_note_service.dart';
 
 class NoteCard extends StatefulWidget {
@@ -102,16 +102,15 @@ class _NoteCardState extends State<NoteCard> {
       _primaryTitleController.text = primaryTitle.title;
     }
 
-    // Convert AppFlowy JSON string to editor document
+    // Use EditorHelper to create editor state from JSON content
     try {
-      final document = Document.fromJson(note.contentAppflowy.isEmpty
-          ? {
-              'document': {'type': 'page', 'children': []}
-            }
-          : {'document': jsonDecode(note.contentAppflowy)});
-      _editorState = EditorState(document: document);
-      _editorScrollController =
-          EditorScrollController(editorState: _editorState!);
+      _editorState = EditorHelper.createEditorFromJson(note.contentAppflowy);
+      if (_editorState != null) {
+        _editorScrollController =
+            EditorScrollController(editorState: _editorState!);
+      } else {
+        _initializeEmptyEditor();
+      }
     } catch (e) {
       debugPrint('Error parsing note content: $e');
       _initializeEmptyEditor();
@@ -119,8 +118,8 @@ class _NoteCardState extends State<NoteCard> {
   }
 
   void _initializeEmptyEditor() {
-    // 避免使用 Document.empty()，直接创建一个最基本的空文档
-    _editorState = EditorState.blank();
+    // Use EditorHelper to create empty editor
+    _editorState = EditorHelper.createEmptyEditor();
     _editorScrollController =
         EditorScrollController(editorState: _editorState!);
   }
@@ -136,9 +135,8 @@ class _NoteCardState extends State<NoteCard> {
     final finalPrimaryTitle =
         primaryTitle.isEmpty ? 'Untitled Note' : primaryTitle;
 
-    // Convert editor document to JSON string
-    final contentJson = _editorState!.document.toJson();
-    final contentAppflowy = jsonEncode(contentJson['document']);
+    // Use EditorHelper to serialize the editor content
+    final contentAppflowy = EditorHelper.serializeEditorContent(_editorState!);
 
     try {
       bool success;
@@ -172,7 +170,6 @@ class _NoteCardState extends State<NoteCard> {
             orElse: () => _titles.first);
         if (currentPrimaryTitle.title != finalPrimaryTitle) {
           // Update the title via API
-          // Note: You'll need to add this method to your ApiNoteService
           await _updateNoteTitle(
               currentPrimaryTitle.id, finalPrimaryTitle, true);
         }
@@ -447,93 +444,11 @@ class _NoteCardState extends State<NoteCard> {
               // 减少水平方向的内边距，让编辑区域更宽
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: _editorState != null && _editorScrollController != null
-                  ? FloatingToolbar(
-                      items: [
-                        paragraphItem,
-                        ...headingItems,
-                        ...markdownFormatItems,
-                        quoteItem,
-                        codeBlockToolbarItem,
-                        bulletedListItem,
-                        numberedListItem,
-                        linkItem,
-                        buildTextColorItem(),
-                        buildHighlightColorItem(),
-                        ...textDirectionItems,
-                        ...alignmentItems
-                      ],
-                      textDirection: TextDirection.ltr,
+                  ? CustomAppFlowyEditor(
                       editorState: _editorState!,
-                      editorScrollController: _editorScrollController!,
-                      child: AppFlowyEditor(
-                        editorState: _editorState!,
-                        editorScrollController: _editorScrollController,
-                        characterShortcutEvents: [
-                          ...codeBlockCharacterEvents,
-                          customSlashCommand([
-                            ...standardSelectionMenuItems,
-                            codeBlockItem('Code Block', Icons.code),
-                          ]),
-                          ...standardCharacterShortcutEvents.where(
-                            (event) {
-                              if (event == slashCommand) {
-                                return false; // remove standard slash command
-                              }
-                              return true;
-                            },
-                          ).toList(),
-                        ],
-                        commandShortcutEvents: [
-                          ...codeBlockCommands(),
-                          ...standardCommandShortcutEvents.where(
-                            (event) =>
-                                event !=
-                                pasteCommand, // remove standard paste command
-                          )
-                        ],
-                        blockComponentBuilders: {
-                          ...standardBlockComponentBuilderMap,
-                          CodeBlockKeys.type: CodeBlockComponentBuilder(
-                              configuration: BlockComponentConfiguration(
-                                textStyle: (Node node, {TextSpan? textSpan}) =>
-                                    const TextStyle(
-                                  fontFamily: 'RobotoMono',
-                                  fontSize: 14,
-                                  height: 1.5,
-                                ),
-                              ),
-                              styleBuilder: () => CodeBlockStyle(
-                                    backgroundColor:
-                                        Theme.of(context).brightness ==
-                                                Brightness.light
-                                            ? Colors.grey[200]!
-                                            : Colors.grey[800]!,
-                                    foregroundColor:
-                                        Theme.of(context).brightness ==
-                                                Brightness.light
-                                            ? Colors.blue
-                                            : Colors.blue[800]!,
-                                  ),
-                              actions: CodeBlockActions(
-                                onCopy: (code) => Clipboard.setData(
-                                    ClipboardData(text: code)),
-                              )),
-                        },
-                        editable: true,
-                        shrinkWrap: false,
-                        // 自定义样式设置，使用 LXGW WenKai Mono 字体
-                        editorStyle: EditorStyle.desktop(
-                          padding: EdgeInsets.zero,
-                          textStyleConfiguration: TextStyleConfiguration(
-                            text: TextStyle(
-                              fontFamily: 'LXGW WenKai',
-                              fontSize: 16,
-                              color:
-                                  Theme.of(context).textTheme.bodyMedium?.color,
-                            ),
-                          ),
-                        ),
-                      ),
+                      editorScrollController: _editorScrollController,
+                      editable: true,
+                      shrinkWrap: false,
                     )
                   : const Center(child: CircularProgressIndicator()),
             ),
