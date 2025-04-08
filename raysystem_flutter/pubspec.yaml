@@ -39,7 +39,10 @@ dependencies:
   screen_capturer: ^0.2.3
   dio: ^5.2.0
   openapi_generator_annotations: ^6.1.0
-  appflowy_editor: ^5.1.0
+  appflowy_editor:
+    git:
+      url: git@github.com:AppFlowy-IO/appflowy-editor.git
+      ref: main 
   openapi:
     path: ./api
   highlight: ^0.7.0

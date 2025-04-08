@@ -25,10 +25,11 @@ packages:
   appflowy_editor:
     dependency: "direct main"
     description:
-      name: appflowy_editor
-      sha256: ce0b9170caca9bfbd525bd924c94733445c1c22137275f8c08c539b31585d0b5
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "552f95fd15627e10a138c6db2a6d0a8089bc9a25"
+      url: "git@github.com:AppFlowy-IO/appflowy-editor.git"
+    source: git
     version: "5.1.0"
   archive:
     dependency: transitive
