@@ -58,6 +58,11 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
                 onItemDoubleClicked: (item) => _controller
                     .handleItemDoubleClicked(item, widget.cardManager),
                 onDeleteNote: _controller.handleDeleteNote,
+                // Connect drag and drop event handlers
+                onStartDrag: _controller.handleStartDrag,
+                onEndDrag: _controller.handleEndDrag,
+                canAcceptDrop: _controller.canAcceptDrop,
+                onDropNote: _controller.handleDrop,
               ),
 
               // Show loading indicator during refresh

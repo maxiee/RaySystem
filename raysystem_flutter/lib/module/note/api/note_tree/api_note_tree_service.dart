@@ -98,6 +98,11 @@ class ApiNoteTreeService implements NoteTreeService {
     }
   }
 
+  @override
+  NotesApi? getNotesApi() {
+    return _notesApi;
+  }
+
   /// Converts NoteTreeNode objects from API to NoteTreeItem objects for the UI
   List<NoteTreeItem> _convertNoteTreeNodesToTreeItems(
       List<NoteResponse> nodes, int level) {

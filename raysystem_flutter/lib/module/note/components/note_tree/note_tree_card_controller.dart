@@ -12,6 +12,7 @@ import 'package:raysystem_flutter/module/note/api/note_tree/note_tree_service.da
 import 'package:raysystem_flutter/module/note/components/note_tree/note_tree_view.dart';
 import 'package:raysystem_flutter/module/note/model/note_tree_model.dart';
 import 'package:raysystem_flutter/module/note/providers/notes_provider.dart';
+import 'package:openapi/openapi.dart';
 
 /// Controller class for NoteTreeCard to separate logic from UI
 class NoteTreeCardController {
@@ -22,6 +23,10 @@ class NoteTreeCardController {
 
   NoteTreeItem? selectedItem;
   bool isRefreshing = false;
+
+  // Drag and drop properties
+  NoteTreeItem? draggedItem;
+  bool isDragging = false;
 
   NoteTreeCardController({
     required this.treeService,
@@ -54,6 +59,172 @@ class NoteTreeCardController {
   /// Get NotesProvider from context
   NotesProvider _getNotesProvider() {
     return Provider.of<NotesProvider>(context, listen: false);
+  }
+
+  /// Start dragging a note item
+  void handleStartDrag(NoteTreeItem item) {
+    debugPrint('Starting drag for item: ${item.name} (ID: ${item.id})');
+    draggedItem = item;
+    isDragging = true;
+  }
+
+  /// End dragging without a drop
+  void handleEndDrag() {
+    draggedItem = null;
+    isDragging = false;
+  }
+
+  /// Check if the target item can accept the dragged item
+  /// Returns true if the drop is valid, false otherwise
+  Future<bool> canAcceptDrop(NoteTreeItem targetItem) async {
+    if (draggedItem == null) return false;
+
+    // Cannot drop onto itself
+    if (targetItem.id == draggedItem!.id) {
+      debugPrint('Cannot drop onto itself');
+      return false;
+    }
+
+    // Check if target is a descendant of the dragged item
+    // This prevents creating cycles in the hierarchy
+    bool isDescendant = await _isDescendantOf(targetItem.id, draggedItem!.id);
+    if (isDescendant) {
+      debugPrint('Cannot drop onto its own descendant');
+      return false;
+    }
+
+    return true;
+  }
+
+  /// Check if itemId is a descendant of potentialAncestorId
+  Future<bool> _isDescendantOf(int itemId, int potentialAncestorId) async {
+    // Get the path from the root to the item
+    final NotesApi? notesApi = treeService.getNotesApi();
+
+    if (notesApi == null) {
+      debugPrint('Error: NotesApi is null');
+      return false;
+    }
+
+    try {
+      final response = await notesApi.getNotePathNotesNoteIdPathGet(
+        noteId: itemId,
+      );
+
+      if (response.data == null) return false;
+
+      // Check if the potentialAncestor is in the path
+      for (var note in response.data!) {
+        if (note.id == potentialAncestorId) {
+          return true;
+        }
+      }
+
+      return false;
+    } catch (e) {
+      debugPrint('Error checking ancestry: $e');
+      return false;
+    }
+  }
+
+  /// Handle dropping a note item onto a target item
+  Future<void> handleDrop(NoteTreeItem targetItem) async {
+    debugPrint(
+        '📦 handleDrop called for target: ${targetItem.name} (ID: ${targetItem.id})');
+
+    // 复制当前的 draggedItem 到局部变量，避免在异步操作过程中它被清空
+    final currentDraggedItem = draggedItem;
+    if (currentDraggedItem == null) {
+      debugPrint('❌ Error: draggedItem is null in handleDrop');
+      return;
+    }
+
+    debugPrint(
+        '📦 Dragged item: ${currentDraggedItem.name} (ID: ${currentDraggedItem.id})');
+
+    // Final validation before proceeding
+    final bool canDrop = await canAcceptDrop(targetItem);
+    debugPrint('📦 canDrop validation result: $canDrop');
+
+    if (!canDrop) {
+      _showErrorSnackBar('Cannot move note to this location');
+      return;
+    }
+
+    // Show loading dialog
+    _showLoadingDialog('Moving note...');
+
+    try {
+      // Get the NotesApi instance
+      final NotesApi? notesApi = treeService.getNotesApi();
+      if (notesApi == null) {
+        throw Exception('NotesApi instance is null');
+      }
+
+      debugPrint('📦 Calling moveNoteNotesNoteIdMovePost API...');
+      debugPrint(
+          '📦 Parameters: noteId=${currentDraggedItem.id}, newParentId=${targetItem.id}');
+
+      final response = await notesApi.moveNoteNotesNoteIdMovePost(
+        noteId: currentDraggedItem.id,
+        newParentId: targetItem.id,
+      );
+
+      // Get parent IDs for refreshing
+      final int? oldParentId =
+          await treeViewKey.currentState?.findParentId(currentDraggedItem.id);
+      debugPrint('📦 Old parent ID: $oldParentId');
+
+      // Hide loading dialog
+      if (context.mounted) Navigator.of(context).pop();
+
+      debugPrint(
+          '📦 API response received: ${response.data != null ? 'success' : 'null data'}');
+
+      if (response.data != null) {
+        // Reset cache to ensure fresh data
+        treeService.resetCache();
+
+        // Refresh the old parent if known
+        if (oldParentId != null && treeViewKey.currentState != null) {
+          if (oldParentId == 0) {
+            // For root notes, refresh the entire tree
+            debugPrint('📦 Refreshing entire tree');
+            await treeViewKey.currentState!.loadInitialData();
+          } else {
+            // For non-root notes, refresh the old parent
+            debugPrint('📦 Refreshing old parent: $oldParentId');
+            await treeViewKey.currentState!.refreshChildren(oldParentId);
+          }
+        }
+
+        // Ensure the target is marked as a folder and expanded
+        if (!targetItem.isFolder) {
+          targetItem.isFolder = true;
+        }
+
+        // Refresh the target to show the moved item
+        debugPrint('📦 Refreshing target folder: ${targetItem.id}');
+        await treeViewKey.currentState!.refreshChildren(targetItem.id);
+
+        // Show success message
+        _showSuccessSnackBar('Note moved successfully');
+      } else {
+        _showErrorSnackBar('Failed to move note');
+      }
+    } catch (e) {
+      // Hide loading dialog if still showing
+      if (context.mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      debugPrint('❌ Error in handleDrop: ${e.toString()}');
+      _showErrorSnackBar('Error moving note: ${e.toString()}');
+    } finally {
+      // Reset drag state
+      debugPrint('📦 Resetting drag state');
+      draggedItem = null;
+      isDragging = false;
+    }
   }
 
   /// Handle adding a child note to a parent

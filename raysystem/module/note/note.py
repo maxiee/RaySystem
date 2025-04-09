@@ -315,7 +315,10 @@ class NoteManager:
 
         # Fetch the note directly within this session context
         result = await session.execute(
-            select(Note).filter(Note.id == note_id).options(joinedload(Note.children))
+            select(Note).filter(Note.id == note_id).options(
+                joinedload(Note.children),
+                joinedload(Note.note_titles)  # Also load note_titles relationship
+            )
         )
         note = result.scalars().first()
 
@@ -332,9 +335,35 @@ class NoteManager:
         ):
             raise ValueError("Cannot move note: would create circular reference")
 
+        # Store old parent ID before updating
+        old_parent_id = note.parent_id
+        
         # Update parent and save
         note.parent_id = new_parent_id
         note.updated_at = datetime.now()
+        
+        # Update has_children flag for new parent (if applicable)
+        if new_parent_id is not None:
+            new_parent = await self.get_note_by_id(new_parent_id, session)
+            if new_parent and not new_parent.has_children:
+                new_parent.has_children = True
+                
+        # Update has_children flag for old parent (if applicable)
+        if old_parent_id is not None:
+            # Check if the old parent still has other children
+            old_parent_children_count = await session.execute(
+                select(func.count()).select_from(Note).filter(
+                    and_(Note.parent_id == old_parent_id, Note.id != note_id)
+                )
+            )
+            remaining_children = old_parent_children_count.scalar_one()
+            
+            # If no children remain, update the old parent's has_children flag
+            if remaining_children == 0:
+                old_parent = await self.get_note_by_id(old_parent_id, session)
+                if old_parent:
+                    old_parent.has_children = False
+
         await session.commit()
         await session.refresh(note)
         return note

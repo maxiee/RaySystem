@@ -20,6 +20,18 @@ class NoteTreeViewClassic extends StatefulWidget {
   /// Callback when delete note is requested
   final Function(NoteTreeItem)? onDeleteNote;
 
+  /// Callback when a note starts being dragged
+  final Function(NoteTreeItem)? onStartDrag;
+
+  /// Callback when drag ends without dropping
+  final Function()? onEndDrag;
+
+  /// Callback to check if a drop target is valid
+  final Future<bool> Function(NoteTreeItem)? canAcceptDrop;
+
+  /// Callback when a note is dropped onto another note
+  final Function(NoteTreeItem)? onDropNote;
+
   /// Flag to determine if the widget should load initial data itself
   final bool autoLoadInitialData;
 
@@ -33,6 +45,10 @@ class NoteTreeViewClassic extends StatefulWidget {
     this.onAddChildNote,
     this.onItemDoubleClicked,
     this.onDeleteNote,
+    this.onStartDrag,
+    this.onEndDrag,
+    this.canAcceptDrop,
+    this.onDropNote,
     this.autoLoadInitialData = true,
     required this.treeService,
   }) : super(key: key);
@@ -58,6 +74,12 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
 
   /// Cache to track which folders have children (to show expand button)
   final Map<int, bool> _hasChildrenCache = {};
+
+  /// Current drag target being hovered (for visual feedback)
+  int? _currentDragTargetId;
+
+  /// Flag to track if a drag target is valid (for visual feedback)
+  bool _isValidTarget = false;
 
   @override
   void initState() {
@@ -470,7 +492,221 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
     final isLoading = _loadingFolders.contains(item.id);
     // 判断当前节点是否有子节点（用于显示展开/折叠按钮）
     final hasChildren = item.isFolder && (_hasChildrenCache[item.id] ?? false);
+    // 判断当前节点是否是拖放目标
+    final isDragTarget = _currentDragTargetId == item.id;
 
+    // Wrap the node with a Draggable and a DragTarget
+    return _buildDragAndDropWrapper(
+      item: item,
+      isLastInLevel: isLastInLevel,
+      isLast: isLast,
+      isSelected: isSelected,
+      isLoading: isLoading,
+      hasChildren: hasChildren,
+      isDragTarget: isDragTarget,
+    );
+  }
+
+  /// Builds a draggable node wrapped in a drag target
+  Widget _buildDragAndDropWrapper({
+    required NoteTreeItem item,
+    required List<bool> isLast,
+    required bool isLastInLevel,
+    required bool isSelected,
+    required bool isLoading,
+    required bool hasChildren,
+    required bool isDragTarget,
+  }) {
+    // The tree node content
+    final Widget treeNodeContent = _buildNodeContent(
+      item: item,
+      isLast: isLast,
+      isLastInLevel: isLastInLevel,
+      isSelected: isSelected,
+      isLoading: isLoading,
+      hasChildren: hasChildren,
+    );
+
+    // Wrap with DragTarget to handle drops
+    return DragTarget<NoteTreeItem>(
+      onWillAccept: (data) {
+        debugPrint(
+            '🎯 onWillAccept for ${item.name} (ID: ${item.id}), data: ${data?.name ?? "null"}');
+
+        // Cannot accept drops if no data or no validation function
+        if (data == null || widget.canAcceptDrop == null) {
+          debugPrint(
+              '🎯 Rejecting drop: data is null or no validation function');
+          return false;
+        }
+
+        // Cannot drop onto self (quick rejection)
+        if (data.id == item.id) {
+          debugPrint('🎯 Rejecting drop: cannot drop onto self');
+          return false;
+        }
+
+        // Start validation process
+        debugPrint('🎯 Starting validation process');
+        _checkDropValidity(data, item);
+
+        // Initially allow the drop to start hover effect
+        // The actual validation will update the state
+        debugPrint('🎯 Initially accepting drop to start hover effect');
+        return true;
+      },
+      onAccept: (data) {
+        debugPrint(
+            '🎯 onAccept called for ${item.name} (ID: ${item.id}), data: ${data.name} (ID: ${data.id})');
+
+        // Handle the drop - call the controller's drop handler
+        if (widget.onDropNote != null) {
+          debugPrint('🎯 Calling onDropNote callback');
+          widget.onDropNote!(item);
+        } else {
+          debugPrint('❌ Error: onDropNote callback is null');
+        }
+
+        // Reset visual feedback
+        setState(() {
+          _currentDragTargetId = null;
+          _isValidTarget = false;
+        });
+      },
+      onLeave: (data) {
+        debugPrint('🎯 onLeave called for ${item.name}');
+        // Reset visual feedback when drag leaves
+        setState(() {
+          _currentDragTargetId = null;
+          _isValidTarget = false;
+        });
+      },
+      builder: (context, candidateData, rejectedData) {
+        // Add visual feedback for drag target
+        final bool showDropFeedback = isDragTarget && candidateData.isNotEmpty;
+
+        return Container(
+          decoration: BoxDecoration(
+            border: showDropFeedback
+                ? Border.all(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 1.5,
+                  )
+                : null,
+            borderRadius: showDropFeedback ? BorderRadius.circular(4) : null,
+            color: showDropFeedback
+                ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
+                : Colors.transparent,
+          ),
+          // Wrap with Draggable to allow dragging the node
+          child: Draggable<NoteTreeItem>(
+            data: item,
+            feedback: Material(
+              elevation: 6.0,
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                width: 220,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      item.icon ??
+                          (item.isFolder ? Icons.folder : Icons.description),
+                      size: 18,
+                      color:
+                          item.isFolder ? Colors.amber[700] : Colors.blue[700],
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        item.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            childWhenDragging: Opacity(
+              opacity: 0.3,
+              child: treeNodeContent,
+            ),
+            onDragStarted: () {
+              debugPrint('🎯 onDragStarted for ${item.name} (ID: ${item.id})');
+              // Notify start of drag
+              if (widget.onStartDrag != null) {
+                widget.onStartDrag!(item);
+              }
+            },
+            onDragEnd: (details) {
+              debugPrint(
+                  '🎯 onDragEnd called with wasAccepted: ${details.wasAccepted}');
+              // Notify end of drag
+              if (widget.onEndDrag != null) {
+                widget.onEndDrag!();
+              }
+            },
+            onDraggableCanceled: (_, __) {
+              debugPrint('🎯 onDraggableCanceled called');
+              // Notify end of drag when canceled
+              if (widget.onEndDrag != null) {
+                widget.onEndDrag!();
+              }
+            },
+            maxSimultaneousDrags: 1,
+            child: treeNodeContent,
+          ),
+        );
+      },
+    );
+  }
+
+  /// Check if drop is valid and update UI accordingly
+  void _checkDropValidity(
+      NoteTreeItem draggedItem, NoteTreeItem targetItem) async {
+    debugPrint(
+        '🎯 _checkDropValidity: Checking if ${draggedItem.name} can be dropped onto ${targetItem.name}');
+
+    if (widget.canAcceptDrop != null) {
+      try {
+        // Perform async validation
+        bool isValid = await widget.canAcceptDrop!(targetItem);
+        debugPrint('🎯 _checkDropValidity result: $isValid');
+
+        // Only update if still mounted
+        if (mounted) {
+          setState(() {
+            _isValidTarget = isValid;
+            _currentDragTargetId = isValid ? targetItem.id : null;
+          });
+        }
+      } catch (e) {
+        debugPrint('❌ Error checking drop validity: $e');
+        if (mounted) {
+          setState(() {
+            _isValidTarget = false;
+            _currentDragTargetId = null;
+          });
+        }
+      }
+    } else {
+      debugPrint('❌ No canAcceptDrop callback provided');
+    }
+  }
+
+  /// Build the content of a tree node
+  Widget _buildNodeContent({
+    required NoteTreeItem item,
+    required List<bool> isLast,
+    required bool isLastInLevel,
+    required bool isSelected,
+    required bool isLoading,
+    required bool hasChildren,
+  }) {
     return GestureDetector(
       // Handle right-click for context menu
       onSecondaryTapDown: (details) {
