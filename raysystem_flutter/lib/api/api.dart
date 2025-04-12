@@ -74,6 +74,11 @@ final llmApi = generatedAPI.Openapi(
     if (apiKey != null) {
       dio.options.headers['X-API-Key'] = apiKey;
     }
+    // 为 LLM API 设置较长的超时时间（单位：毫秒）
+    dio.options.connectTimeout = const Duration(milliseconds: 60000); // 60秒连接超时
+    dio.options.receiveTimeout =
+        const Duration(milliseconds: 240000); // 240秒接收超时
+    dio.options.sendTimeout = const Duration(milliseconds: 60000); // 60秒发送超时
     return dio;
   })(),
 ).getLLMApi();

@@ -4,7 +4,11 @@ from openai import OpenAIError
 
 from .schemas import ChatCompletionRequest, ChatCompletionResponse, ListModelsResponse
 from .llm import LLMService, logging_middleware  # Import service and example middleware
-from .middleware import LLMMiddleware
+from .middleware import (
+    LLMMiddleware,
+    http_tracking_middleware,
+    response_validation_middleware,
+)
 from utils.config import load_config_file
 
 
@@ -17,6 +21,8 @@ def get_llm_service() -> LLMService:
     # Define middleware list (can be loaded/configured dynamically)
     configured_middleware: List[LLMMiddleware] = [
         logging_middleware,
+        http_tracking_middleware,  # Track HTTP-related issues
+        response_validation_middleware,  # Validate response format
         # Add other middleware here (e.g., token counting, db logging)
     ]
 
@@ -60,30 +66,68 @@ async def chat_completion_endpoint(
     The model_name parameter in the request allows selecting which configured model to use.
     If not specified, the default model will be used.
     """
+    import uuid
+    import traceback
+    from datetime import datetime
+
+    # 生成请求ID用于跟踪
+    req_id = str(uuid.uuid4())[:8]
+    start_time = datetime.now()
+    print(f"[{req_id}] API请求开始: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"[{req_id}] 请求模型: {request.model_name or '默认'}")
+    print(f"[{req_id}] 请求消息数量: {len(request.messages)}")
+
     try:
+        # 调用LLM服务处理请求
         response = await llm_service.create_chat_completion(request)
+
+        end_time = datetime.now()
+        duration = (end_time - start_time).total_seconds()
+        print(f"[{req_id}] API请求成功完成，耗时: {duration:.2f}秒")
+
+        # 验证响应是否有效
+        if (
+            response
+            and hasattr(response, "message")
+            and hasattr(response.message, "content")
+        ):
+            content_length = len(response.message.content)
+            print(f"[{req_id}] 响应内容长度: {content_length}")
+            if content_length == 0:
+                print(f"[{req_id}] 警告: 响应内容为空")
+
         return response
     except OpenAIError as e:
-        # Handle specific errors from the OpenAI SDK or compatible service
-        # You might want to map different OpenAI errors to specific HTTP status codes
-        print(f"LLM API Error in endpoint: {e}")
+        # 处理OpenAI SDK特定错误
+        end_time = datetime.now()
+        duration = (end_time - start_time).total_seconds()
+        print(f"[{req_id}] LLM API错误，耗时: {duration:.2f}秒，错误: {e}")
+        print(f"[{req_id}] 错误类型: {type(e).__name__}")
+
         raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,  # Or another appropriate code
-            detail=(f"LLM service error: {e}"),
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=(f"LLM服务错误: {e}"),
         )
     except ValueError as e:
-        # Handle validation errors or internal logic errors
-        print(f"Value Error in endpoint: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)  # Or 500 if internal
-        )
+        # 处理验证错误或内部逻辑错误
+        end_time = datetime.now()
+        duration = (end_time - start_time).total_seconds()
+        print(f"[{req_id}] 值错误，耗时: {duration:.2f}秒，错误: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
-        # Catch-all for unexpected errors
-        print(f"Unexpected Error in /chat endpoint: {type(e).__name__}: {e}")
-        # Log the full traceback here in a real application
+        # 处理所有其他未预期错误
+        end_time = datetime.now()
+        duration = (end_time - start_time).total_seconds()
+        print(
+            f"[{req_id}] 未预期错误，耗时: {duration:.2f}秒，类型: {type(e).__name__}，错误: {e}"
+        )
+        # 记录完整堆栈跟踪
+        print(f"[{req_id}] 完整堆栈跟踪:")
+        print(traceback.format_exc())
+
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred while processing the chat completion.",
+            detail="处理聊天请求时发生意外错误",
         )
 
 
