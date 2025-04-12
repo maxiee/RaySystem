@@ -7,6 +7,7 @@ import 'package:raysystem_flutter/commands/todo_commands.dart';
 import 'package:raysystem_flutter/commands/playground_commands.dart';
 import 'package:raysystem_flutter/commands/info_commands.dart';
 import 'package:raysystem_flutter/commands/scheduler_commands.dart';
+import 'package:raysystem_flutter/commands/llm_commands.dart';
 
 final List<Command> rootCommands = [
   settingsCommands,
@@ -16,6 +17,7 @@ final List<Command> rootCommands = [
   playgroundCommands,
   infoCommands,
   schedulerCommands,
+  llmCommands,
 ];
 
 Map<String, dynamic> get commands => {

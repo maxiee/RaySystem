@@ -63,3 +63,17 @@ final notesTitleApi = generatedAPI.Openapi(
     return dio;
   })(),
 ).getNoteTitlesApi();
+
+final llmApi = generatedAPI.Openapi(
+  basePathOverride: getBaseUrl(),
+  dio: (() {
+    final dio = generatedAPI.Openapi(
+      basePathOverride: getBaseUrl(),
+    ).dio;
+    final apiKey = getApiKey();
+    if (apiKey != null) {
+      dio.options.headers['X-API-Key'] = apiKey;
+    }
+    return dio;
+  })(),
+).getLLMApi();
