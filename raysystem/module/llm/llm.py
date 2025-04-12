@@ -1,6 +1,13 @@
 import os
-from typing import List, Optional, Dict, Any, Tuple
+from typing import List, Optional, Dict, Any, Tuple, Union, cast, TypedDict
 from openai import AsyncOpenAI, OpenAIError
+from openai.types.chat import (
+    ChatCompletionMessageParam,
+    ChatCompletionSystemMessageParam,
+    ChatCompletionUserMessageParam,
+    ChatCompletionAssistantMessageParam,
+    ChatCompletionToolMessageParam,
+)
 from .schemas import (
     ChatCompletionRequest,
     ChatCompletionResponse,
@@ -20,8 +27,8 @@ class ModelConfig:
         base_url: str,
         api_key: str,
         model_name: str,
-        display_name: str = None,
-        description: str = None,
+        display_name: str = "",
+        description: str = "",
     ):
         self.name = name  # Config name/identifier
         self.base_url = base_url
@@ -43,8 +50,8 @@ class LLMService:
 
     def __init__(
         self,
-        config_dict: Dict = None,
-        default_model_name: str = None,
+        config_dict: Dict = {},
+        default_model_name: str = "",
         middleware: Optional[List[LLMMiddleware]] = None,
     ):
         """Initialize LLM service with multiple model configurations.
@@ -176,16 +183,62 @@ class LLMService:
         }
 
         try:
-            # Convert Pydantic models to dicts for the SDK
-            messages_dict = context[
-                "request_messages"
-            ]  # Use potentially modified messages
+            # Convert message dicts to properly typed ChatCompletionMessageParam objects
+            messages: List[ChatCompletionMessageParam] = []
+
+            # Process each message based on its role
+            for msg in context["request_messages"]:
+                role = msg.get("role", "")
+                content = msg.get("content", "")
+
+                # Create properly typed messages based on role
+                if role == "system":
+                    # Type hint for the type checker
+                    system_msg: ChatCompletionSystemMessageParam = {
+                        "role": "system",
+                        "content": content,
+                    }
+                    messages.append(system_msg)
+
+                elif role == "user":
+                    user_msg: ChatCompletionUserMessageParam = {
+                        "role": "user",
+                        "content": content,
+                    }
+                    messages.append(user_msg)
+
+                elif role == "assistant":
+                    assistant_msg: ChatCompletionAssistantMessageParam = {
+                        "role": "assistant",
+                        "content": content,
+                    }
+                    messages.append(assistant_msg)
+
+                elif role == "tool":
+                    # Tool messages require tool_call_id and name
+                    tool_msg: ChatCompletionToolMessageParam = {
+                        "role": "tool",
+                        "content": content,
+                        "tool_call_id": msg.get(
+                            "tool_call_id", ""
+                        ),  # Required for tool messages
+                    }
+
+                    messages.append(tool_msg)
+
+                else:
+                    # Fallback for any other role types
+                    # Note: This should not normally happen with properly validated input
+                    print(f"Warning: Unexpected message role: {role}")
+                    # Use generic type and cast it
+                    generic_msg: Dict[str, str] = {"role": role, "content": content}
+                    messages.append(cast(ChatCompletionMessageParam, generic_msg))
 
             # Make the async call to the OpenAI compatible API using the specific client
             client = model_config.get_client()
             response = await client.chat.completions.create(
                 model=context["model"],
-                messages=messages_dict,
+                messages=messages,
                 # Add other parameters like temperature, max_tokens if needed
             )
 
