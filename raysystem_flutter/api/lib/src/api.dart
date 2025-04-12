@@ -10,6 +10,7 @@ import 'package:openapi/src/auth/basic_auth.dart';
 import 'package:openapi/src/auth/bearer_auth.dart';
 import 'package:openapi/src/auth/oauth.dart';
 import 'package:openapi/src/api/default_api.dart';
+import 'package:openapi/src/api/llm_api.dart';
 import 'package:openapi/src/api/note_titles_api.dart';
 import 'package:openapi/src/api/notes_api.dart';
 
@@ -82,6 +83,12 @@ class Openapi {
   /// by doing that all interceptors will not be executed
   DefaultApi getDefaultApi() {
     return DefaultApi(dio, serializers);
+  }
+
+  /// Get LLMApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  LLMApi getLLMApi() {
+    return LLMApi(dio, serializers);
   }
 
   /// Get NoteTitlesApi instance, base route and serializer can be overridden by a given but be careful,

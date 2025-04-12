@@ -76,6 +76,8 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**readSitesSitesGet**](doc/DefaultApi.md#readsitessitesget) | **GET** /sites/ | Read Sites
 [*DefaultApi*](doc/DefaultApi.md) | [**recognizeTextOcrRecognizePost**](doc/DefaultApi.md#recognizetextocrrecognizepost) | **POST** /ocr/recognize | Recognize Text
 [*DefaultApi*](doc/DefaultApi.md) | [**rootGet**](doc/DefaultApi.md#rootget) | **GET** / | Root
+[*LLMApi*](doc/LLMApi.md) | [**chatCompletionEndpointLlmChatPost**](doc/LLMApi.md#chatcompletionendpointllmchatpost) | **POST** /llm/chat | Generate Chat Completion
+[*LLMApi*](doc/LLMApi.md) | [**listModelsEndpointLlmModelsGet**](doc/LLMApi.md#listmodelsendpointllmmodelsget) | **GET** /llm/models | List Available LLM Models
 [*NoteTitlesApi*](doc/NoteTitlesApi.md) | [**addNoteTitleNotesNoteIdTitlesPost**](doc/NoteTitlesApi.md#addnotetitlenotesnoteidtitlespost) | **POST** /notes/{note_id}/titles | Add Note Title
 [*NoteTitlesApi*](doc/NoteTitlesApi.md) | [**deleteNoteTitleNotesTitlesTitleIdDelete**](doc/NoteTitlesApi.md#deletenotetitlenotestitlestitleiddelete) | **DELETE** /notes/titles/{title_id} | Delete Note Title
 [*NoteTitlesApi*](doc/NoteTitlesApi.md) | [**getNoteTitlesNotesNoteIdTitlesGet**](doc/NoteTitlesApi.md#getnotetitlesnotesnoteidtitlesget) | **GET** /notes/{note_id}/titles | Get Note Titles
@@ -93,12 +95,18 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [ChatCompletionRequest](doc/ChatCompletionRequest.md)
+ - [ChatCompletionResponse](doc/ChatCompletionResponse.md)
+ - [ChatMessageInput](doc/ChatMessageInput.md)
+ - [ChatMessageOutput](doc/ChatMessageOutput.md)
  - [DiskMetrics](doc/DiskMetrics.md)
  - [HTTPValidationError](doc/HTTPValidationError.md)
  - [InfoList](doc/InfoList.md)
  - [InfoResponse](doc/InfoResponse.md)
  - [InfoStats](doc/InfoStats.md)
+ - [ListModelsResponse](doc/ListModelsResponse.md)
  - [MemoryMetrics](doc/MemoryMetrics.md)
+ - [ModelInfo](doc/ModelInfo.md)
  - [NetworkMetrics](doc/NetworkMetrics.md)
  - [NoteCreate](doc/NoteCreate.md)
  - [NoteResponse](doc/NoteResponse.md)

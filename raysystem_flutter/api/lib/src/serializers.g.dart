@@ -7,12 +7,18 @@ part of 'serializers.dart';
 // **************************************************************************
 
 Serializers _$serializers = (new Serializers().toBuilder()
+      ..add(ChatCompletionRequest.serializer)
+      ..add(ChatCompletionResponse.serializer)
+      ..add(ChatMessageInput.serializer)
+      ..add(ChatMessageOutput.serializer)
       ..add(DiskMetrics.serializer)
       ..add(HTTPValidationError.serializer)
       ..add(InfoList.serializer)
       ..add(InfoResponse.serializer)
       ..add(InfoStats.serializer)
+      ..add(ListModelsResponse.serializer)
       ..add(MemoryMetrics.serializer)
+      ..add(ModelInfo.serializer)
       ..add(NetworkMetrics.serializer)
       ..add(NoteCreate.serializer)
       ..add(NoteResponse.serializer)
@@ -31,11 +37,17 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..add(ValidationError.serializer)
       ..add(ValidationErrorLocInner.serializer)
       ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(ChatMessageInput)]),
+          () => new ListBuilder<ChatMessageInput>())
+      ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(DiskMetrics)]),
           () => new ListBuilder<DiskMetrics>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(InfoResponse)]),
           () => new ListBuilder<InfoResponse>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(ModelInfo)]),
+          () => new ListBuilder<ModelInfo>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(NoteResponse)]),
           () => new ListBuilder<NoteResponse>())

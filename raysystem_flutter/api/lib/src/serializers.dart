@@ -14,12 +14,18 @@ import 'package:built_value/iso_8601_date_time_serializer.dart';
 import 'package:openapi/src/date_serializer.dart';
 import 'package:openapi/src/model/date.dart';
 
+import 'package:openapi/src/model/chat_completion_request.dart';
+import 'package:openapi/src/model/chat_completion_response.dart';
+import 'package:openapi/src/model/chat_message_input.dart';
+import 'package:openapi/src/model/chat_message_output.dart';
 import 'package:openapi/src/model/disk_metrics.dart';
 import 'package:openapi/src/model/http_validation_error.dart';
 import 'package:openapi/src/model/info_list.dart';
 import 'package:openapi/src/model/info_response.dart';
 import 'package:openapi/src/model/info_stats.dart';
+import 'package:openapi/src/model/list_models_response.dart';
 import 'package:openapi/src/model/memory_metrics.dart';
+import 'package:openapi/src/model/model_info.dart';
 import 'package:openapi/src/model/network_metrics.dart';
 import 'package:openapi/src/model/note_create.dart';
 import 'package:openapi/src/model/note_response.dart';
@@ -41,12 +47,18 @@ import 'package:openapi/src/model/validation_error_loc_inner.dart';
 part 'serializers.g.dart';
 
 @SerializersFor([
+  ChatCompletionRequest,
+  ChatCompletionResponse,
+  ChatMessageInput,
+  ChatMessageOutput,
   DiskMetrics,
   HTTPValidationError,
   InfoList,
   InfoResponse,
   InfoStats,
+  ListModelsResponse,
   MemoryMetrics,
+  ModelInfo,
   NetworkMetrics,
   NoteCreate,
   NoteResponse,
