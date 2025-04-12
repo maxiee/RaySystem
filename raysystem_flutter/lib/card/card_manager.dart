@@ -1,15 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:raysystem_flutter/card/card_list_view.dart';
 
+// Define layout modes
+enum CardLayoutMode { singleColumn, dualColumn }
+
 class CardManager with ChangeNotifier {
-  final List<Widget> _cards = [];
-  final int _maxCards;
+  // Use two lists for dual columns
+  final List<Widget> _leftCards = [];
+  final List<Widget> _rightCards = [];
+
+  final int _maxCardsPerColumn;
   // 存储 key 到卡片索引的映射，用于快速查找
-  final Map<Key, int> _keyToIndexMap = {};
+  // Maps for key to index lookup per column
+  final Map<Key, int> _leftKeyToIndexMap = {};
+  final Map<Key, int> _rightKeyToIndexMap = {};
 
-  CardManager({int maxCards = 20}) : _maxCards = maxCards;
+  // Layout and active column state
+  CardLayoutMode _layoutMode = CardLayoutMode.singleColumn;
+  int _activeColumnIndex = 0; // 0 for left, 1 for right
 
-  List<Widget> get cards => List.unmodifiable(_cards);
+  CardManager({int maxCardsPerColumn = 20})
+      : _maxCardsPerColumn = maxCardsPerColumn;
+
+  // Getters for layout and active column
+  CardLayoutMode get layoutMode => _layoutMode;
+  int get activeColumnIndex => _activeColumnIndex;
+
+  // Getters for card lists (unmodifiable)
+  List<Widget> get leftCards => List.unmodifiable(_leftCards);
+  List<Widget> get rightCards => List.unmodifiable(_rightCards);
+
+  // Set layout mode
+  void setLayoutMode(CardLayoutMode mode) {
+    if (_layoutMode != mode) {
+      _layoutMode = mode;
+      // Reset active column to left when switching modes? Or keep it?
+      // Let's reset to left when switching to dual, keep it otherwise.
+      if (_layoutMode == CardLayoutMode.dualColumn) {
+        _activeColumnIndex = 0;
+      } else {
+        _activeColumnIndex = 0; // Always 0 in single column mode
+      }
+      notifyListeners();
+    }
+  }
+
+  // Set active column (only relevant in dual column mode)
+  void setActiveColumn(int index) {
+    if (_layoutMode == CardLayoutMode.dualColumn &&
+        _activeColumnIndex != index &&
+        (index == 0 || index == 1)) {
+      _activeColumnIndex = index;
+      notifyListeners();
+    }
+  }
+
+  // Find key location (which column and index)
+  ({int columnIndex, int index})? _findKeyLocation(Key key) {
+    if (_leftKeyToIndexMap.containsKey(key)) {
+      return (columnIndex: 0, index: _leftKeyToIndexMap[key]!);
+    }
+    if (_rightKeyToIndexMap.containsKey(key)) {
+      return (columnIndex: 1, index: _rightKeyToIndexMap[key]!);
+    }
+    return null;
+  }
 
   // 添加新卡片
   void addCard(
@@ -23,17 +78,31 @@ class CardManager with ChangeNotifier {
     EdgeInsetsGeometry? margin,
     double? elevation,
   }) {
-    if (_cards.length >= _maxCards) {
+    final targetList =
+        (_layoutMode == CardLayoutMode.singleColumn || _activeColumnIndex == 0)
+            ? _leftCards
+            : _rightCards;
+    final targetMap =
+        (_layoutMode == CardLayoutMode.singleColumn || _activeColumnIndex == 0)
+            ? _leftKeyToIndexMap
+            : _rightKeyToIndexMap;
+    final currentColumnIndex =
+        (_layoutMode == CardLayoutMode.singleColumn || _activeColumnIndex == 0)
+            ? 0
+            : 1;
+
+    // Apply max card limit per column
+    if (targetList.length >= _maxCardsPerColumn) {
       // 移除最早的一条，同时也要更新映射
-      final firstCardWidget = _cards[0];
+      final firstCardWidget = targetList[0];
       // 找到第一张卡片的 key
       final firstCardKey = _findKeyInWidget(firstCardWidget);
       if (firstCardKey != null) {
-        _keyToIndexMap.remove(firstCardKey);
+        targetMap.remove(firstCardKey);
       }
-      _cards.removeAt(0);
+      targetList.removeAt(0);
       // 更新所有剩余卡片的索引
-      _updateIndices();
+      _updateIndices(currentColumnIndex);
     }
 
     // 使用 UniqueKey 确保卡片在列表中的唯一性
@@ -68,56 +137,72 @@ class CardManager with ChangeNotifier {
       ),
     );
 
-    _cards.add(card);
+    targetList.add(card);
     // 存储 key 到索引的映射
-    _keyToIndexMap[cardKey] = _cards.length - 1;
+    targetMap[cardKey] = targetList.length - 1;
 
     notifyListeners();
   }
 
   // 根据索引移除卡片
-  void removeCard(int index) {
-    if (index >= 0 && index < _cards.length) {
-      final cardWidget = _cards[index];
+  void removeCard(int index, int columnIndex) {
+    if (columnIndex != 0 && columnIndex != 1) return; // Invalid column
+
+    final targetList = columnIndex == 0 ? _leftCards : _rightCards;
+    final targetMap =
+        columnIndex == 0 ? _leftKeyToIndexMap : _rightKeyToIndexMap;
+
+    if (index >= 0 && index < targetList.length) {
+      final cardWidget = targetList[index];
       final cardKey = _findKeyInWidget(cardWidget);
       if (cardKey != null) {
-        _keyToIndexMap.remove(cardKey);
+        targetMap.remove(cardKey);
       }
-      _cards.removeAt(index);
-      // 更新索引映射
-      _updateIndices();
+      targetList.removeAt(index);
+      _updateIndices(columnIndex); // Update indices for the affected column
       notifyListeners();
     }
   }
 
   // 根据 key 移除卡片
   void removeCardByKey(Key key) {
-    final index = _keyToIndexMap[key];
-    if (index != null) {
-      _cards.removeAt(index);
-      _keyToIndexMap.remove(key);
-      // 更新索引映射
-      _updateIndices();
+    final location = _findKeyLocation(key);
+
+    if (location != null) {
+      final targetList = location.columnIndex == 0 ? _leftCards : _rightCards;
+      final targetMap =
+          location.columnIndex == 0 ? _leftKeyToIndexMap : _rightKeyToIndexMap;
+
+      targetList.removeAt(location.index);
+      targetMap.remove(key);
+      _updateIndices(
+          location.columnIndex); // Update indices for the affected column
       notifyListeners();
     }
   }
 
   // 清空所有卡片
   void clearCards() {
-    _cards.clear();
-    _keyToIndexMap.clear();
+    _leftCards.clear();
+    _rightCards.clear();
+    _leftKeyToIndexMap.clear();
+    _rightKeyToIndexMap.clear();
     notifyListeners();
   }
 
   // 获取当前卡片数量
-  int get cardCount => _cards.length;
+  int get cardCount => _leftCards.length + _rightCards.length;
 
   // 更新所有卡片的索引映射
-  void _updateIndices() {
-    for (int i = 0; i < _cards.length; i++) {
-      final key = _findKeyInWidget(_cards[i]);
+  void _updateIndices(int columnIndex) {
+    final targetList = columnIndex == 0 ? _leftCards : _rightCards;
+    final targetMap =
+        columnIndex == 0 ? _leftKeyToIndexMap : _rightKeyToIndexMap;
+    targetMap.clear(); // Clear and rebuild map for the column
+    for (int i = 0; i < targetList.length; i++) {
+      final key = _findKeyInWidget(targetList[i]);
       if (key != null) {
-        _keyToIndexMap[key] = i;
+        targetMap[key] = i;
       }
     }
   }

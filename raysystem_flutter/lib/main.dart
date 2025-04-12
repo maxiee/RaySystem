@@ -10,7 +10,7 @@ import 'package:raysystem_flutter/module/note/providers/notes_provider.dart';
 void main() {
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (_) => CardManager(maxCards: 20)),
+      ChangeNotifierProvider(create: (_) => CardManager(maxCardsPerColumn: 20)),
       ChangeNotifierProvider(create: (_) => ThemeNotifier()),
       ChangeNotifierProvider(create: (_) => SystemMetricsProvider()),
       ChangeNotifierProvider(create: (_) => NotesProvider()),
@@ -153,6 +153,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    // Watch CardManager to get total count for status bar
+    final cardManager = context.watch<CardManager>();
 
     return Scaffold(
       backgroundColor: theme.colorScheme.background,
@@ -164,9 +166,7 @@ class _HomePageState extends State<HomePage> {
           StatusBar(
             left: [
               StatusBarItem(child: Text('Demo Mode')),
-              StatusBarItem(
-                  child: Text(
-                      'Cards: ${context.watch<CardManager>().cards.length}')),
+              StatusBarItem(child: Text('Cards: ${cardManager.cardCount}')),
             ],
             center: [
               StatusBarItem(child: Text('RaySystem')),

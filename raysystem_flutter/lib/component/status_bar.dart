@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:raysystem_flutter/card/card_manager.dart';
 import 'package:raysystem_flutter/component/system_metrics_provider.dart';
 
 class StatusBarItem extends StatelessWidget {
@@ -125,6 +126,34 @@ class StatusBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    // Watch CardManager for layout mode changes
+    final cardManager = context.watch<CardManager>();
+
+    // Determine the icon based on the current layout mode
+    final layoutIcon = cardManager.layoutMode == CardLayoutMode.singleColumn
+        ? Icons.view_agenda_outlined // Icon for single column
+        : Icons.view_module_outlined; // Icon for dual column
+
+    // Create the layout toggle button
+    Widget layoutToggleButton = Tooltip(
+      message: cardManager.layoutMode == CardLayoutMode.singleColumn
+          ? 'Switch to Dual Column View'
+          : 'Switch to Single Column View',
+      child: IconButton(
+        iconSize: 16,
+        padding: EdgeInsets.zero,
+        constraints: BoxConstraints(), // Remove default padding
+        icon: Icon(layoutIcon),
+        onPressed: () {
+          final currentMode = cardManager.layoutMode;
+          cardManager.setLayoutMode(
+            currentMode == CardLayoutMode.singleColumn
+                ? CardLayoutMode.dualColumn
+                : CardLayoutMode.singleColumn,
+          );
+        },
+      ),
+    );
 
     return Container(
       decoration: BoxDecoration(
@@ -152,6 +181,8 @@ class StatusBar extends StatelessWidget {
             ),
             Row(children: [
               StatusBarItem(child: _buildMetricsSection(context)),
+              // Add the layout toggle button here
+              StatusBarItem(child: layoutToggleButton),
               ...right.map((w) => StatusBarItem(child: w)).toList()
             ]),
           ],
