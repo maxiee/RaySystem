@@ -1,3 +1,42 @@
 # Specify the location where RaySystem will store its data
 # Default: ~/RaySystem
 data_path: ~/RaySystem
+
+# LLM service configuration - multiple models can be configured
+llm:
+  # Default model to use when no specific model is requested
+  default_model: gpt-4
+  
+  # Model configurations
+  models:
+    # A model configuration for GPT-4
+    gpt-4:
+      base_url: "https://api.openai.com/v1"
+      api_key: "your-openai-api-key-here"
+      model_name: "gpt-4"
+      display_name: "GPT-4"
+      description: "OpenAI's GPT-4 model - most capable for complex tasks"
+    
+    # A model configuration for GPT-3.5 Turbo
+    gpt-3.5-turbo:
+      base_url: "https://api.openai.com/v1"
+      api_key: "your-openai-api-key-here"
+      model_name: "gpt-3.5-turbo"
+      display_name: "GPT-3.5 Turbo"
+      description: "OpenAI's GPT-3.5 Turbo model - fast and cost-effective"
+    
+    # An example of a local model using Ollama
+    local-codellama:
+      base_url: "http://localhost:11434/v1"
+      api_key: "ollama"  # Typically not needed for Ollama, but included for compatibility
+      model_name: "codellama"
+      display_name: "CodeLlama (Local)"
+      description: "Locally hosted CodeLlama model for code generation"
+    
+    # An example configuration for Azure OpenAI
+    azure-gpt4:
+      base_url: "https://your-azure-endpoint.openai.azure.com/openai/deployments/your-deployment-name"
+      api_key: "your-azure-api-key"
+      model_name: "gpt-4" # The deployed model name in Azure
+      display_name: "Azure GPT-4"
+      description: "GPT-4 deployed on Azure OpenAI"

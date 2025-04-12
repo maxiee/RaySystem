@@ -1,22 +1,38 @@
-from typing import Protocol, Any, Dict, List, Coroutine, Callable, Awaitable
-
-# Context dictionary passed to middleware
-ChatContext = Dict[str, Any]
-# Example keys: 'request_messages', 'model', 'response_message', 'raw_openai_response', 'error', 'metadata'
+from typing import Dict, List, Any, Callable, Awaitable, TypedDict, Optional, Union
 
 
-# Define the middleware callable type using a Protocol for type checking
-class LLMMiddleware(Protocol):
-    async def __call__(self, context: ChatContext) -> None:
-        """
-        An async callable that processes the chat context.
-        It can inspect or modify the context before or after the LLM call.
-        """
-        ...
+# Type for chat context dictionary
+class ChatContext(TypedDict, total=False):
+    """Context passed through middleware chain during LLM operations."""
+
+    request_messages: List[Dict[str, Any]]  # List of message dictionaries
+    model: str  # Model identifier to send to the API
+    model_config_name: str  # Name of model config in our system
+    response_message: Any  # The response message object
+    raw_openai_response: Optional[Dict[str, Any]]  # Full raw response from OpenAI
+    error: Optional[Exception]  # Any error that occurred
+    metadata: Dict[str, Any]  # Metadata for middleware communication
 
 
-# Helper function to apply middleware (can be used in the service)
-async def apply_middleware(middleware_list: List[LLMMiddleware], context: ChatContext):
-    """Applies a list of middleware functions sequentially to the context."""
+# Type for middleware function
+LLMMiddleware = Callable[[ChatContext], Awaitable[None]]
+
+
+async def apply_middleware(
+    middleware_list: List[LLMMiddleware], context: ChatContext
+) -> None:
+    """
+    Apply a list of middleware functions to the LLM context.
+
+    Args:
+        middleware_list: List of middleware functions to apply
+        context: The context object to pass through the middleware chain
+    """
     for middleware in middleware_list:
-        await middleware(context)
+        try:
+            await middleware(context)
+        except Exception as e:
+            print(f"Error in middleware {middleware.__name__}: {e}")
+            # Only set the error if not already set
+            if context.get("error") is None:
+                context["error"] = e

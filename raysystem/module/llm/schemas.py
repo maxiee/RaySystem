@@ -18,8 +18,10 @@ class ChatCompletionRequest(BaseModel):
     messages: List[ChatMessageInput] = Field(
         ..., description="A list of messages comprising the conversation history."
     )
-    # Optional: Add other parameters like model, temperature, max_tokens if you want to allow overrides per request
-    # model: Optional[str] = Field(None, description="Model to use for this completion.")
+    model_name: Optional[str] = Field(
+        None,
+        description="Name of the model to use for this completion. If not provided, the default model will be used.",
+    )
 
 
 class ChatMessageOutput(BaseModel):
@@ -37,5 +39,30 @@ class ChatCompletionResponse(BaseModel):
     message: ChatMessageOutput = Field(
         ..., description="The generated chat message from the assistant."
     )
+    model_used: str = Field(
+        ..., description="The name of the model used for this completion."
+    )
     # Optional: Add usage statistics if needed and available from the LLM service
     # usage: Optional[Dict[str, int]] = Field(None, description="Token usage statistics.")
+
+
+class ModelInfo(BaseModel):
+    """Information about an available LLM model."""
+
+    name: str = Field(
+        ...,
+        description="The name of the model, used as identifier when requesting completions",
+    )
+    display_name: str = Field(
+        ..., description="User-friendly display name for the model"
+    )
+    description: Optional[str] = Field(
+        None, description="Optional description of the model capabilities"
+    )
+
+
+class ListModelsResponse(BaseModel):
+    """Response body for the list models endpoint."""
+
+    models: List[ModelInfo] = Field(..., description="List of available models")
+    default_model: str = Field(..., description="The name of the default model")

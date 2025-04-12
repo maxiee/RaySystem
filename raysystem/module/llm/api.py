@@ -2,41 +2,33 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from openai import OpenAIError
 
-from .schemas import ChatCompletionRequest, ChatCompletionResponse
+from .schemas import ChatCompletionRequest, ChatCompletionResponse, ListModelsResponse
 from .llm import LLMService, logging_middleware  # Import service and example middleware
 from .middleware import LLMMiddleware
+from utils.config import load_config_file
 
 
 # --- Dependency Injection Setup ---
-# This function provides the LLMService instance to the endpoint.
-# It should be configured to load settings (URL, key, model) from your
-# central configuration system (e.g., RaySystemConfig.yaml).
-# It also defines which middleware functions to use.
 def get_llm_service() -> LLMService:
+    """
+    Provides the LLMService instance to the endpoints.
+    Loads configuration from RaySystemConfig.yaml.
+    """
     # Define middleware list (can be loaded/configured dynamically)
     configured_middleware: List[LLMMiddleware] = [
         logging_middleware,
         # Add other middleware here (e.g., token counting, db logging)
     ]
 
-    # In a real app, load base_url, api_key, default_model from your config
-    # from raysystem.config import settings # Example
-    # service = LLMService(
-    #     base_url=settings.get("llm_service"),
-    #     api_key=settings.get("llm_key"),
-    #     default_model=settings.get("llm_model"),
-    #     middleware=configured_middleware
-    # )
-    # Using placeholders from llm.py for now:
+    # Load config directly from RaySystemConfig.yaml
     try:
-        # You might want a singleton pattern here if config loading is expensive
-        service = LLMService(middleware=configured_middleware)
+        config = load_config_file()
+        # Create service with config, middleware will be applied to all LLM requests
+        service = LLMService(config_dict=config, middleware=configured_middleware)
         return service
     except ValueError as e:
         # Handle configuration errors during startup or first request
         print(f"FATAL: LLM Service configuration error: {e}")
-        # This exception will prevent the app from starting correctly if raised early,
-        # or cause a 500 error if raised during a request.
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"LLM service not configured correctly: {e}",
@@ -64,6 +56,9 @@ async def chat_completion_endpoint(
     """
     Receives chat messages, interacts with the LLM service via `LLMService`,
     and returns the assistant's response. Handles potential errors.
+
+    The model_name parameter in the request allows selecting which configured model to use.
+    If not specified, the default model will be used.
     """
     try:
         response = await llm_service.create_chat_completion(request)
@@ -89,4 +84,29 @@ async def chat_completion_endpoint(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while processing the chat completion.",
+        )
+
+
+@router.get(
+    "/models",
+    response_model=ListModelsResponse,
+    summary="List Available LLM Models",
+    description="Returns a list of available LLM models that can be used for chat completions.",
+    status_code=status.HTTP_200_OK,
+)
+async def list_models_endpoint(
+    llm_service: LLMService = Depends(get_llm_service),  # Inject the service
+):
+    """
+    Lists all available LLM models that can be used with the /chat endpoint.
+    Also indicates which model is the default.
+    """
+    try:
+        models, default_model = llm_service.get_available_models()
+        return ListModelsResponse(models=models, default_model=default_model)
+    except Exception as e:
+        print(f"Error in list_models_endpoint: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unable to retrieve model list: {e}",
         )
