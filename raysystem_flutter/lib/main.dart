@@ -3,11 +3,25 @@ import 'package:provider/provider.dart';
 import 'package:raysystem_flutter/card/card_list_view.dart';
 import 'package:raysystem_flutter/card/card_manager.dart';
 import 'package:raysystem_flutter/commands.dart';
-import 'package:raysystem_flutter/component/status_bar.dart';
+import 'package:raysystem_flutter/component/status_bar/status_bar.dart';
 import 'package:raysystem_flutter/component/system_metrics_provider.dart';
 import 'package:raysystem_flutter/module/note/providers/notes_provider.dart';
+import 'package:window_manager/window_manager.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+  windowManager.waitUntilReadyToShow(
+      WindowOptions(
+        skipTaskbar: false,
+        title: 'RaySystem - GitHub: maxiee/RaySystem 🌟',
+        center: true,
+        backgroundColor: Colors.transparent,
+        minimumSize: Size(800, 600),
+      ), () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => CardManager(maxCardsPerColumn: 20)),

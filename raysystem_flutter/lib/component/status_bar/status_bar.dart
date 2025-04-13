@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:raysystem_flutter/card/card_manager.dart';
+import 'package:raysystem_flutter/component/status_bar/items/always_on_top.dart';
 import 'package:raysystem_flutter/component/system_metrics_provider.dart';
 
 class StatusBarItem extends StatelessWidget {
@@ -183,7 +184,8 @@ class StatusBar extends StatelessWidget {
               StatusBarItem(child: _buildMetricsSection(context)),
               // Add the layout toggle button here
               StatusBarItem(child: layoutToggleButton),
-              ...right.map((w) => StatusBarItem(child: w)).toList()
+              StatusBarItem(child: AlwaysOnTopItem()),
+              ...right.map((w) => StatusBarItem(child: w))
             ]),
           ],
         ),

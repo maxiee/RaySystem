@@ -46,6 +46,7 @@ dependencies:
   openapi:
     path: ./api
   highlight: ^0.7.0
+  window_manager: ^0.4.3
 
 dev_dependencies:
   flutter_test:
