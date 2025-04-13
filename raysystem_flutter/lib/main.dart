@@ -16,8 +16,6 @@ void main() async {
         skipTaskbar: false,
         title: 'RaySystem - GitHub: maxiee/RaySystem 🌟',
         center: true,
-        backgroundColor: Colors.transparent,
-        minimumSize: Size(800, 600),
       ), () async {
     await windowManager.show();
     await windowManager.focus();
