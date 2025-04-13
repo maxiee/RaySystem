@@ -21,7 +21,7 @@ final noteCommands = Command(
       callback: (context, cardManager) async {
         cardManager.addCard(
             SizedBox(
-              height: MediaQuery.of(context).size.height - 200,
+              height: MediaQuery.of(context).size.height / 2,
               child: NoteTreeCard(
                 treeService: ApiNoteTreeService(notesApi: notesApi),
               ),
