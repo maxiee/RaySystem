@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:raysystem_flutter/card/card_list_view.dart';
+import 'package:raysystem_flutter/component/card/ray_card.dart';
 import 'package:raysystem_flutter/component/widgets/mac_os_close_button.dart';
 
 // Define layout modes
