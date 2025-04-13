@@ -74,25 +74,15 @@ class LLMService:
         llm_config = config_dict.get("llm", {})
         models_config = llm_config.get("models", {})
 
-        if not models_config:
-            # Fallback to environment variables if no config found
-            self._setup_from_environment()
-        else:
-            # Set up the configured models
-            for model_name, model_cfg in models_config.items():
-                self.model_configs[model_name] = ModelConfig(
-                    name=model_name,
-                    base_url=model_cfg.get("base_url"),
-                    api_key=model_cfg.get("api_key"),
-                    model_name=model_cfg.get("model_name"),
-                    display_name=model_cfg.get("display_name", model_name),
-                    description=model_cfg.get("description"),
-                )
-
-        # No models configured? That's a problem.
-        if not self.model_configs:
-            raise ValueError(
-                "No LLM models configured. Please check your RaySystemConfig.yaml."
+        # Set up the configured models
+        for model_name, model_cfg in models_config.items():
+            self.model_configs[model_name] = ModelConfig(
+                name=model_name,
+                base_url=model_cfg.get("base_url"),
+                api_key=model_cfg.get("api_key"),
+                model_name=model_cfg.get("model_name"),
+                display_name=model_cfg.get("display_name", model_name),
+                description=model_cfg.get("description"),
             )
 
         # Set default model
