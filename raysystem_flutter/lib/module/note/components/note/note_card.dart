@@ -31,6 +31,11 @@ class _NoteCardState extends State<NoteCard> {
   String? _errorMessage;
   bool _showSecondaryTitles = false;
 
+  // Add variables to track content changes
+  bool _hasChanges = false;
+  String _originalTitle = '';
+  String _originalContent = '';
+
   late NoteResponse _note;
   List<NoteTitleResponse> _titles = [];
 
@@ -39,6 +44,9 @@ class _NoteCardState extends State<NoteCard> {
     super.initState();
     _primaryTitleController = TextEditingController();
     _isNew = widget.noteId == null;
+
+    // Add listener to title changes
+    _primaryTitleController.addListener(_onContentChanged);
 
     // Load note if editing an existing one
     if (!_isNew) {
@@ -49,11 +57,17 @@ class _NoteCardState extends State<NoteCard> {
       _isLoading = false;
       // Initialize empty editor for new note
       _initializeEmptyEditor();
+      // For new notes, always allow saving
+      setState(() {
+        _hasChanges = true;
+      });
     }
   }
 
   @override
   void dispose() {
+    _primaryTitleController.removeListener(_onContentChanged);
+    _editorState?.dispose();
     _primaryTitleController.dispose();
     super.dispose();
   }
@@ -108,9 +122,17 @@ class _NoteCardState extends State<NoteCard> {
       if (_editorState != null) {
         _editorScrollController =
             EditorScrollController(editorState: _editorState!);
+
+        // Add listener to editor changes
+        _editorState!.document.root.addListener(_onDocumentChange);
       } else {
         _initializeEmptyEditor();
       }
+
+      // Initialize change tracking
+      _originalTitle = _primaryTitleController.text;
+      _originalContent = note.contentAppflowy ?? '';
+      _hasChanges = false;
     } catch (e) {
       debugPrint('Error parsing note content: $e');
       _initializeEmptyEditor();
@@ -122,6 +144,9 @@ class _NoteCardState extends State<NoteCard> {
     _editorState = EditorHelper.createEmptyEditor();
     _editorScrollController =
         EditorScrollController(editorState: _editorState!);
+
+    // Add listener to editor changes
+    _editorState!.document.root.addListener(_onDocumentChange);
   }
 
   Future<void> _saveNote() async {
@@ -155,6 +180,11 @@ class _NoteCardState extends State<NoteCard> {
             _note = note;
             _titles = note.noteTitles.toList();
             _isNew = false; // 标记为不再是新笔记
+
+            // Reset change tracking
+            _originalTitle = finalPrimaryTitle;
+            _originalContent = contentAppflowy;
+            _hasChanges = false;
           });
 
           debugPrint('Note created with ID: ${_note.id}');
@@ -179,8 +209,12 @@ class _NoteCardState extends State<NoteCard> {
         if (success && mounted) {
           setState(() {
             _note = updatedNote;
-            _loadNoteTitles();
+            // Reset change tracking
+            _originalTitle = finalPrimaryTitle;
+            _originalContent = contentAppflowy;
+            _hasChanges = false;
           });
+          _loadNoteTitles();
         }
 
         debugPrint(
@@ -500,7 +534,7 @@ class _NoteCardState extends State<NoteCard> {
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
             child: ElevatedButton(
-              onPressed: _isSaving ? null : _saveNote,
+              onPressed: (_isSaving || !_hasChanges) ? null : _saveNote,
               child: _isSaving
                   ? const CircularProgressIndicator.adaptive()
                   : Text(_isNew ? '创建' : '更新'),
@@ -641,5 +675,27 @@ class _NoteCardState extends State<NoteCard> {
         ),
       ],
     );
+  }
+
+  void _onDocumentChange() {
+    if (_editorState == null) return;
+    _onContentChanged();
+  }
+
+  void _onContentChanged() {
+    if (_editorState == null) return;
+
+    final currentTitle = _primaryTitleController.text;
+    final currentContent = EditorHelper.serializeEditorContent(_editorState!);
+
+    final hasChanges =
+        currentTitle != _originalTitle || currentContent != _originalContent;
+
+    // Only update state if the change status actually changed
+    if (hasChanges != _hasChanges) {
+      setState(() {
+        _hasChanges = hasChanges;
+      });
+    }
   }
 }
