@@ -537,7 +537,7 @@ class _NoteCardState extends State<NoteCard> {
               onPressed: (_isSaving || !_hasChanges) ? null : _saveNote,
               child: _isSaving
                   ? const CircularProgressIndicator.adaptive()
-                  : Text(_isNew ? '创建' : '更新'),
+                  : const Icon(Icons.save),
             ),
           ),
         ],
