@@ -453,22 +453,12 @@ class _NoteCardState extends State<NoteCard> {
                   : const Center(child: CircularProgressIndicator()),
             ),
           ),
-          // Save button
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: _isSaving ? null : _saveNote,
-              child: _isSaving
-                  ? const CircularProgressIndicator.adaptive()
-                  : Text(_isNew ? '创建笔记' : '更新笔记'),
-            ),
-          ),
         ],
       ),
     );
   }
 
-  // Build the primary title section with enhanced UI
+  // Move the save button to the top-right corner of the primary title section
   Widget _buildPrimaryTitleSection() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -503,6 +493,17 @@ class _NoteCardState extends State<NoteCard> {
                 contentPadding: EdgeInsets.zero,
               ),
               style: Theme.of(context).textTheme.headlineSmall,
+            ),
+          ),
+
+          // Save button
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: ElevatedButton(
+              onPressed: _isSaving ? null : _saveNote,
+              child: _isSaving
+                  ? const CircularProgressIndicator.adaptive()
+                  : Text(_isNew ? '创建' : '更新'),
             ),
           ),
         ],
