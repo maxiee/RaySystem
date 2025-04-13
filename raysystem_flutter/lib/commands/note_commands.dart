@@ -44,28 +44,25 @@ final noteCommands = Command(
       },
     ),
     Command(
-      command: 'note-list',
-      title: '查看笔记列表',
+      command: 'note-recent',
+      title: '最近笔记',
       icon: Icons.list,
       callback: (context, cardManager) {
         // 添加笔记列表卡片，使用 autoLoad 属性避免在构建过程中加载数据
         cardManager.addCard(
-          SizedBox(
-            height: 400,
-            child: RecentNotesListCard(
-              autoLoad: false, // 不在构建过程中自动加载
-              onNoteTap: (noteId) {
-                // When a note is tapped, open it in a new card
-                cardManager.addCard(
-                  SizedBox(
-                    height: 400,
-                    child: NoteCard(
-                      noteId: noteId,
-                    ),
+          RecentNotesListCard(
+            autoLoad: false, // 不在构建过程中自动加载
+            onNoteTap: (noteId) {
+              // When a note is tapped, open it in a new card
+              cardManager.addCard(
+                SizedBox(
+                  height: MediaQuery.of(context).size.height - 200,
+                  child: NoteCard(
+                    noteId: noteId,
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         );
 

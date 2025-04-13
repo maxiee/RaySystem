@@ -65,33 +65,26 @@ class _RecentNotesListCardState extends State<RecentNotesListCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(8.0),
-      elevation: 2.0,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Recent Notes',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.refresh),
-                  onPressed: _refreshNotes,
-                  tooltip: 'Refresh recent notes',
-                ),
-              ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Recent Notes',
+              style: Theme.of(context).textTheme.titleLarge,
             ),
-          ),
-          const Divider(height: 1),
-          _buildNotesList(),
-        ],
-      ),
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: _refreshNotes,
+              tooltip: 'Refresh recent notes',
+            ),
+          ],
+        ),
+        const Divider(height: 1),
+        _buildNotesList(),
+      ],
     );
   }
 
@@ -131,37 +124,38 @@ class _RecentNotesListCardState extends State<RecentNotesListCard> {
             ? recentNotes.sublist(0, widget.maxNotes)
             : recentNotes;
 
-        return ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: displayedNotes.length,
-          separatorBuilder: (_, __) => const Divider(height: 1),
-          itemBuilder: (context, index) {
-            final noteState = displayedNotes[index];
-            final note = noteState.note;
+        return Expanded(
+          child: ListView.separated(
+            itemCount: displayedNotes.length,
+            separatorBuilder: (_, __) => const Divider(height: 1),
+            itemBuilder: (context, index) {
+              final noteState = displayedNotes[index];
+              final note = noteState.note;
 
-            return ListTile(
-              title: Text(
-                note.noteTitles.first.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              subtitle: Text(
-                'Updated: ${_formatDateTime(note.updatedAt)}',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              trailing: noteState.status == NoteOperationStatus.loading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2.0),
-                    )
-                  : const Icon(Icons.chevron_right),
-              onTap: widget.onNoteTap != null
-                  ? () => widget.onNoteTap!(note.id)
-                  : null,
-            );
-          },
+              return ListTile(
+                dense: true,
+                title: Text(
+                  note.noteTitles.first.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(
+                  'Updated: ${_formatDateTime(note.updatedAt)}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                trailing: noteState.status == NoteOperationStatus.loading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2.0),
+                      )
+                    : const Icon(Icons.chevron_right),
+                onTap: widget.onNoteTap != null
+                    ? () => widget.onNoteTap!(note.id)
+                    : null,
+              );
+            },
+          ),
         );
       },
     );
