@@ -177,7 +177,6 @@ class _HomePageState extends State<HomePage> {
         children: [
           StatusBar(
             left: [
-              StatusBarItem(child: Text('Demo Mode')),
               StatusBarItem(child: Text('Cards: ${cardManager.cardCount}')),
             ],
             center: [
@@ -185,7 +184,10 @@ class _HomePageState extends State<HomePage> {
             ],
             right: [
               StatusBarItem(
-                  child: Text(DateTime.now().toString().substring(0, 19))),
+                  child: Text(DateTime.now()
+                      .toString()
+                      .substring(0, 19)
+                      .replaceAll(' ', '\n'))),
             ],
           ),
           Expanded(

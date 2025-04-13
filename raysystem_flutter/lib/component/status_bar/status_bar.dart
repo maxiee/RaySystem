@@ -169,7 +169,7 @@ class StatusBar extends StatelessWidget {
         ),
       ),
       child: Container(
-        height: 32,
+        height: 38,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Row(
           children: [
