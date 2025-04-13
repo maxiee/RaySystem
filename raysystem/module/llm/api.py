@@ -2,13 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from openai import OpenAIError
 
+from module.llm.llm import LLMService
+from module.llm.middlewares.http import http_tracking_middleware
+from module.llm.middlewares.logging import logging_middleware
+
 from .schemas import ChatCompletionRequest, ChatCompletionResponse, ListModelsResponse
-from .llm import LLMService, logging_middleware  # Import service and example middleware
-from .middleware import (
-    LLMMiddleware,
-    http_tracking_middleware,
-    response_validation_middleware,
-)
+from .middleware import LLMMiddleware
+
 from utils.config import load_config_file
 
 
@@ -22,7 +22,6 @@ def get_llm_service() -> LLMService:
     configured_middleware: List[LLMMiddleware] = [
         logging_middleware,
         http_tracking_middleware,  # Track HTTP-related issues
-        response_validation_middleware,  # Validate response format
         # Add other middleware here (e.g., token counting, db logging)
     ]
 
