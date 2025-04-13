@@ -100,29 +100,6 @@ class LLMService:
             f"Default: {self.default_model_name}, Middleware Count: {len(self.middleware)}"
         )
 
-    def _setup_from_environment(self):
-        """Set up a single model configuration from environment variables (fallback)."""
-        # Using environment variables as fallback
-        base_url = os.getenv("LLM_SERVICE_URL", "http://localhost:8000/v1")
-        api_key = os.getenv("LLM_API_KEY", "not-needed-for-local")
-        model_name = os.getenv("LLM_MODEL_NAME", "local-model")
-
-        if not base_url:
-            raise ValueError("LLM_SERVICE_URL must be configured.")
-        if not model_name:
-            raise ValueError("LLM_MODEL_NAME must be configured.")
-
-        # Create a default model config
-        self.model_configs["default"] = ModelConfig(
-            name="default",
-            base_url=base_url,
-            api_key=api_key,
-            model_name=model_name,
-            display_name="Default Model",
-            description="Default model from environment variables",
-        )
-        self.default_model_name = "default"
-
     def get_model_config(self, model_name: Optional[str] = None) -> ModelConfig:
         """Get model configuration by name, or the default if not specified."""
         name_to_use = model_name or self.default_model_name
