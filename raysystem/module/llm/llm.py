@@ -29,6 +29,8 @@ class ModelConfig:
         model_name: str,
         display_name: str = "",
         description: str = "",
+        temperature: float = 0.7,
+        top_p: float = 1.0,
     ):
         self.name = name  # Config name/identifier
         self.base_url = base_url
@@ -36,6 +38,8 @@ class ModelConfig:
         self.model_name = model_name  # Actual model identifier to send to API
         self.display_name = display_name or name
         self.description = description
+        self.temperature = temperature
+        self.top_p = top_p
         self.client = None  # Will be initialized when needed
 
     def get_client(self) -> AsyncOpenAI:
@@ -83,6 +87,8 @@ class LLMService:
                 model_name=model_cfg.get("model_name"),
                 display_name=model_cfg.get("display_name", model_name),
                 description=model_cfg.get("description"),
+                temperature=model_cfg.get("temperature", 0.7),
+                top_p=model_cfg.get("top_p", 1.0),
             )
 
         # Set default model
@@ -206,7 +212,8 @@ class LLMService:
             response = await client.chat.completions.create(
                 model=context["model"],
                 messages=messages,
-                # Add other parameters like temperature, max_tokens if needed
+                temperature=model_config.temperature,
+                top_p=model_config.top_p,
             )
 
             context["raw_openai_response"] = response.model_dump()

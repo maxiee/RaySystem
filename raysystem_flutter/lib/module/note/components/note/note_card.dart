@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async'; // 添加 import 以支持 StreamSubscription
 
 import 'package:flutter/material.dart';
 import 'package:appflowy_editor/appflowy_editor.dart';
@@ -30,6 +31,9 @@ class _NoteCardState extends State<NoteCard> {
   bool _isSaving = false;
   String? _errorMessage;
   bool _showSecondaryTitles = false;
+
+  // 用于存储编辑器事务流的订阅
+  StreamSubscription? _editorSubscription;
 
   // Add variables to track content changes
   bool _hasChanges = false;
@@ -68,6 +72,7 @@ class _NoteCardState extends State<NoteCard> {
   void dispose() {
     _primaryTitleController.removeListener(_onContentChanged);
     _editorState?.dispose();
+    _editorSubscription?.cancel(); // 取消订阅以避免内存泄漏
     _primaryTitleController.dispose();
     super.dispose();
   }
@@ -123,8 +128,13 @@ class _NoteCardState extends State<NoteCard> {
         _editorScrollController =
             EditorScrollController(editorState: _editorState!);
 
-        // Add listener to editor changes
+        // 监听文档根节点变化
         _editorState!.document.root.addListener(_onDocumentChange);
+
+        // 添加对编辑器变化的直接监听
+        _editorSubscription = _editorState!.transactionStream.listen((_) {
+          _onContentChanged();
+        });
       } else {
         _initializeEmptyEditor();
       }
@@ -696,6 +706,9 @@ class _NoteCardState extends State<NoteCard> {
       setState(() {
         _hasChanges = hasChanges;
       });
+      debugPrint('Change status updated: $_hasChanges');
+      debugPrint('Title changed: ${currentTitle != _originalTitle}');
+      debugPrint('Content changed: ${currentContent != _originalContent}');
     }
   }
 }
