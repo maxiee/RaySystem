@@ -26,7 +26,7 @@ class ApiLLMService implements LLMService {
   Future<List<ModelInfo>> getAvailableModels() async {
     try {
       final response = await _llmApi.listModelsEndpointLlmModelsGet();
-      return response.data?.models?.toList() ?? [];
+      return response.data?.models.toList() ?? [];
     } catch (e) {
       debugPrint('Error getting available models: $e');
       return [];

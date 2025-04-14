@@ -47,6 +47,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
 
     try {
       final models = await _llmService.getAvailableModels();
+      print('Available models: $models');
 
       if (mounted) {
         setState(() {

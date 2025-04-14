@@ -33,6 +33,8 @@ class ChatSettingsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('availableModels: $availableModels');
+    print('selectedModelId: $selectedModelId');
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Column(
@@ -96,6 +98,7 @@ class ChatSettingsPanel extends StatelessWidget {
             ),
             // Divider
             const DropdownMenuItem<String?>(
+              value: 'divider',
               enabled: false,
               child: Divider(),
             ),
