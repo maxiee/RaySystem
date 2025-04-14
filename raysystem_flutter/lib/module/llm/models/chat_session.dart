@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:openapi/openapi.dart';
 import 'chat_message.dart';
+import 'chat_prompt.dart';
 
 /// Represents a chat session with conversation history and settings
 class ChatSession extends ChangeNotifier {
@@ -19,17 +20,25 @@ class ChatSession extends ChangeNotifier {
   /// Whether a message is currently being generated
   bool _isGenerating = false;
 
+  /// Currently selected prompt/role
+  ChatPrompt? _selectedPrompt;
+
+  /// List of available prompts
+  List<ChatPrompt> _availablePrompts = ChatPromptService.getAllPrompts();
+
   /// Constructor with optional initial settings
   ChatSession({
     List<ChatMessage>? initialMessages,
     String? selectedModelId,
     List<ModelInfo>? availableModels,
     double? temperature,
+    ChatPrompt? selectedPrompt,
   }) {
     _messages = initialMessages ?? [];
     _selectedModelId = selectedModelId;
     _availableModels = availableModels ?? [];
     _temperature = temperature ?? 0.7;
+    _selectedPrompt = selectedPrompt;
   }
 
   /// Get all messages in the conversation
@@ -69,6 +78,29 @@ class ChatSession extends ChangeNotifier {
   set isGenerating(bool value) {
     _isGenerating = value;
     notifyListeners();
+  }
+
+  /// Get the currently selected prompt
+  ChatPrompt? get selectedPrompt => _selectedPrompt;
+
+  /// Set the selected prompt
+  set selectedPrompt(ChatPrompt? prompt) {
+    _selectedPrompt = prompt;
+    notifyListeners();
+  }
+
+  /// Get all available prompts
+  List<ChatPrompt> get availablePrompts => List.unmodifiable(_availablePrompts);
+
+  /// Apply the currently selected prompt
+  void applySelectedPrompt() {
+    if (_selectedPrompt != null) {
+      // Clear any existing system messages
+      _messages.removeWhere((message) => message.role == 'system');
+
+      // Add new system message with the prompt text
+      addSystemMessage(_selectedPrompt!.promptText);
+    }
   }
 
   /// Add a user message to the conversation

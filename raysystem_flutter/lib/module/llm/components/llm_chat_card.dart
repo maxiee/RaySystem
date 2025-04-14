@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../api/api.dart';
 import '../api/llm_service.dart';
-import '../models/chat_message.dart';
 import '../models/chat_session.dart';
 import 'chat_input_field.dart';
 import 'chat_message_bubble.dart';
 import 'chat_settings_panel.dart';
+import 'prompt_selector.dart';
 
 /// A card widget that displays an LLM chat interface
 class LLMChatCard extends StatefulWidget {
@@ -20,6 +20,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
   final LLMService _llmService = ApiLLMService(llmApi: llmApi);
   late ChatSession _chatSession;
   bool _showSettings = false;
+  bool _showPrompts = false; // Toggle for prompt selector visibility
   bool _isLoading = true;
 
   final ScrollController _scrollController = ScrollController();
@@ -150,6 +151,20 @@ class _LLMChatCardState extends State<LLMChatCard> {
           ),
           const Spacer(),
 
+          // Prompt templates toggle
+          IconButton(
+            icon: Icon(
+              _showPrompts ? Icons.psychology_outlined : Icons.psychology,
+              size: 20,
+            ),
+            onPressed: () {
+              setState(() {
+                _showPrompts = !_showPrompts;
+              });
+            },
+            tooltip: _showPrompts ? 'Hide prompts' : 'Show prompts',
+          ),
+
           // Settings toggle
           IconButton(
             icon: Icon(
@@ -203,32 +218,81 @@ class _LLMChatCardState extends State<LLMChatCard> {
                   // Header
                   _buildHeader(context),
 
-                  // Optional settings panel
-                  if (_showSettings)
-                    AnimatedSize(
-                      duration: const Duration(milliseconds: 200),
-                      child: ChatSettingsPanel(
-                        availableModels: chatSession.availableModels,
-                        selectedModelId: chatSession.selectedModelId,
-                        temperature: chatSession.temperature,
-                        onModelChanged: (modelId) {
-                          chatSession.selectedModelId = modelId;
-                        },
-                        onTemperatureChanged: (value) {
-                          chatSession.temperature = value;
-                        },
-                        enabled: !chatSession.isGenerating,
-                      ),
-                    ),
-
                   // Divider
                   const Divider(height: 1),
 
-                  // Chat messages area
+                  // Use Expanded to make the Stack fill the remaining space
                   Expanded(
-                    child: _isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : _buildChatMessagesArea(chatSession),
+                    child: Stack(
+                      children: [
+                        // Chat messages area (base layer)
+                        Positioned.fill(
+                          child: _isLoading
+                              ? const Center(child: CircularProgressIndicator())
+                              : _buildChatMessagesArea(chatSession),
+                        ),
+
+                        // Optional prompt selector panel (overlay)
+                        if (_showPrompts)
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            child: Material(
+                              elevation: 2,
+                              child: AnimatedSize(
+                                duration: const Duration(milliseconds: 200),
+                                child: PromptSelector(
+                                  prompts: chatSession.availablePrompts,
+                                  selectedPrompt: chatSession.selectedPrompt,
+                                  onPromptSelected: (prompt) {
+                                    chatSession.selectedPrompt = prompt;
+                                  },
+                                  onApplyPrompt: () {
+                                    chatSession.applySelectedPrompt();
+                                    // Show a confirmation
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Applied prompt: ${chatSession.selectedPrompt?.name}',
+                                        ),
+                                        duration: const Duration(seconds: 2),
+                                      ),
+                                    );
+                                  },
+                                  enabled: !chatSession.isGenerating,
+                                ),
+                              ),
+                            ),
+                          ),
+
+                        // Optional settings panel (overlay)
+                        if (_showSettings)
+                          Positioned(
+                            top: _showPrompts ? null : 0,
+                            left: 0,
+                            right: 0,
+                            child: Material(
+                              elevation: 2,
+                              child: AnimatedSize(
+                                duration: const Duration(milliseconds: 200),
+                                child: ChatSettingsPanel(
+                                  availableModels: chatSession.availableModels,
+                                  selectedModelId: chatSession.selectedModelId,
+                                  temperature: chatSession.temperature,
+                                  onModelChanged: (modelId) {
+                                    chatSession.selectedModelId = modelId;
+                                  },
+                                  onTemperatureChanged: (value) {
+                                    chatSession.temperature = value;
+                                  },
+                                  enabled: !chatSession.isGenerating,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
 
                   // Input area
