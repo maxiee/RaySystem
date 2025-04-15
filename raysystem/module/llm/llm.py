@@ -254,3 +254,149 @@ class LLMService:
             )
         else:
             raise ValueError("LLM call finished without a response or error.")
+
+    async def create_streaming_chat_completion(self, request: ChatCompletionRequest):
+        """
+        Generates a streaming chat completion using the configured LLM service,
+        applying any registered middleware.
+
+        Args:
+            request: Chat completion request containing messages and optional model name
+
+        Yields:
+            Chunks of the generated response as they become available
+        """
+        # Get the requested model or default
+        model_config = self.get_model_config(request.model_name)
+
+        # Prepare context for middleware
+        context: ChatContext = {
+            "request_messages": [msg.model_dump() for msg in request.messages],
+            "model": model_config.model_name,
+            "model_config_name": model_config.name,
+            "response_message": None,
+            "raw_openai_response": None,
+            "error": None,
+            "metadata": {"streaming": True},  # Mark as streaming for middleware
+        }
+
+        # Apply any pre-processing middleware first
+        pre_context: ChatContext = context.copy()
+        await apply_middleware(self.middleware, pre_context)
+        if pre_context["error"] is not None:
+            if isinstance(pre_context["error"], Exception):
+                raise pre_context["error"]
+            else:
+                raise RuntimeError(str(pre_context["error"]))
+
+        try:
+            # Convert message dicts to properly typed ChatCompletionMessageParam objects
+            messages: List[ChatCompletionMessageParam] = []
+
+            # Process each message based on its role
+            for msg in context["request_messages"]:
+                role = msg.get("role", "")
+                content = msg.get("content", "")
+
+                # Create properly typed messages based on role
+                if role == "system":
+                    system_msg: ChatCompletionSystemMessageParam = {
+                        "role": "system",
+                        "content": content,
+                    }
+                    messages.append(system_msg)
+
+                elif role == "user":
+                    user_msg: ChatCompletionUserMessageParam = {
+                        "role": "user",
+                        "content": content,
+                    }
+                    messages.append(user_msg)
+
+                elif role == "assistant":
+                    assistant_msg: ChatCompletionAssistantMessageParam = {
+                        "role": "assistant",
+                        "content": content,
+                    }
+                    messages.append(assistant_msg)
+
+                elif role == "tool":
+                    tool_msg: ChatCompletionToolMessageParam = {
+                        "role": "tool",
+                        "content": content,
+                        "tool_call_id": msg.get("tool_call_id", ""),
+                    }
+                    messages.append(tool_msg)
+
+                else:
+                    print(f"Warning: Unexpected message role: {role}")
+                    generic_msg: Dict[str, str] = {"role": role, "content": content}
+                    messages.append(cast(ChatCompletionMessageParam, generic_msg))
+
+            # Make the streaming call to the OpenAI compatible API
+            client = model_config.get_client()
+            stream = await client.chat.completions.create(
+                model=context["model"],
+                messages=messages,
+                temperature=model_config.temperature,
+                top_p=model_config.top_p,
+                stream=True,  # Enable streaming
+            )
+
+            # Stream the response chunks
+            accumulated_content = ""
+
+            # Use a regular for loop to prevent any buffering behavior from asyncio
+            async for chunk in stream:
+                if chunk.choices and len(chunk.choices) > 0:
+                    delta = chunk.choices[0].delta
+                    content = getattr(delta, "content", None)
+
+                    # Only yield chunks that have content
+                    if content:
+                        accumulated_content += content
+
+                        # Create minimal context for this chunk (for middleware)
+                        chunk_context: ChatContext = {
+                            "chunk": content,
+                            "metadata": {"streaming": True},
+                        }
+
+                        # Apply minimal middleware to the chunk
+                        # await apply_middleware(
+                        #     [
+                        #         m
+                        #         for m in self.middleware
+                        #         if hasattr(m, "stream_priority") and m.stream_priority
+                        #     ],
+                        #     chunk_context,
+                        # )
+
+                        # Immediately yield the processed chunk
+                        yield chunk_context.get("chunk", content)
+
+            # Register full content for post-processing middleware
+            if accumulated_content:
+                post_context: ChatContext = context.copy()
+                post_context["streaming_completed"] = True
+                post_context["response_message"] = {
+                    "role": "assistant",
+                    "content": accumulated_content,
+                }
+                await apply_middleware(self.middleware, post_context)
+
+        except OpenAIError as e:
+            print(f"OpenAI API Streaming Error: {e}")
+            context["error"] = e
+            # Apply middleware to handle the error
+            await apply_middleware(self.middleware, context)
+            if context["error"]:
+                raise context["error"]
+
+        except Exception as e:
+            print(f"Error during LLM streaming interaction: {e}")
+            context["error"] = e
+            # Apply middleware to handle the error
+            await apply_middleware(self.middleware, context)
+            if context["error"]:
+                raise context["error"]

@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from typing import List
+import asyncio
+from typing import AsyncGenerator, List
+from fastapi.responses import StreamingResponse
 from openai import OpenAIError
 
 from module.llm.llm import LLMService
@@ -45,6 +47,114 @@ router = APIRouter(
     prefix="/llm",
     tags=["LLM"],  # Tag for OpenAPI documentation grouping
 )
+
+
+@router.post("/chat_stream")
+async def chat_stream_endpoint(
+    request: ChatCompletionRequest,
+    llm_service: LLMService = Depends(get_llm_service),  # Inject the service
+):
+    """
+    Stream chat completions as SSE events.
+
+    Returns a real-time stream of partial completion results as they're generated.
+    """
+    import uuid
+    import traceback
+    import json
+    from datetime import datetime
+    from typing import AsyncGenerator, cast
+
+    # Generate request ID for tracking
+    req_id = str(uuid.uuid4())[:8]
+    start_time = datetime.now()
+    print(
+        f"[{req_id}] Streaming API请求开始: {start_time.strftime('%Y-%m-%d %H:%M:%S')}"
+    )
+    print(f"[{req_id}] 请求模型: {request.model_name or '默认'}")
+    print(f"[{req_id}] 请求消息数量: {len(request.messages)}")
+
+    async def event_generator() -> AsyncGenerator[str, None]:
+        """Generate SSE events from LLM streaming responses."""
+        try:
+            # Send start event immediately
+            yield "event: start\ndata: {}\n\n"
+            await asyncio.sleep(0)  # Force yield to client
+
+            # Process the streaming response
+            content_so_far = ""
+            chunk_count = 0
+
+            async for chunk in llm_service.create_streaming_chat_completion(request):
+                # 确保 chunk 是字符串类型
+                chunk_str = cast(str, chunk) if chunk is not None else ""
+                content_so_far += chunk_str
+                chunk_count += 1
+
+                # Log occasional progress for debugging
+                if chunk_count % 10 == 0:
+                    print(f"[{req_id}] 已发送 {chunk_count} 个数据块")
+
+                # Format the chunk as a JSON event
+                event_data = json.dumps({"content": chunk_str, "done": False})
+                yield f"data: {event_data}\n\n"
+                await asyncio.sleep(0)  # Force yield to client
+
+            # Send completion event with full content
+            complete_data = json.dumps(
+                {
+                    "content": content_so_far,
+                    "done": True,
+                    "model": request.model_name or llm_service.default_model_name,
+                }
+            )
+            yield f"event: complete\ndata: {complete_data}\n\n"
+
+            # Log completion
+            end_time = datetime.now()
+            duration = (end_time - start_time).total_seconds()
+            print(f"[{req_id}] Streaming API请求成功完成，耗时: {duration:.2f}秒")
+            print(
+                f"[{req_id}] 响应内容长度: {len(content_so_far)}，共发送 {chunk_count} 个数据块"
+            )
+
+        except OpenAIError as e:
+            # Handle OpenAI SDK specific errors
+            end_time = datetime.now()
+            duration = (end_time - start_time).total_seconds()
+            print(f"[{req_id}] LLM流式API错误，耗时: {duration:.2f}秒，错误: {e}")
+            print(f"[{req_id}] 错误类型: {type(e).__name__}")
+
+            # Send error event
+            error_data = json.dumps({"error": f"LLM服务错误: {e}", "done": True})
+            yield f"event: error\ndata: {error_data}\n\n"
+
+        except Exception as e:
+            # Handle all other unexpected errors
+            end_time = datetime.now()
+            duration = (end_time - start_time).total_seconds()
+            print(
+                f"[{req_id}] 未预期流式错误，耗时: {duration:.2f}秒，类型: {type(e).__name__}，错误: {e}"
+            )
+            print(f"[{req_id}] 完整堆栈跟踪:")
+            print(traceback.format_exc())
+
+            # Send error event
+            error_data = json.dumps(
+                {"error": "处理流式请求时发生意外错误", "done": True}
+            )
+            yield f"event: error\ndata: {error_data}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache, no-transform",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",  # Disable proxy buffering
+            "Content-Type": "text/event-stream",  # Explicitly set content type
+        },
+    )
 
 
 @router.post(

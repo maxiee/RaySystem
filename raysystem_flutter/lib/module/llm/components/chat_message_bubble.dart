@@ -147,14 +147,26 @@ class ChatMessageBubble extends StatelessWidget {
                 ),
 
               // Message content
-              message.isGenerating
-                  ? _buildGeneratingIndicator(context, textColor)
-                  : SelectableText(
-                      message.content,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Always show content, even when generating
+                  if (message.content.isNotEmpty)
+                    SelectableText(
+                      message.content.trimLeft(), // Trim leading whitespace
                       style: TextStyle(
                         color: textColor,
                       ),
                     ),
+
+                  // Show generating indicator if still generating
+                  if (message.isGenerating)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: _buildGeneratingIndicator(context, textColor),
+                    ),
+                ],
+              ),
             ],
           ),
         ),
@@ -190,7 +202,7 @@ class ChatMessageBubble extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Text(
-          'Generating...',
+          '...',
           style: TextStyle(
             color: textColor,
             fontStyle: FontStyle.italic,

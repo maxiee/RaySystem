@@ -77,6 +77,7 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**recognizeTextOcrRecognizePost**](doc/DefaultApi.md#recognizetextocrrecognizepost) | **POST** /ocr/recognize | Recognize Text
 [*DefaultApi*](doc/DefaultApi.md) | [**rootGet**](doc/DefaultApi.md#rootget) | **GET** / | Root
 [*LLMApi*](doc/LLMApi.md) | [**chatCompletionEndpointLlmChatPost**](doc/LLMApi.md#chatcompletionendpointllmchatpost) | **POST** /llm/chat | Generate Chat Completion
+[*LLMApi*](doc/LLMApi.md) | [**chatStreamEndpointLlmChatStreamPost**](doc/LLMApi.md#chatstreamendpointllmchatstreampost) | **POST** /llm/chat_stream | Chat Stream Endpoint
 [*LLMApi*](doc/LLMApi.md) | [**listModelsEndpointLlmModelsGet**](doc/LLMApi.md#listmodelsendpointllmmodelsget) | **GET** /llm/models | List Available LLM Models
 [*NoteTitlesApi*](doc/NoteTitlesApi.md) | [**addNoteTitleNotesNoteIdTitlesPost**](doc/NoteTitlesApi.md#addnotetitlenotesnoteidtitlespost) | **POST** /notes/{note_id}/titles | Add Note Title
 [*NoteTitlesApi*](doc/NoteTitlesApi.md) | [**deleteNoteTitleNotesTitlesTitleIdDelete**](doc/NoteTitlesApi.md#deletenotetitlenotestitlestitleiddelete) | **DELETE** /notes/titles/{title_id} | Delete Note Title

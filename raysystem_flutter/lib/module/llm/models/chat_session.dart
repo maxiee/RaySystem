@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:openapi/openapi.dart';
+import 'package:dio/dio.dart';
 import 'chat_message.dart';
 import 'chat_prompt.dart';
 
@@ -25,6 +26,9 @@ class ChatSession extends ChangeNotifier {
 
   /// List of available prompts
   List<ChatPrompt> _availablePrompts = ChatPromptService.getAllPrompts();
+
+  /// Cancel token for active streaming requests
+  CancelToken? _streamCancelToken;
 
   /// Constructor with optional initial settings
   ChatSession({
@@ -133,12 +137,33 @@ class ChatSession extends ChangeNotifier {
     }
   }
 
-  /// Complete the generation of the last assistant message
-  void completeLastAssistantMessage() {
+  /// Append content to the last assistant message (for streaming)
+  void appendToLastAssistantMessage(String content) {
     if (_messages.isNotEmpty && _messages.last.role == 'assistant') {
       final index = _messages.length - 1;
-      _messages[index] = _messages[index].copyWith(isGenerating: false);
+      final currentContent = _messages[index].content;
+      _messages[index] =
+          _messages[index].copyWith(content: currentContent + content);
+      notifyListeners();
+    }
+  }
+
+  /// Complete the generation of the last assistant message
+  void completeLastAssistantMessage({bool updateContent = true}) {
+    if (_messages.isNotEmpty && _messages.last.role == 'assistant') {
+      final index = _messages.length - 1;
+      final lastMessage = _messages[index];
+      
+      // Create a copy of the message with isGenerating set to false
+      // If updateContent is false, keep the existing content to avoid duplication
+      _messages[index] = lastMessage.copyWith(
+        isGenerating: false,
+        // No need to provide content when updateContent is false
+        // When updateContent is true, using the existing content (no change)
+      );
+      
       _isGenerating = false;
+      _streamCancelToken = null; // Clear the cancel token when complete
       notifyListeners();
     }
   }
@@ -147,6 +172,7 @@ class ChatSession extends ChangeNotifier {
   void addErrorMessage(String errorMessage) {
     _messages.add(ChatMessage.error(errorMessage));
     _isGenerating = false;
+    _streamCancelToken = null; // Clear the cancel token on error
     notifyListeners();
   }
 
@@ -159,5 +185,26 @@ class ChatSession extends ChangeNotifier {
   /// Convert all messages to API format for sending to backend
   List<ChatMessageInput> toApiMessages() {
     return _messages.map((msg) => msg.toApiMessage()).toList();
+  }
+
+  /// Get the current cancel token or create a new one
+  CancelToken getOrCreateCancelToken() {
+    _streamCancelToken ??= CancelToken();
+    return _streamCancelToken!;
+  }
+
+  /// Cancel any ongoing streaming request
+  void cancelStreamingRequest() {
+    if (_streamCancelToken != null && !_streamCancelToken!.isCancelled) {
+      _streamCancelToken!.cancel('User cancelled the request');
+      _streamCancelToken = null;
+    }
+  }
+
+  @override
+  void dispose() {
+    // Make sure to cancel any ongoing requests when disposed
+    cancelStreamingRequest();
+    super.dispose();
   }
 }

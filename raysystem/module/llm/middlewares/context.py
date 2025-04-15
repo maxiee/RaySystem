@@ -12,3 +12,7 @@ class ChatContext(TypedDict, total=False):
     raw_openai_response: Optional[Dict[str, Any]]  # Full raw response from OpenAI
     error: Optional[Exception]  # Any error that occurred
     metadata: Dict[str, Any]  # Metadata for middleware communication
+    
+    # 流式处理相关字段
+    chunk: Optional[str]  # 当前的内容片段（用于流式传输）
+    streaming_completed: bool  # 标记流式传输是否完成

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../api/api.dart';
@@ -80,29 +81,53 @@ class _LLMChatCardState extends State<LLMChatCard> {
     _scrollToBottom();
 
     try {
-      // Send the message to the API
-      final response = await _llmService.sendChatCompletion(
+      // Create a cancel token for the streaming request
+      final cancelToken = _chatSession.getOrCreateCancelToken();
+
+      // Get the stream from the API
+      final stream = await _llmService.sendStreamingChatCompletion(
         messages: _chatSession.toApiMessages(),
         modelId: _chatSession.selectedModelId,
         temperature: _chatSession.temperature,
+        cancelToken: cancelToken,
       );
 
-      if (!mounted) return;
+      // Track the accumulating message content
+      String fullContent = '';
 
-      if (response != null) {
-        final content = response.message.content;
-        _chatSession.updateLastAssistantMessage(content);
-      } else {
-        _chatSession.addErrorMessage('Failed to get response from API');
+      // Process the streaming response
+      await for (final chunk in stream) {
+        if (!mounted) {
+          _chatSession.cancelStreamingRequest();
+          break;
+        }
+
+        // 检查是否为有效的新内容
+        if (chunk.isNotEmpty) {
+          // Add the new chunk to our accumulated content
+          fullContent += chunk;
+
+          // Update with the full content accumulated so far
+          _chatSession.updateLastAssistantMessage(fullContent);
+
+          // Scroll to show new content
+          _scrollToBottom();
+        }
       }
     } catch (e) {
       if (mounted) {
-        _chatSession.addErrorMessage('Error: ${e.toString()}');
+        if (e is DioException && e.type == DioExceptionType.cancel) {
+          // User cancelled the request, so we'll just show what we have so far
+          debugPrint('Stream cancelled by user');
+        } else {
+          _chatSession.addErrorMessage('Error: ${e.toString()}');
+        }
       }
     } finally {
       // Complete the assistant message generation indicator
+      // WITHOUT updating the content again, just mark as not generating
       if (mounted) {
-        _chatSession.completeLastAssistantMessage();
+        _chatSession.completeLastAssistantMessage(updateContent: false);
         // Scroll to bottom after response
         _scrollToBottom();
       }
@@ -111,11 +136,19 @@ class _LLMChatCardState extends State<LLMChatCard> {
 
   /// Scroll the chat list to the bottom
   void _scrollToBottom() {
+    // Only schedule scroll if the widget is still mounted
+    if (!mounted) return;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
+        // Use a shorter duration for smoother streaming appearance
+        final scrollDuration = _chatSession.isGenerating
+            ? const Duration(milliseconds: 100) // Faster during generation
+            : const Duration(milliseconds: 300); // Normal speed otherwise
+
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
+          duration: scrollDuration,
           curve: Curves.easeOut,
         );
       }

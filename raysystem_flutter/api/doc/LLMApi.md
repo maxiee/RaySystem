@@ -10,6 +10,7 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**chatCompletionEndpointLlmChatPost**](LLMApi.md#chatcompletionendpointllmchatpost) | **POST** /llm/chat | Generate Chat Completion
+[**chatStreamEndpointLlmChatStreamPost**](LLMApi.md#chatstreamendpointllmchatstreampost) | **POST** /llm/chat_stream | Chat Stream Endpoint
 [**listModelsEndpointLlmModelsGet**](LLMApi.md#listmodelsendpointllmmodelsget) | **GET** /llm/models | List Available LLM Models
 
 
@@ -44,6 +45,49 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**ChatCompletionResponse**](ChatCompletionResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **chatStreamEndpointLlmChatStreamPost**
+> JsonObject chatStreamEndpointLlmChatStreamPost(chatCompletionRequest)
+
+Chat Stream Endpoint
+
+Stream chat completions as SSE events.  Returns a real-time stream of partial completion results as they're generated.
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+
+final api = Openapi().getLLMApi();
+final ChatCompletionRequest chatCompletionRequest = ; // ChatCompletionRequest | 
+
+try {
+    final response = api.chatStreamEndpointLlmChatStreamPost(chatCompletionRequest);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling LLMApi->chatStreamEndpointLlmChatStreamPost: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **chatCompletionRequest** | [**ChatCompletionRequest**](ChatCompletionRequest.md)|  | 
+
+### Return type
+
+[**JsonObject**](JsonObject.md)
 
 ### Authorization
 

@@ -79,10 +79,3 @@ lib/src/model/validation_error.dart
 lib/src/model/validation_error_loc_inner.dart
 lib/src/serializers.dart
 pubspec.yaml
-test/chat_completion_request_test.dart
-test/chat_completion_response_test.dart
-test/chat_message_input_test.dart
-test/chat_message_output_test.dart
-test/list_models_response_test.dart
-test/llm_api_test.dart
-test/model_info_test.dart
