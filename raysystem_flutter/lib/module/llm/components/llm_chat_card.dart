@@ -27,7 +27,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
   bool _showPrompts = false; // Toggle for prompt selector visibility
   bool _showSessionsSidebar = false; // Toggle for sessions sidebar visibility
   bool _isLoading = true;
-  int? _activeSessionId; // Currently loaded session ID
+  String? _activeSessionTitle; // 当前会话标题
 
   final ScrollController _scrollController = ScrollController();
 
@@ -173,7 +173,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
   /// Build the header with title and settings toggle
   Widget _buildHeader(BuildContext context) {
     final sessionTitle =
-        _activeSessionId != null ? 'Session #$_activeSessionId' : 'LLM Chat';
+        _activeSessionTitle != null ? _activeSessionTitle! : 'LLM Chat';
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -240,8 +240,8 @@ class _LLMChatCardState extends State<LLMChatCard> {
                 : () {
                     setState(() {
                       _chatSession.clearMessages();
-                      // Clear active session ID when clearing conversation
-                      _activeSessionId = null;
+                      // Clear active session ID and title when clearing conversation
+                      _activeSessionTitle = null;
                     });
                   },
             tooltip: 'Clear conversation',
@@ -475,7 +475,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
   void _handleSessionSelected(ChatSessionModel sessionModel) {
     setState(() {
       _isLoading = false;
-      _activeSessionId = sessionModel.id;
+      _activeSessionTitle = sessionModel.title;
     });
 
     // Update the UI title to reflect the selected session
