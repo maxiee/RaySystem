@@ -3,6 +3,7 @@ import 'package:openapi/openapi.dart';
 import 'package:dio/dio.dart';
 import 'chat_message.dart';
 import 'chat_prompt.dart';
+import 'chat_session_model.dart';
 
 /// Represents a chat session with conversation history and settings
 class ChatSession extends ChangeNotifier {
@@ -199,6 +200,61 @@ class ChatSession extends ChangeNotifier {
       _streamCancelToken!.cancel('User cancelled the request');
       _streamCancelToken = null;
     }
+  }
+
+  /// Load the chat session from a session model
+  void loadFromSessionModel(ChatSessionModel model) {
+    try {
+      // First clear existing messages
+      _messages = []; // Directly clear the internal list
+
+      // Set model name if available
+      if (model.modelName.isNotEmpty) {
+        selectedModelId = model.modelName;
+      }
+
+      // Parse the content JSON
+      final parsedMessageMaps = model.parseContent();
+
+      // Add each message to the chat session
+      for (final msgMap in parsedMessageMaps) {
+        final role = msgMap['role'] as String?;
+        final content = msgMap['content'] as String?;
+
+        if (role == null || content == null) continue;
+
+        // Create a message based on the role and add it directly to _messages
+        switch (role) {
+          case 'user':
+            _messages.add(ChatMessage.user(content));
+            break;
+          case 'assistant':
+            _messages.add(ChatMessage.assistant(content));
+            break;
+          case 'system':
+            _messages.add(ChatMessage.system(content));
+            break;
+          case 'error':
+            _messages.add(ChatMessage.error(content));
+            break;
+        }
+      }
+
+      // Notify listeners after all messages are loaded
+      notifyListeners();
+    } catch (e) {
+      // Start with a clean slate if there's an error
+      _messages = [];
+
+      // If parsing fails, add an error message
+      addErrorMessage('Failed to load chat session: $e');
+    }
+  }
+
+  /// Add an assistant message directly (without generating indicator)
+  void addAssistantMessageDirect(String content) {
+    _messages.add(ChatMessage.assistant(content, isGenerating: false));
+    notifyListeners();
   }
 
   @override

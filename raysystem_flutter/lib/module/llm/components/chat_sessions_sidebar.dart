@@ -89,7 +89,7 @@ class _ChatSessionsSidebarState extends State<ChatSessionsSidebar> {
           newSessions.add(ChatSessionModel(
             id: item.id,
             title: item.title,
-            modelName: item.modelName,
+            modelName: item.modelName ?? '',
             contentJson: item.contentJson,
             createdAt: DateTime.parse(item.createdAt.toString()),
             updatedAt: DateTime.parse(item.updatedAt.toString()),
@@ -164,7 +164,7 @@ class _ChatSessionsSidebarState extends State<ChatSessionsSidebar> {
         final newSession = ChatSessionModel(
           id: response.data!.id,
           title: response.data!.title,
-          modelName: response.data!.modelName,
+          modelName: response.data?.modelName ?? '',
           contentJson: response.data!.contentJson,
           createdAt: DateTime.parse(response.data!.createdAt.toString()),
           updatedAt: DateTime.parse(response.data!.updatedAt.toString()),
@@ -267,7 +267,7 @@ class _ChatSessionsSidebarState extends State<ChatSessionsSidebar> {
         final loadedSession = ChatSessionModel(
           id: response.data!.id,
           title: response.data!.title,
-          modelName: response.data!.modelName,
+          modelName: response.data?.modelName ?? '',
           contentJson: response.data!.contentJson,
           createdAt: DateTime.parse(response.data!.createdAt.toString()),
           updatedAt: DateTime.parse(response.data!.updatedAt.toString()),
@@ -328,7 +328,7 @@ class _ChatSessionsSidebarState extends State<ChatSessionsSidebar> {
             _chatSessions[index] = ChatSessionModel(
               id: response.data!.id,
               title: response.data!.title,
-              modelName: response.data!.modelName,
+              modelName: response.data?.modelName ?? '',
               contentJson: response.data!.contentJson,
               createdAt: DateTime.parse(response.data!.createdAt.toString()),
               updatedAt: DateTime.parse(response.data!.updatedAt.toString()),

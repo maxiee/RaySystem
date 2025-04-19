@@ -24,7 +24,7 @@ class ChatSessionModel {
     return ChatSessionModel(
       id: response.id,
       title: response.title,
-      modelName: response.modelName,
+      modelName: response.modelName ?? '',
       contentJson: response.contentJson,
       createdAt: response.createdAt,
       updatedAt: response.updatedAt,
