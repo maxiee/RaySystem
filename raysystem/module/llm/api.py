@@ -63,7 +63,7 @@ async def create_chat_session(
     async with session:
         new_session = await kChatSessionManager.create_chat_session(
             title=chat_session.title,
-            model_name=chat_session.model_name,
+            model_name=chat_session.model_name or "",  # Provide default model
             content_json=chat_session.content_json,
             session=session,
         )
