@@ -22,7 +22,8 @@ from module.db.base import Base
 import module.info.model
 import module.people.model
 import module.task_scheduler.model
-import module.note.model  # Add the new Note model
+import module.note.model
+import module.llm.model
 
 target_metadata = Base.metadata
 
@@ -71,9 +72,8 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, 
-            target_metadata=target_metadata,
-            render_as_batch=True)
+            connection=connection, target_metadata=target_metadata, render_as_batch=True
+        )
 
         with context.begin_transaction():
             context.run_migrations()
