@@ -21,7 +21,6 @@ class LLMChatCard extends StatefulWidget {
 
 class _LLMChatCardState extends State<LLMChatCard> {
   final LLMService _llmService = ApiLLMService(llmApi: llmApi);
-  late ChatSession _chatSession;
   bool _showSettings = false;
   bool _showPrompts = false; // Toggle for prompt selector visibility
   bool _showSessionsSidebar = false; // Toggle for sessions sidebar visibility
@@ -33,10 +32,11 @@ class _LLMChatCardState extends State<LLMChatCard> {
   @override
   void initState() {
     super.initState();
-    _chatSession = ChatSession();
-
-    // Initialize by loading available models
-    _loadModels();
+    // 初始化时通过 Provider 获取 ChatSession 并加载模型
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final chatSession = Provider.of<ChatSession>(context, listen: false);
+      _loadModels(chatSession);
+    });
   }
 
   @override
@@ -46,7 +46,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
   }
 
   /// Load available models from the API
-  Future<void> _loadModels() async {
+  Future<void> _loadModels(ChatSession chatSession) async {
     setState(() {
       _isLoading = true;
     });
@@ -57,7 +57,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
 
       if (mounted) {
         setState(() {
-          _chatSession.availableModels = models;
+          chatSession.availableModels = models;
           _isLoading = false;
         });
       }
@@ -66,33 +66,34 @@ class _LLMChatCardState extends State<LLMChatCard> {
         setState(() {
           _isLoading = false;
         });
-        _showErrorSnackbar('Failed to load models: ${e.toString()}');
+        _showErrorSnackbar('Failed to load models: \\${e.toString()}');
       }
     }
   }
 
   /// Send a user message and get response from the LLM API
   Future<void> _sendMessage(String message) async {
+    final chatSession = Provider.of<ChatSession>(context, listen: false);
     if (message.trim().isEmpty) return;
 
     // Add user message to the chat
-    _chatSession.addUserMessage(message);
+    chatSession.addUserMessage(message);
 
     // Start generating indicator for response
-    _chatSession.startAssistantMessage();
+    chatSession.startAssistantMessage();
 
     // Scroll to the bottom
     _scrollToBottom();
 
     try {
       // Create a cancel token for the streaming request
-      final cancelToken = _chatSession.getOrCreateCancelToken();
+      final cancelToken = chatSession.getOrCreateCancelToken();
 
       // Get the stream from the API
       final stream = await _llmService.sendStreamingChatCompletion(
-        messages: _chatSession.toApiMessages(),
-        modelId: _chatSession.selectedModelId,
-        temperature: _chatSession.temperature,
+        messages: chatSession.toApiMessages(),
+        modelId: chatSession.selectedModelId,
+        temperature: chatSession.temperature,
         cancelToken: cancelToken,
       );
 
@@ -102,7 +103,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
       // Process the streaming response
       await for (final chunk in stream) {
         if (!mounted) {
-          _chatSession.cancelStreamingRequest();
+          chatSession.cancelStreamingRequest();
           break;
         }
 
@@ -112,7 +113,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
           fullContent += chunk;
 
           // Update with the full content accumulated so far
-          _chatSession.updateLastAssistantMessage(fullContent);
+          chatSession.updateLastAssistantMessage(fullContent);
 
           // Scroll to show new content
           _scrollToBottom();
@@ -124,14 +125,14 @@ class _LLMChatCardState extends State<LLMChatCard> {
           // User cancelled the request, so we'll just show what we have so far
           debugPrint('Stream cancelled by user');
         } else {
-          _chatSession.addErrorMessage('Error: ${e.toString()}');
+          chatSession.addErrorMessage('Error: \\${e.toString()}');
         }
       }
     } finally {
       // Complete the assistant message generation indicator
       // WITHOUT updating the content again, just mark as not generating
       if (mounted) {
-        _chatSession.completeLastAssistantMessage(updateContent: false);
+        chatSession.completeLastAssistantMessage(updateContent: false);
         // Scroll to bottom after response
         _scrollToBottom();
       }
@@ -146,7 +147,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         // Use a shorter duration for smoother streaming appearance
-        final scrollDuration = _chatSession.isGenerating
+        final scrollDuration = _showPrompts
             ? const Duration(milliseconds: 100) // Faster during generation
             : const Duration(milliseconds: 300); // Normal speed otherwise
 
@@ -171,6 +172,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
 
   /// Build the header with title and settings toggle
   Widget _buildHeader(BuildContext context) {
+    final chatSession = Provider.of<ChatSession>(context);
     final sessionTitle =
         _activeSessionTitle != null ? _activeSessionTitle! : 'LLM Chat';
 
@@ -234,12 +236,11 @@ class _LLMChatCardState extends State<LLMChatCard> {
           // Clear conversation button
           IconButton(
             icon: const Icon(Icons.delete_outline, size: 20),
-            onPressed: _chatSession.messages.isEmpty
+            onPressed: chatSession.messages.isEmpty
                 ? null
                 : () {
                     setState(() {
-                      _chatSession.clearMessages();
-                      // Clear active session ID and title when clearing conversation
+                      chatSession.clearMessages();
                       _activeSessionTitle = null;
                     });
                   },
@@ -252,169 +253,164 @@ class _LLMChatCardState extends State<LLMChatCard> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: _chatSession,
-      child: Consumer<ChatSession>(
-        builder: (context, chatSession, _) {
-          return Card(
-            margin: EdgeInsets.zero,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12)),
-            ),
-            elevation: 1,
-            clipBehavior: Clip.antiAlias,
-            child: SizedBox(
-              height: 500, // Fixed height to prevent unbounded height error
-              child: Row(
-                children: [
-                  // Chat Session Management Sidebar
-                  if (_showSessionsSidebar)
-                    ChatSessionsSidebar(
-                      llmApi: llmApi,
-                      onSessionSelected: _handleSessionSelected,
-                      onSidebarToggle: (show) =>
-                          setState(() => _showSessionsSidebar = show),
-                      isOpen: _showSessionsSidebar,
-                      currentChatSession: _chatSession,
-                    )
-                  else
-                    // Just the toggle handle when sidebar is closed
-                    InkWell(
-                      onTap: () => setState(() => _showSessionsSidebar = true),
-                      child: Container(
-                        width: 24,
-                        decoration: BoxDecoration(
-                          border: Border(
-                              right: BorderSide(
-                                  color: Theme.of(context).dividerColor)),
-                        ),
-                        child: Center(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Icon(
-                              Icons.chevron_right,
-                              size: 20,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
+    return Consumer<ChatSession>(
+      builder: (context, chatSession, _) {
+        return Card(
+          margin: EdgeInsets.zero,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+          ),
+          elevation: 1,
+          clipBehavior: Clip.antiAlias,
+          child: SizedBox(
+            height: 500, // Fixed height to prevent unbounded height error
+            child: Row(
+              children: [
+                // Chat Session Management Sidebar
+                if (_showSessionsSidebar)
+                  ChatSessionsSidebar(
+                    llmApi: llmApi,
+                    onSessionSelected: _handleSessionSelected,
+                    onSidebarToggle: (show) =>
+                        setState(() => _showSessionsSidebar = show),
+                    isOpen: _showSessionsSidebar,
+                    currentChatSession: chatSession,
+                  )
+                else
+                  // Just the toggle handle when sidebar is closed
+                  InkWell(
+                    onTap: () => setState(() => _showSessionsSidebar = true),
+                    child: Container(
+                      width: 24,
+                      decoration: BoxDecoration(
+                        border: Border(
+                            right: BorderSide(
+                                color: Theme.of(context).dividerColor)),
+                      ),
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Icon(
+                            Icons.chevron_right,
+                            size: 20,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
                       ),
                     ),
+                  ),
 
-                  // Main Chat Area
-                  Expanded(
-                    child: Column(
-                      mainAxisSize:
-                          MainAxisSize.min, // Set to min to avoid flex issues
-                      children: [
-                        // Header
-                        _buildHeader(context),
+                // Main Chat Area
+                Expanded(
+                  child: Column(
+                    mainAxisSize:
+                        MainAxisSize.min, // Set to min to avoid flex issues
+                    children: [
+                      // Header
+                      _buildHeader(context),
 
-                        // Divider
-                        const Divider(height: 1),
+                      // Divider
+                      const Divider(height: 1),
 
-                        // Use Expanded to make the Stack fill the remaining space
-                        Expanded(
-                          child: Stack(
-                            children: [
-                              // Chat messages area (base layer)
-                              Positioned.fill(
-                                child: _isLoading
-                                    ? const Center(
-                                        child: CircularProgressIndicator())
-                                    : _buildChatMessagesArea(chatSession),
+                      // Use Expanded to make the Stack fill the remaining space
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            // Chat messages area (base layer)
+                            Positioned.fill(
+                              child: _isLoading
+                                  ? const Center(
+                                      child: CircularProgressIndicator())
+                                  : _buildChatMessagesArea(chatSession),
+                            ),
+
+                            // Optional prompt selector panel (overlay)
+                            if (_showPrompts)
+                              Positioned(
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                child: Material(
+                                  elevation: 2,
+                                  child: AnimatedSize(
+                                    duration: const Duration(milliseconds: 200),
+                                    child: PromptSelector(
+                                      prompts: chatSession.availablePrompts,
+                                      selectedPrompt:
+                                          chatSession.selectedPrompt,
+                                      onPromptSelected: (prompt) {
+                                        chatSession.selectedPrompt = prompt;
+                                      },
+                                      onApplyPrompt: () {
+                                        chatSession.applySelectedPrompt();
+                                        // Show a confirmation
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Applied prompt: ${chatSession.selectedPrompt?.name}',
+                                            ),
+                                            duration:
+                                                const Duration(seconds: 2),
+                                          ),
+                                        );
+                                      },
+                                      enabled: !chatSession.isGenerating,
+                                    ),
+                                  ),
+                                ),
                               ),
 
-                              // Optional prompt selector panel (overlay)
-                              if (_showPrompts)
-                                Positioned(
-                                  top: 0,
-                                  left: 0,
-                                  right: 0,
-                                  child: Material(
-                                    elevation: 2,
-                                    child: AnimatedSize(
-                                      duration:
-                                          const Duration(milliseconds: 200),
-                                      child: PromptSelector(
-                                        prompts: chatSession.availablePrompts,
-                                        selectedPrompt:
-                                            chatSession.selectedPrompt,
-                                        onPromptSelected: (prompt) {
-                                          chatSession.selectedPrompt = prompt;
-                                        },
-                                        onApplyPrompt: () {
-                                          chatSession.applySelectedPrompt();
-                                          // Show a confirmation
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                'Applied prompt: ${chatSession.selectedPrompt?.name}',
-                                              ),
-                                              duration:
-                                                  const Duration(seconds: 2),
-                                            ),
-                                          );
-                                        },
-                                        enabled: !chatSession.isGenerating,
-                                      ),
+                            // Optional settings panel (overlay)
+                            if (_showSettings)
+                              Positioned(
+                                top: _showPrompts ? null : 0,
+                                left: 0,
+                                right: 0,
+                                child: Material(
+                                  elevation: 2,
+                                  child: AnimatedSize(
+                                    duration: const Duration(milliseconds: 200),
+                                    child: ChatSettingsPanel(
+                                      availableModels:
+                                          chatSession.availableModels,
+                                      selectedModelId:
+                                          chatSession.selectedModelId,
+                                      temperature: chatSession.temperature,
+                                      onModelChanged: (modelId) {
+                                        chatSession.selectedModelId = modelId;
+                                      },
+                                      onTemperatureChanged: (value) {
+                                        chatSession.temperature = value;
+                                      },
+                                      enabled: !chatSession.isGenerating,
                                     ),
                                   ),
                                 ),
-
-                              // Optional settings panel (overlay)
-                              if (_showSettings)
-                                Positioned(
-                                  top: _showPrompts ? null : 0,
-                                  left: 0,
-                                  right: 0,
-                                  child: Material(
-                                    elevation: 2,
-                                    child: AnimatedSize(
-                                      duration:
-                                          const Duration(milliseconds: 200),
-                                      child: ChatSettingsPanel(
-                                        availableModels:
-                                            chatSession.availableModels,
-                                        selectedModelId:
-                                            chatSession.selectedModelId,
-                                        temperature: chatSession.temperature,
-                                        onModelChanged: (modelId) {
-                                          chatSession.selectedModelId = modelId;
-                                        },
-                                        onTemperatureChanged: (value) {
-                                          chatSession.temperature = value;
-                                        },
-                                        enabled: !chatSession.isGenerating,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
+                              ),
+                          ],
                         ),
+                      ),
 
-                        // Input area
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ChatInputField(
-                            onSubmit: _sendMessage,
-                            enabled: !chatSession.isGenerating,
-                            placeholder: chatSession.isGenerating
-                                ? 'Waiting for response...'
-                                : 'Type a message...',
-                          ),
+                      // Input area
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ChatInputField(
+                          onSubmit: _sendMessage,
+                          enabled: !chatSession.isGenerating,
+                          placeholder: chatSession.isGenerating
+                              ? 'Waiting for response...'
+                              : 'Type a message...',
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -472,6 +468,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
 
   /// Handle when a chat session is selected from the sidebar
   void _handleSessionSelected(ChatSessionModel sessionModel) {
+    final chatSession = Provider.of<ChatSession>(context, listen: false);
     setState(() {
       _isLoading = false;
       _activeSessionTitle = sessionModel.title;
@@ -486,7 +483,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
     );
 
     // Load the session content
-    _chatSession.loadFromSessionModel(sessionModel);
+    chatSession.loadFromSessionModel(sessionModel);
 
     // Auto-scroll to the bottom after loading the session
     _scrollToBottom();

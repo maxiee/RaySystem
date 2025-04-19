@@ -6,6 +6,7 @@ import 'package:raysystem_flutter/commands.dart';
 import 'package:raysystem_flutter/component/status_bar/status_bar.dart';
 import 'package:raysystem_flutter/component/system_metrics_provider.dart';
 import 'package:raysystem_flutter/module/note/providers/notes_provider.dart';
+import 'package:raysystem_flutter/module/llm/models/chat_session.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
@@ -26,6 +27,7 @@ void main() async {
       ChangeNotifierProvider(create: (_) => ThemeNotifier()),
       ChangeNotifierProvider(create: (_) => SystemMetricsProvider()),
       ChangeNotifierProvider(create: (_) => NotesProvider()),
+      ChangeNotifierProvider(create: (_) => ChatSession()), // 全局注入 ChatSession
     ],
     child: const MyApp(),
   ));
