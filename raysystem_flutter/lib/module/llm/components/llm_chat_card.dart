@@ -4,10 +4,13 @@ import 'package:provider/provider.dart';
 import '../../../api/api.dart';
 import '../api/llm_service.dart';
 import '../models/chat_session.dart';
+import '../models/chat_session_model.dart';
+import '../models/chat_session_management.dart';
 import 'chat_input_field.dart';
 import 'chat_message_bubble.dart';
 import 'chat_settings_panel.dart';
 import 'prompt_selector.dart';
+import 'chat_sessions_sidebar.dart';
 
 /// A card widget that displays an LLM chat interface
 class LLMChatCard extends StatefulWidget {
@@ -22,7 +25,9 @@ class _LLMChatCardState extends State<LLMChatCard> {
   late ChatSession _chatSession;
   bool _showSettings = false;
   bool _showPrompts = false; // Toggle for prompt selector visibility
+  bool _showSessionsSidebar = false; // Toggle for sessions sidebar visibility
   bool _isLoading = true;
+  int? _activeSessionId; // Currently loaded session ID
 
   final ScrollController _scrollController = ScrollController();
 
@@ -167,11 +172,14 @@ class _LLMChatCardState extends State<LLMChatCard> {
 
   /// Build the header with title and settings toggle
   Widget _buildHeader(BuildContext context) {
+    final sessionTitle =
+        _activeSessionId != null ? 'Session #$_activeSessionId' : 'LLM Chat';
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
         children: [
-          // Card title
+          // Card title with session indicator if applicable
           Icon(
             Icons.chat,
             size: 20,
@@ -179,10 +187,22 @@ class _LLMChatCardState extends State<LLMChatCard> {
           ),
           const SizedBox(width: 8),
           Text(
-            'LLM Chat',
+            sessionTitle,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const Spacer(),
+
+          // Session management button (only shown when sidebar is hidden)
+          if (!_showSessionsSidebar)
+            IconButton(
+              icon: const Icon(Icons.folder_outlined, size: 20),
+              onPressed: () {
+                setState(() {
+                  _showSessionsSidebar = true;
+                });
+              },
+              tooltip: 'Manage chat sessions',
+            ),
 
           // Prompt templates toggle
           IconButton(
@@ -220,6 +240,8 @@ class _LLMChatCardState extends State<LLMChatCard> {
                 : () {
                     setState(() {
                       _chatSession.clearMessages();
+                      // Clear active session ID when clearing conversation
+                      _activeSessionId = null;
                     });
                   },
             tooltip: 'Clear conversation',
@@ -244,99 +266,148 @@ class _LLMChatCardState extends State<LLMChatCard> {
             clipBehavior: Clip.antiAlias,
             child: SizedBox(
               height: 500, // Fixed height to prevent unbounded height error
-              child: Column(
-                mainAxisSize:
-                    MainAxisSize.min, // Set to min to avoid flex issues
+              child: Row(
                 children: [
-                  // Header
-                  _buildHeader(context),
+                  // Chat Session Management Sidebar
+                  if (_showSessionsSidebar)
+                    ChatSessionsSidebar(
+                      llmApi: llmApi,
+                      onSessionSelected: _handleSessionSelected,
+                      onSidebarToggle: (show) =>
+                          setState(() => _showSessionsSidebar = show),
+                      isOpen: _showSessionsSidebar,
+                      currentChatSession: _chatSession,
+                    )
+                  else
+                    // Just the toggle handle when sidebar is closed
+                    InkWell(
+                      onTap: () => setState(() => _showSessionsSidebar = true),
+                      child: Container(
+                        width: 24,
+                        decoration: BoxDecoration(
+                          border: Border(
+                              right: BorderSide(
+                                  color: Theme.of(context).dividerColor)),
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Icon(
+                              Icons.chevron_right,
+                              size: 20,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
 
-                  // Divider
-                  const Divider(height: 1),
-
-                  // Use Expanded to make the Stack fill the remaining space
+                  // Main Chat Area
                   Expanded(
-                    child: Stack(
+                    child: Column(
+                      mainAxisSize:
+                          MainAxisSize.min, // Set to min to avoid flex issues
                       children: [
-                        // Chat messages area (base layer)
-                        Positioned.fill(
-                          child: _isLoading
-                              ? const Center(child: CircularProgressIndicator())
-                              : _buildChatMessagesArea(chatSession),
+                        // Header
+                        _buildHeader(context),
+
+                        // Divider
+                        const Divider(height: 1),
+
+                        // Use Expanded to make the Stack fill the remaining space
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              // Chat messages area (base layer)
+                              Positioned.fill(
+                                child: _isLoading
+                                    ? const Center(
+                                        child: CircularProgressIndicator())
+                                    : _buildChatMessagesArea(chatSession),
+                              ),
+
+                              // Optional prompt selector panel (overlay)
+                              if (_showPrompts)
+                                Positioned(
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  child: Material(
+                                    elevation: 2,
+                                    child: AnimatedSize(
+                                      duration:
+                                          const Duration(milliseconds: 200),
+                                      child: PromptSelector(
+                                        prompts: chatSession.availablePrompts,
+                                        selectedPrompt:
+                                            chatSession.selectedPrompt,
+                                        onPromptSelected: (prompt) {
+                                          chatSession.selectedPrompt = prompt;
+                                        },
+                                        onApplyPrompt: () {
+                                          chatSession.applySelectedPrompt();
+                                          // Show a confirmation
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                'Applied prompt: ${chatSession.selectedPrompt?.name}',
+                                              ),
+                                              duration:
+                                                  const Duration(seconds: 2),
+                                            ),
+                                          );
+                                        },
+                                        enabled: !chatSession.isGenerating,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                              // Optional settings panel (overlay)
+                              if (_showSettings)
+                                Positioned(
+                                  top: _showPrompts ? null : 0,
+                                  left: 0,
+                                  right: 0,
+                                  child: Material(
+                                    elevation: 2,
+                                    child: AnimatedSize(
+                                      duration:
+                                          const Duration(milliseconds: 200),
+                                      child: ChatSettingsPanel(
+                                        availableModels:
+                                            chatSession.availableModels,
+                                        selectedModelId:
+                                            chatSession.selectedModelId,
+                                        temperature: chatSession.temperature,
+                                        onModelChanged: (modelId) {
+                                          chatSession.selectedModelId = modelId;
+                                        },
+                                        onTemperatureChanged: (value) {
+                                          chatSession.temperature = value;
+                                        },
+                                        enabled: !chatSession.isGenerating,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
 
-                        // Optional prompt selector panel (overlay)
-                        if (_showPrompts)
-                          Positioned(
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            child: Material(
-                              elevation: 2,
-                              child: AnimatedSize(
-                                duration: const Duration(milliseconds: 200),
-                                child: PromptSelector(
-                                  prompts: chatSession.availablePrompts,
-                                  selectedPrompt: chatSession.selectedPrompt,
-                                  onPromptSelected: (prompt) {
-                                    chatSession.selectedPrompt = prompt;
-                                  },
-                                  onApplyPrompt: () {
-                                    chatSession.applySelectedPrompt();
-                                    // Show a confirmation
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Applied prompt: ${chatSession.selectedPrompt?.name}',
-                                        ),
-                                        duration: const Duration(seconds: 2),
-                                      ),
-                                    );
-                                  },
-                                  enabled: !chatSession.isGenerating,
-                                ),
-                              ),
-                            ),
+                        // Input area
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ChatInputField(
+                            onSubmit: _sendMessage,
+                            enabled: !chatSession.isGenerating,
+                            placeholder: chatSession.isGenerating
+                                ? 'Waiting for response...'
+                                : 'Type a message...',
                           ),
-
-                        // Optional settings panel (overlay)
-                        if (_showSettings)
-                          Positioned(
-                            top: _showPrompts ? null : 0,
-                            left: 0,
-                            right: 0,
-                            child: Material(
-                              elevation: 2,
-                              child: AnimatedSize(
-                                duration: const Duration(milliseconds: 200),
-                                child: ChatSettingsPanel(
-                                  availableModels: chatSession.availableModels,
-                                  selectedModelId: chatSession.selectedModelId,
-                                  temperature: chatSession.temperature,
-                                  onModelChanged: (modelId) {
-                                    chatSession.selectedModelId = modelId;
-                                  },
-                                  onTemperatureChanged: (value) {
-                                    chatSession.temperature = value;
-                                  },
-                                  enabled: !chatSession.isGenerating,
-                                ),
-                              ),
-                            ),
-                          ),
+                        ),
                       ],
-                    ),
-                  ),
-
-                  // Input area
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ChatInputField(
-                      onSubmit: _sendMessage,
-                      enabled: !chatSession.isGenerating,
-                      placeholder: chatSession.isGenerating
-                          ? 'Waiting for response...'
-                          : 'Type a message...',
                     ),
                   ),
                 ],
@@ -398,5 +469,27 @@ class _LLMChatCardState extends State<LLMChatCard> {
         ],
       ),
     );
+  }
+
+  /// Handle when a chat session is selected from the sidebar
+  void _handleSessionSelected(ChatSessionModel sessionModel) {
+    setState(() {
+      _isLoading = false;
+      _activeSessionId = sessionModel.id;
+    });
+
+    // Update the UI title to reflect the selected session
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Loaded chat session: ${sessionModel.title}'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+
+    // Load the session content
+    _chatSession.loadFromSessionModel(sessionModel);
+
+    // Auto-scroll to the bottom after loading the session
+    _scrollToBottom();
   }
 }

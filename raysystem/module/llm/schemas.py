@@ -67,7 +67,7 @@ class ChatSessionBase(BaseModel):
     """Base schema for chat sessions."""
 
     title: str
-    model_name: str
+    model_name: Optional[str] = ""
     content_json: str
 
 

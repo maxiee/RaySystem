@@ -25,7 +25,7 @@ class ChatSession extends ChangeNotifier {
   ChatPrompt? _selectedPrompt;
 
   /// List of available prompts
-  List<ChatPrompt> _availablePrompts = ChatPromptService.getAllPrompts();
+  final List<ChatPrompt> _availablePrompts = ChatPromptService.getAllPrompts();
 
   /// Cancel token for active streaming requests
   CancelToken? _streamCancelToken;
@@ -153,7 +153,7 @@ class ChatSession extends ChangeNotifier {
     if (_messages.isNotEmpty && _messages.last.role == 'assistant') {
       final index = _messages.length - 1;
       final lastMessage = _messages[index];
-      
+
       // Create a copy of the message with isGenerating set to false
       // If updateContent is false, keep the existing content to avoid duplication
       _messages[index] = lastMessage.copyWith(
@@ -161,7 +161,7 @@ class ChatSession extends ChangeNotifier {
         // No need to provide content when updateContent is false
         // When updateContent is true, using the existing content (no change)
       );
-      
+
       _isGenerating = false;
       _streamCancelToken = null; // Clear the cancel token when complete
       notifyListeners();

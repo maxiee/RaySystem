@@ -47,6 +47,7 @@ dependencies:
     path: ./api
   highlight: ^0.7.0
   window_manager: ^0.4.3
+  infinite_scroll_pagination: ^5.0.0
 
 dev_dependencies:
   flutter_test:
