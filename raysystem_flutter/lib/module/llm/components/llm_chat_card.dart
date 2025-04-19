@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +6,7 @@ import '../../../api/api.dart';
 import '../api/llm_service.dart';
 import '../models/chat_session.dart';
 import '../models/chat_session_model.dart';
+import 'package:openapi/openapi.dart'; // Import for ChatSessionUpdate
 import 'chat_header.dart';
 import 'chat_input_field.dart';
 import 'chat_messages_area.dart';
@@ -27,6 +29,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
   bool _showSessionsSidebar = false; // Toggle for sessions sidebar visibility
   bool _isLoading = true;
   String? _activeSessionTitle; // 当前会话标题
+  int? _activeSessionId; // 当前会话ID
 
   final ScrollController _scrollController = ScrollController();
 
@@ -136,7 +139,52 @@ class _LLMChatCardState extends State<LLMChatCard> {
         chatSession.completeLastAssistantMessage(updateContent: false);
         // Scroll to bottom after response
         _scrollToBottom();
+
+        // Auto-save the chat session after successful response
+        if (_activeSessionId != null) {
+          _autoSaveCurrentSession();
+        }
       }
+    }
+  }
+
+  /// Automatically save the current chat session after a successful response
+  Future<void> _autoSaveCurrentSession() async {
+    // Only attempt to save if we have an active session ID
+    if (_activeSessionId == null) return;
+
+    final chatSession = Provider.of<ChatSession>(context, listen: false);
+    if (chatSession.messages.isEmpty) return; // No messages to save
+
+    try {
+      // Prepare the current session's content JSON
+      final contentJson = jsonEncode(chatSession.messages
+          .map((msg) => {
+                'role': msg.role,
+                'content': msg.content,
+                'timestamp': msg.timestamp.toIso8601String(),
+              })
+          .toList());
+
+      // Create update request body
+      final request = ChatSessionUpdate((b) {
+        b.contentJson = contentJson;
+      });
+
+      // Send API request
+      final response =
+          await llmApi.updateChatSessionLlmChatSessionsSessionIdPut(
+        sessionId: _activeSessionId!,
+        chatSessionUpdate: request,
+      );
+
+      if (response.data != null) {
+        // Show subtle auto-save indication (optional)
+        debugPrint('Auto-saved chat session: ${_activeSessionTitle}');
+      }
+    } catch (e) {
+      debugPrint('Auto-save failed: ${e.toString()}');
+      // Silent failure for auto-save to avoid disrupting user experience
     }
   }
 
@@ -376,6 +424,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
     setState(() {
       _isLoading = false;
       _activeSessionTitle = sessionModel.title;
+      _activeSessionId = sessionModel.id; // Store the session ID
     });
 
     // Update the UI title to reflect the selected session
