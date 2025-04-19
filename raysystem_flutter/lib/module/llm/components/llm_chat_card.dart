@@ -5,8 +5,9 @@ import '../../../api/api.dart';
 import '../api/llm_service.dart';
 import '../models/chat_session.dart';
 import '../models/chat_session_model.dart';
+import 'chat_header.dart';
 import 'chat_input_field.dart';
-import 'chat_message_bubble.dart';
+import 'chat_messages_area.dart';
 import 'chat_settings_panel.dart';
 import 'prompt_selector.dart';
 import 'chat_sessions_sidebar.dart';
@@ -170,86 +171,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
     );
   }
 
-  /// Build the header with title and settings toggle
-  Widget _buildHeader(BuildContext context) {
-    final chatSession = Provider.of<ChatSession>(context);
-    final sessionTitle =
-        _activeSessionTitle != null ? _activeSessionTitle! : 'LLM Chat';
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Row(
-        children: [
-          // Card title with session indicator if applicable
-          Icon(
-            Icons.chat,
-            size: 20,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            sessionTitle,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const Spacer(),
-
-          // Session management button (only shown when sidebar is hidden)
-          if (!_showSessionsSidebar)
-            IconButton(
-              icon: const Icon(Icons.folder_outlined, size: 20),
-              onPressed: () {
-                setState(() {
-                  _showSessionsSidebar = true;
-                });
-              },
-              tooltip: 'Manage chat sessions',
-            ),
-
-          // Prompt templates toggle
-          IconButton(
-            icon: Icon(
-              _showPrompts ? Icons.psychology_outlined : Icons.psychology,
-              size: 20,
-            ),
-            onPressed: () {
-              setState(() {
-                _showPrompts = !_showPrompts;
-              });
-            },
-            tooltip: _showPrompts ? 'Hide prompts' : 'Show prompts',
-          ),
-
-          // Settings toggle
-          IconButton(
-            icon: Icon(
-              _showSettings ? Icons.settings_outlined : Icons.settings,
-              size: 20,
-            ),
-            onPressed: () {
-              setState(() {
-                _showSettings = !_showSettings;
-              });
-            },
-            tooltip: _showSettings ? 'Hide settings' : 'Show settings',
-          ),
-
-          // Clear conversation button
-          IconButton(
-            icon: const Icon(Icons.delete_outline, size: 20),
-            onPressed: chatSession.messages.isEmpty
-                ? null
-                : () {
-                    setState(() {
-                      chatSession.clearMessages();
-                      _activeSessionTitle = null;
-                    });
-                  },
-            tooltip: 'Clear conversation',
-          ),
-        ],
-      ),
-    );
-  }
+  // Using ChatHeader widget instead of _buildHeader method
 
   @override
   Widget build(BuildContext context) {
@@ -307,7 +229,36 @@ class _LLMChatCardState extends State<LLMChatCard> {
                         MainAxisSize.min, // Set to min to avoid flex issues
                     children: [
                       // Header
-                      _buildHeader(context),
+                      ChatHeader(
+                        chatSession: chatSession,
+                        sessionTitle: _activeSessionTitle,
+                        showSessionsSidebar: _showSessionsSidebar,
+                        showPrompts: _showPrompts,
+                        showSettings: _showSettings,
+                        onToggleSessionsSidebar: () {
+                          setState(() {
+                            _showSessionsSidebar = true;
+                          });
+                        },
+                        onTogglePrompts: () {
+                          setState(() {
+                            _showPrompts = !_showPrompts;
+                          });
+                        },
+                        onToggleSettings: () {
+                          setState(() {
+                            _showSettings = !_showSettings;
+                          });
+                        },
+                        onClearChat: chatSession.messages.isEmpty
+                            ? null
+                            : () {
+                                setState(() {
+                                  chatSession.clearMessages();
+                                  _activeSessionTitle = null;
+                                });
+                              },
+                      ),
 
                       // Divider
                       const Divider(height: 1),
@@ -321,7 +272,10 @@ class _LLMChatCardState extends State<LLMChatCard> {
                               child: _isLoading
                                   ? const Center(
                                       child: CircularProgressIndicator())
-                                  : _buildChatMessagesArea(chatSession),
+                                  : ChatMessagesArea(
+                                      chatSession: chatSession,
+                                      scrollController: _scrollController,
+                                    ),
                             ),
 
                             // Optional prompt selector panel (overlay)
@@ -414,57 +368,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
     );
   }
 
-  /// Build the chat messages scrollable area
-  Widget _buildChatMessagesArea(ChatSession chatSession) {
-    final messages = chatSession.messages;
-
-    return messages.isEmpty
-        ? _buildEmptyChatPlaceholder()
-        : ListView.builder(
-            controller: _scrollController,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            itemCount: messages.length,
-            itemBuilder: (context, index) {
-              return ChatMessageBubble(
-                message: messages[index],
-              );
-            },
-          );
-  }
-
-  /// Build placeholder for empty chat
-  Widget _buildEmptyChatPlaceholder() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min, // Make sure to use MainAxisSize.min
-        children: [
-          Icon(
-            Icons.chat_bubble_outline,
-            size: 48,
-            color: Theme.of(context).colorScheme.outline,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Start a conversation',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.outline,
-                ),
-          ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: Text(
-              'Type a message below to chat with an AI assistant',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Methods _buildChatMessagesArea and _buildEmptyChatPlaceholder have been refactored as separate widgets
 
   /// Handle when a chat session is selected from the sidebar
   void _handleSessionSelected(ChatSessionModel sessionModel) {
