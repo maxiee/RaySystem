@@ -138,14 +138,8 @@ class _ChatSessionsSidebarState extends State<ChatSessionsSidebar> {
     setState(() => _isLoading = true);
 
     try {
-      // 准备当前会话的内容JSON
-      final contentJson = jsonEncode(widget.currentChatSession.messages
-          .map((msg) => {
-                'role': msg.role,
-                'content': msg.content,
-                'timestamp': msg.timestamp.toIso8601String(),
-              })
-          .toList());
+      // 创建新会话时，contentJson 设为空数组
+      final contentJson = jsonEncode([]);
 
       // 创建请求体
       final request = ChatSessionCreate((b) {
@@ -176,6 +170,9 @@ class _ChatSessionsSidebarState extends State<ChatSessionsSidebar> {
           _creatingNewSession = false;
           _titleController.clear();
         });
+
+        // 通知父组件切换到新会话
+        widget.onSessionSelected(newSession);
 
         // 显示成功消息
         if (mounted) {
