@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:openapi/openapi.dart';
 
 /// Represents a chat message in the UI with additional metadata

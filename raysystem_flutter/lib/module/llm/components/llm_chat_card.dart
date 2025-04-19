@@ -5,7 +5,6 @@ import '../../../api/api.dart';
 import '../api/llm_service.dart';
 import '../models/chat_session.dart';
 import '../models/chat_session_model.dart';
-import '../models/chat_session_management.dart';
 import 'chat_input_field.dart';
 import 'chat_message_bubble.dart';
 import 'chat_settings_panel.dart';
@@ -54,7 +53,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
 
     try {
       final models = await _llmService.getAvailableModels();
-      print('Available models: $models');
+      debugPrint('Available models: $models');
 
       if (mounted) {
         setState(() {
