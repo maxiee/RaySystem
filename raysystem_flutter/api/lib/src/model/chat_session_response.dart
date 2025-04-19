@@ -24,7 +24,7 @@ abstract class ChatSessionResponse
   String get title;
 
   @BuiltValueField(wireName: r'model_name')
-  String get modelName;
+  String? get modelName;
 
   @BuiltValueField(wireName: r'content_json')
   String get contentJson;
@@ -72,11 +72,13 @@ class _$ChatSessionResponseSerializer
       object.title,
       specifiedType: const FullType(String),
     );
-    yield r'model_name';
-    yield serializers.serialize(
-      object.modelName,
-      specifiedType: const FullType(String),
-    );
+    if (object.modelName != null) {
+      yield r'model_name';
+      yield serializers.serialize(
+        object.modelName,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
     yield r'content_json';
     yield serializers.serialize(
       object.contentJson,
@@ -132,8 +134,9 @@ class _$ChatSessionResponseSerializer
         case r'model_name':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
           result.modelName = valueDes;
           break;
         case r'content_json':

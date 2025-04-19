@@ -9,7 +9,7 @@ import 'package:openapi/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **title** | **String** |  | 
-**modelName** | **String** |  | 
+**modelName** | **String** |  | [optional] 
 **contentJson** | **String** |  | 
 **id** | **int** |  | 
 **createdAt** | [**DateTime**](DateTime.md) |  | 

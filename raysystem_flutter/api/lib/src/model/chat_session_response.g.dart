@@ -10,7 +10,7 @@ class _$ChatSessionResponse extends ChatSessionResponse {
   @override
   final String title;
   @override
-  final String modelName;
+  final String? modelName;
   @override
   final String contentJson;
   @override
@@ -26,7 +26,7 @@ class _$ChatSessionResponse extends ChatSessionResponse {
 
   _$ChatSessionResponse._(
       {required this.title,
-      required this.modelName,
+      this.modelName,
       required this.contentJson,
       required this.id,
       required this.createdAt,
@@ -34,8 +34,6 @@ class _$ChatSessionResponse extends ChatSessionResponse {
       : super._() {
     BuiltValueNullFieldError.checkNotNull(
         title, r'ChatSessionResponse', 'title');
-    BuiltValueNullFieldError.checkNotNull(
-        modelName, r'ChatSessionResponse', 'modelName');
     BuiltValueNullFieldError.checkNotNull(
         contentJson, r'ChatSessionResponse', 'contentJson');
     BuiltValueNullFieldError.checkNotNull(id, r'ChatSessionResponse', 'id');
@@ -157,8 +155,7 @@ class ChatSessionResponseBuilder
         new _$ChatSessionResponse._(
           title: BuiltValueNullFieldError.checkNotNull(
               title, r'ChatSessionResponse', 'title'),
-          modelName: BuiltValueNullFieldError.checkNotNull(
-              modelName, r'ChatSessionResponse', 'modelName'),
+          modelName: modelName,
           contentJson: BuiltValueNullFieldError.checkNotNull(
               contentJson, r'ChatSessionResponse', 'contentJson'),
           id: BuiltValueNullFieldError.checkNotNull(

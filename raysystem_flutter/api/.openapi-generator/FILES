@@ -89,8 +89,3 @@ lib/src/model/validation_error.dart
 lib/src/model/validation_error_loc_inner.dart
 lib/src/serializers.dart
 pubspec.yaml
-test/chat_session_create_test.dart
-test/chat_session_response_test.dart
-test/chat_session_update_test.dart
-test/chat_sessions_api_test.dart
-test/chat_sessions_list_response_test.dart
