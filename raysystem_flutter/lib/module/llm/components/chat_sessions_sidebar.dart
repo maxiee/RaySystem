@@ -191,6 +191,69 @@ class _ChatSessionsSidebarState extends State<ChatSessionsSidebar> {
     }
   }
 
+  /// Create a new chat session with current date/time as title
+  Future<void> _createSessionWithCurrentDateTime() async {
+    setState(() => _isLoading = true);
+
+    try {
+      // Generate title with current date and time
+      final now = DateTime.now();
+      final formattedDate =
+          '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+
+      // Create empty content JSON
+      final contentJson = jsonEncode([]);
+
+      // Create request body
+      final request = ChatSessionCreate((b) {
+        b.title = formattedDate;
+        b.modelName = widget.currentChatSession.selectedModelId;
+        b.contentJson = contentJson;
+      });
+
+      // Send API request
+      final response = await widget.llmApi.createChatSessionLlmChatSessionsPost(
+        chatSessionCreate: request,
+      );
+
+      if (response.data != null) {
+        // Create new session model
+        final newSession = ChatSessionModel(
+          id: response.data!.id,
+          title: response.data!.title,
+          modelName: response.data?.modelName ?? '',
+          contentJson: response.data!.contentJson,
+          createdAt: DateTime.parse(response.data!.createdAt.toString()),
+          updatedAt: DateTime.parse(response.data!.updatedAt.toString()),
+        );
+
+        setState(() {
+          _chatSessions.insert(0, newSession);
+          _selectedSessionId = newSession.id;
+        });
+
+        // Notify parent component
+        widget.onSessionSelected(newSession);
+
+        // Show success message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('New chat session created'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      _showErrorSnackbar('Failed to create chat session: ${e.toString()}');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   /// Delete a chat session
   Future<void> _deleteChatSession(int sessionId) async {
     // 显示确认对话框
@@ -507,10 +570,38 @@ class _ChatSessionsSidebarState extends State<ChatSessionsSidebar> {
       ),
       selected: isSelected,
       selectedTileColor: theme.colorScheme.secondaryContainer,
-      trailing: IconButton(
-        icon: const Icon(Icons.delete_outline, size: 18),
-        onPressed: () => _deleteChatSession(session.id),
-        tooltip: 'Delete session',
+      trailing: PopupMenuButton<String>(
+        icon: const Icon(Icons.more_vert, size: 20),
+        tooltip: 'Options',
+        itemBuilder: (context) => [
+          const PopupMenuItem(
+            value: 'rename',
+            child: Row(
+              children: [
+                Icon(Icons.edit, size: 18),
+                SizedBox(width: 8),
+                Text('Rename'),
+              ],
+            ),
+          ),
+          const PopupMenuItem(
+            value: 'delete',
+            child: Row(
+              children: [
+                Icon(Icons.delete_outline, size: 18),
+                SizedBox(width: 8),
+                Text('Delete'),
+              ],
+            ),
+          ),
+        ],
+        onSelected: (value) {
+          if (value == 'rename') {
+            _renameSession(session.id, session.title);
+          } else if (value == 'delete') {
+            _deleteChatSession(session.id);
+          }
+        },
       ),
       onTap: () => _loadChatSession(session),
     );
@@ -594,7 +685,7 @@ class _ChatSessionsSidebarState extends State<ChatSessionsSidebar> {
         children: [
           Expanded(
             child: ElevatedButton.icon(
-              onPressed: () => setState(() => _creatingNewSession = true),
+              onPressed: _isLoading ? null : _createSessionWithCurrentDateTime,
               icon: const Icon(Icons.add, size: 18),
               label: const Text('New'),
               style: ElevatedButton.styleFrom(
@@ -617,5 +708,92 @@ class _ChatSessionsSidebarState extends State<ChatSessionsSidebar> {
         ],
       ),
     );
+  }
+
+  /// Rename a chat session
+  Future<void> _renameSession(int sessionId, String currentTitle) async {
+    final TextEditingController renameController =
+        TextEditingController(text: currentTitle);
+
+    // Show rename dialog
+    final newTitle = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Rename Session'),
+        content: TextField(
+          controller: renameController,
+          decoration: const InputDecoration(
+            labelText: 'Session Title',
+            hintText: 'Enter a new name for this chat session',
+          ),
+          maxLength: 100,
+          autofocus: true,
+          textCapitalization: TextCapitalization.sentences,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(null),
+            child: const Text('CANCEL'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(renameController.text),
+            child: const Text('RENAME'),
+          ),
+        ],
+      ),
+    );
+
+    // If user cancelled or entered empty title
+    if (newTitle == null || newTitle.trim().isEmpty) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      // Create update request with new title
+      final request = ChatSessionUpdate((b) {
+        b.title = newTitle.trim();
+      });
+
+      // Send API request
+      final response =
+          await widget.llmApi.updateChatSessionLlmChatSessionsSessionIdPut(
+        sessionId: sessionId,
+        chatSessionUpdate: request,
+      );
+
+      if (response.data != null) {
+        // Update session in list
+        setState(() {
+          final index = _chatSessions.indexWhere((s) => s.id == sessionId);
+          if (index >= 0) {
+            _chatSessions[index] = ChatSessionModel(
+              id: response.data!.id,
+              title: response.data!.title,
+              modelName: response.data?.modelName ?? '',
+              contentJson: response.data!.contentJson,
+              createdAt: DateTime.parse(response.data!.createdAt.toString()),
+              updatedAt: DateTime.parse(response.data!.updatedAt.toString()),
+            );
+          }
+        });
+
+        // Show success message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Session renamed'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      _showErrorSnackbar('Failed to rename session: ${e.toString()}');
+    } finally {
+      renameController.dispose();
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 }
