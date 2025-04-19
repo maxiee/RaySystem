@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:openapi/openapi.dart';
-import '../../../api/api.dart';
 import '../models/chat_session.dart';
 import '../models/chat_session_model.dart';
-import '../models/chat_session_management.dart';
 
 /// A sidebar widget to manage chat sessions (list, create, select, delete)
 class ChatSessionsSidebar extends StatefulWidget {
@@ -84,8 +82,8 @@ class _ChatSessionsSidebarState extends State<ChatSessionsSidebar> {
       // 解析数据
       final newSessions = <ChatSessionModel>[];
 
-      if (response.data != null && response.data!.items != null) {
-        for (final item in response.data!.items!) {
+      if (response.data != null) {
+        for (final item in response.data!.items) {
           newSessions.add(ChatSessionModel(
             id: item.id,
             title: item.title,
@@ -508,7 +506,7 @@ class _ChatSessionsSidebarState extends State<ChatSessionsSidebar> {
         style: theme.textTheme.bodySmall,
       ),
       selected: isSelected,
-      selectedTileColor: theme.colorScheme.primaryContainer.withOpacity(0.2),
+      selectedTileColor: theme.colorScheme.secondaryContainer,
       trailing: IconButton(
         icon: const Icon(Icons.delete_outline, size: 18),
         onPressed: () => _deleteChatSession(session.id),
