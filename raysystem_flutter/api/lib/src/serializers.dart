@@ -18,6 +18,10 @@ import 'package:openapi/src/model/chat_completion_request.dart';
 import 'package:openapi/src/model/chat_completion_response.dart';
 import 'package:openapi/src/model/chat_message_input.dart';
 import 'package:openapi/src/model/chat_message_output.dart';
+import 'package:openapi/src/model/chat_session_create.dart';
+import 'package:openapi/src/model/chat_session_response.dart';
+import 'package:openapi/src/model/chat_session_update.dart';
+import 'package:openapi/src/model/chat_sessions_list_response.dart';
 import 'package:openapi/src/model/disk_metrics.dart';
 import 'package:openapi/src/model/http_validation_error.dart';
 import 'package:openapi/src/model/info_list.dart';
@@ -51,6 +55,10 @@ part 'serializers.g.dart';
   ChatCompletionResponse,
   ChatMessageInput,
   ChatMessageOutput,
+  ChatSessionCreate,
+  ChatSessionResponse,
+  ChatSessionUpdate,
+  ChatSessionsListResponse,
   DiskMetrics,
   HTTPValidationError,
   InfoList,

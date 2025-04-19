@@ -11,6 +11,10 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..add(ChatCompletionResponse.serializer)
       ..add(ChatMessageInput.serializer)
       ..add(ChatMessageOutput.serializer)
+      ..add(ChatSessionCreate.serializer)
+      ..add(ChatSessionResponse.serializer)
+      ..add(ChatSessionUpdate.serializer)
+      ..add(ChatSessionsListResponse.serializer)
       ..add(DiskMetrics.serializer)
       ..add(HTTPValidationError.serializer)
       ..add(InfoList.serializer)
@@ -39,6 +43,10 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(ChatMessageInput)]),
           () => new ListBuilder<ChatMessageInput>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(ChatSessionResponse)]),
+          () => new ListBuilder<ChatSessionResponse>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(DiskMetrics)]),
           () => new ListBuilder<DiskMetrics>())

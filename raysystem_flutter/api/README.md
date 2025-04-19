@@ -47,14 +47,14 @@ Please follow the [installation procedure](#installation--usage) and then run th
 import 'package:openapi/openapi.dart';
 
 
-final api = Openapi().getDefaultApi();
-final SiteCreate siteCreate = ; // SiteCreate | 
+final api = Openapi().getChatSessionsApi();
+final ChatSessionCreate chatSessionCreate = ; // ChatSessionCreate | 
 
 try {
-    final response = await api.createSiteSitesPost(siteCreate);
+    final response = await api.createChatSessionLlmChatSessionsPost_0(chatSessionCreate);
     print(response);
 } catch on DioException (e) {
-    print("Exception when calling DefaultApi->createSiteSitesPost: $e\n");
+    print("Exception when calling ChatSessionsApi->createChatSessionLlmChatSessionsPost_0: $e\n");
 }
 
 ```
@@ -65,6 +65,11 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+[*ChatSessionsApi*](doc/ChatSessionsApi.md) | [**createChatSessionLlmChatSessionsPost_0**](doc/ChatSessionsApi.md#createchatsessionllmchatsessionspost_0) | **POST** /llm/chat-sessions/ | Create Chat Session
+[*ChatSessionsApi*](doc/ChatSessionsApi.md) | [**deleteChatSessionLlmChatSessionsSessionIdDelete_0**](doc/ChatSessionsApi.md#deletechatsessionllmchatsessionssessioniddelete_0) | **DELETE** /llm/chat-sessions/{session_id} | Delete Chat Session
+[*ChatSessionsApi*](doc/ChatSessionsApi.md) | [**getChatSessionLlmChatSessionsSessionIdGet_0**](doc/ChatSessionsApi.md#getchatsessionllmchatsessionssessionidget_0) | **GET** /llm/chat-sessions/{session_id} | Get Chat Session
+[*ChatSessionsApi*](doc/ChatSessionsApi.md) | [**listChatSessionsLlmChatSessionsGet_0**](doc/ChatSessionsApi.md#listchatsessionsllmchatsessionsget_0) | **GET** /llm/chat-sessions/ | List Chat Sessions
+[*ChatSessionsApi*](doc/ChatSessionsApi.md) | [**updateChatSessionLlmChatSessionsSessionIdPut_0**](doc/ChatSessionsApi.md#updatechatsessionllmchatsessionssessionidput_0) | **PUT** /llm/chat-sessions/{session_id} | Update Chat Session
 [*DefaultApi*](doc/DefaultApi.md) | [**createSiteSitesPost**](doc/DefaultApi.md#createsitesitespost) | **POST** /sites/ | Create Site
 [*DefaultApi*](doc/DefaultApi.md) | [**deleteSiteSitesSiteIdDelete**](doc/DefaultApi.md#deletesitesitessiteiddelete) | **DELETE** /sites/{site_id} | Delete Site
 [*DefaultApi*](doc/DefaultApi.md) | [**getInfoStatsInfosStatsGet**](doc/DefaultApi.md#getinfostatsinfosstatsget) | **GET** /infos/stats | Get Info Stats
@@ -78,7 +83,12 @@ Class | Method | HTTP request | Description
 [*DefaultApi*](doc/DefaultApi.md) | [**rootGet**](doc/DefaultApi.md#rootget) | **GET** / | Root
 [*LLMApi*](doc/LLMApi.md) | [**chatCompletionEndpointLlmChatPost**](doc/LLMApi.md#chatcompletionendpointllmchatpost) | **POST** /llm/chat | Generate Chat Completion
 [*LLMApi*](doc/LLMApi.md) | [**chatStreamEndpointLlmChatStreamPost**](doc/LLMApi.md#chatstreamendpointllmchatstreampost) | **POST** /llm/chat_stream | Chat Stream Endpoint
+[*LLMApi*](doc/LLMApi.md) | [**createChatSessionLlmChatSessionsPost**](doc/LLMApi.md#createchatsessionllmchatsessionspost) | **POST** /llm/chat-sessions/ | Create Chat Session
+[*LLMApi*](doc/LLMApi.md) | [**deleteChatSessionLlmChatSessionsSessionIdDelete**](doc/LLMApi.md#deletechatsessionllmchatsessionssessioniddelete) | **DELETE** /llm/chat-sessions/{session_id} | Delete Chat Session
+[*LLMApi*](doc/LLMApi.md) | [**getChatSessionLlmChatSessionsSessionIdGet**](doc/LLMApi.md#getchatsessionllmchatsessionssessionidget) | **GET** /llm/chat-sessions/{session_id} | Get Chat Session
+[*LLMApi*](doc/LLMApi.md) | [**listChatSessionsLlmChatSessionsGet**](doc/LLMApi.md#listchatsessionsllmchatsessionsget) | **GET** /llm/chat-sessions/ | List Chat Sessions
 [*LLMApi*](doc/LLMApi.md) | [**listModelsEndpointLlmModelsGet**](doc/LLMApi.md#listmodelsendpointllmmodelsget) | **GET** /llm/models | List Available LLM Models
+[*LLMApi*](doc/LLMApi.md) | [**updateChatSessionLlmChatSessionsSessionIdPut**](doc/LLMApi.md#updatechatsessionllmchatsessionssessionidput) | **PUT** /llm/chat-sessions/{session_id} | Update Chat Session
 [*NoteTitlesApi*](doc/NoteTitlesApi.md) | [**addNoteTitleNotesNoteIdTitlesPost**](doc/NoteTitlesApi.md#addnotetitlenotesnoteidtitlespost) | **POST** /notes/{note_id}/titles | Add Note Title
 [*NoteTitlesApi*](doc/NoteTitlesApi.md) | [**deleteNoteTitleNotesTitlesTitleIdDelete**](doc/NoteTitlesApi.md#deletenotetitlenotestitlestitleiddelete) | **DELETE** /notes/titles/{title_id} | Delete Note Title
 [*NoteTitlesApi*](doc/NoteTitlesApi.md) | [**getNoteTitlesNotesNoteIdTitlesGet**](doc/NoteTitlesApi.md#getnotetitlesnotesnoteidtitlesget) | **GET** /notes/{note_id}/titles | Get Note Titles
@@ -100,6 +110,10 @@ Class | Method | HTTP request | Description
  - [ChatCompletionResponse](doc/ChatCompletionResponse.md)
  - [ChatMessageInput](doc/ChatMessageInput.md)
  - [ChatMessageOutput](doc/ChatMessageOutput.md)
+ - [ChatSessionCreate](doc/ChatSessionCreate.md)
+ - [ChatSessionResponse](doc/ChatSessionResponse.md)
+ - [ChatSessionUpdate](doc/ChatSessionUpdate.md)
+ - [ChatSessionsListResponse](doc/ChatSessionsListResponse.md)
  - [DiskMetrics](doc/DiskMetrics.md)
  - [HTTPValidationError](doc/HTTPValidationError.md)
  - [InfoList](doc/InfoList.md)

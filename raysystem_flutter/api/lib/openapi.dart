@@ -10,6 +10,7 @@ export 'package:openapi/src/auth/oauth.dart';
 export 'package:openapi/src/serializers.dart';
 export 'package:openapi/src/model/date.dart';
 
+export 'package:openapi/src/api/chat_sessions_api.dart';
 export 'package:openapi/src/api/default_api.dart';
 export 'package:openapi/src/api/llm_api.dart';
 export 'package:openapi/src/api/note_titles_api.dart';
@@ -19,6 +20,10 @@ export 'package:openapi/src/model/chat_completion_request.dart';
 export 'package:openapi/src/model/chat_completion_response.dart';
 export 'package:openapi/src/model/chat_message_input.dart';
 export 'package:openapi/src/model/chat_message_output.dart';
+export 'package:openapi/src/model/chat_session_create.dart';
+export 'package:openapi/src/model/chat_session_response.dart';
+export 'package:openapi/src/model/chat_session_update.dart';
+export 'package:openapi/src/model/chat_sessions_list_response.dart';
 export 'package:openapi/src/model/disk_metrics.dart';
 export 'package:openapi/src/model/http_validation_error.dart';
 export 'package:openapi/src/model/info_list.dart';

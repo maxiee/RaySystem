@@ -5,6 +5,11 @@ doc/ChatCompletionRequest.md
 doc/ChatCompletionResponse.md
 doc/ChatMessageInput.md
 doc/ChatMessageOutput.md
+doc/ChatSessionCreate.md
+doc/ChatSessionResponse.md
+doc/ChatSessionUpdate.md
+doc/ChatSessionsApi.md
+doc/ChatSessionsListResponse.md
 doc/DefaultApi.md
 doc/DiskMetrics.md
 doc/HTTPValidationError.md
@@ -36,6 +41,7 @@ doc/ValidationError.md
 doc/ValidationErrorLocInner.md
 lib/openapi.dart
 lib/src/api.dart
+lib/src/api/chat_sessions_api.dart
 lib/src/api/default_api.dart
 lib/src/api/llm_api.dart
 lib/src/api/note_titles_api.dart
@@ -51,6 +57,10 @@ lib/src/model/chat_completion_request.dart
 lib/src/model/chat_completion_response.dart
 lib/src/model/chat_message_input.dart
 lib/src/model/chat_message_output.dart
+lib/src/model/chat_session_create.dart
+lib/src/model/chat_session_response.dart
+lib/src/model/chat_session_update.dart
+lib/src/model/chat_sessions_list_response.dart
 lib/src/model/date.dart
 lib/src/model/disk_metrics.dart
 lib/src/model/http_validation_error.dart
@@ -79,3 +89,8 @@ lib/src/model/validation_error.dart
 lib/src/model/validation_error_loc_inner.dart
 lib/src/serializers.dart
 pubspec.yaml
+test/chat_session_create_test.dart
+test/chat_session_response_test.dart
+test/chat_session_update_test.dart
+test/chat_sessions_api_test.dart
+test/chat_sessions_list_response_test.dart
