@@ -225,191 +225,181 @@ class _LLMChatCardState extends State<LLMChatCard> {
   Widget build(BuildContext context) {
     return Consumer<ChatSession>(
       builder: (context, chatSession, _) {
-        return Card(
-          margin: EdgeInsets.zero,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(12)),
-          ),
-          elevation: 1,
-          clipBehavior: Clip.antiAlias,
-          child: SizedBox(
-            height: 500, // Fixed height to prevent unbounded height error
-            child: Row(
-              children: [
-                // Chat Session Management Sidebar
-                if (_showSessionsSidebar)
-                  ChatSessionsSidebar(
-                    llmApi: llmApi,
-                    onSessionSelected: _handleSessionSelected,
-                    onSidebarToggle: (show) =>
-                        setState(() => _showSessionsSidebar = show),
-                    isOpen: _showSessionsSidebar,
-                    currentChatSession: chatSession,
-                  )
-                else
-                  // Just the toggle handle when sidebar is closed
-                  InkWell(
-                    onTap: () => setState(() => _showSessionsSidebar = true),
-                    child: Container(
-                      width: 24,
-                      decoration: BoxDecoration(
-                        border: Border(
-                            right: BorderSide(
-                                color: Theme.of(context).dividerColor)),
-                      ),
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Icon(
-                            Icons.chevron_right,
-                            size: 20,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
+        return SizedBox(
+          height: 500, // Fixed height to prevent unbounded height error
+          child: Row(
+            children: [
+              // Chat Session Management Sidebar
+              if (_showSessionsSidebar)
+                ChatSessionsSidebar(
+                  llmApi: llmApi,
+                  onSessionSelected: _handleSessionSelected,
+                  onSidebarToggle: (show) =>
+                      setState(() => _showSessionsSidebar = show),
+                  isOpen: _showSessionsSidebar,
+                  currentChatSession: chatSession,
+                )
+              else
+                // Just the toggle handle when sidebar is closed
+                InkWell(
+                  onTap: () => setState(() => _showSessionsSidebar = true),
+                  child: Container(
+                    width: 24,
+                    decoration: BoxDecoration(
+                      border: Border(
+                          right: BorderSide(
+                              color: Theme.of(context).dividerColor)),
+                    ),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Icon(
+                          Icons.chevron_right,
+                          size: 20,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                     ),
                   ),
+                ),
 
-                // Main Chat Area
-                Expanded(
-                  child: Column(
-                    mainAxisSize:
-                        MainAxisSize.min, // Set to min to avoid flex issues
-                    children: [
-                      // Header
-                      ChatHeader(
-                        chatSession: chatSession,
-                        sessionTitle: _activeSessionTitle,
-                        showSessionsSidebar: _showSessionsSidebar,
-                        showPrompts: _showPrompts,
-                        showSettings: _showSettings,
-                        onToggleSessionsSidebar: () {
-                          setState(() {
-                            _showSessionsSidebar = true;
-                          });
-                        },
-                        onTogglePrompts: () {
-                          setState(() {
-                            _showPrompts = !_showPrompts;
-                          });
-                        },
-                        onToggleSettings: () {
-                          setState(() {
-                            _showSettings = !_showSettings;
-                          });
-                        },
-                        onClearChat: chatSession.messages.isEmpty
-                            ? null
-                            : () {
-                                setState(() {
-                                  chatSession.clearMessages();
-                                  _activeSessionTitle = null;
-                                });
-                              },
-                      ),
+              // Main Chat Area
+              Expanded(
+                child: Column(
+                  mainAxisSize:
+                      MainAxisSize.min, // Set to min to avoid flex issues
+                  children: [
+                    // Header
+                    ChatHeader(
+                      chatSession: chatSession,
+                      sessionTitle: _activeSessionTitle,
+                      showSessionsSidebar: _showSessionsSidebar,
+                      showPrompts: _showPrompts,
+                      showSettings: _showSettings,
+                      onToggleSessionsSidebar: () {
+                        setState(() {
+                          _showSessionsSidebar = true;
+                        });
+                      },
+                      onTogglePrompts: () {
+                        setState(() {
+                          _showPrompts = !_showPrompts;
+                        });
+                      },
+                      onToggleSettings: () {
+                        setState(() {
+                          _showSettings = !_showSettings;
+                        });
+                      },
+                      onClearChat: chatSession.messages.isEmpty
+                          ? null
+                          : () {
+                              setState(() {
+                                chatSession.clearMessages();
+                                _activeSessionTitle = null;
+                              });
+                            },
+                    ),
 
-                      // Divider
-                      const Divider(height: 1),
+                    // Divider
+                    const Divider(height: 1),
 
-                      // Use Expanded to make the Stack fill the remaining space
-                      Expanded(
-                        child: Stack(
-                          children: [
-                            // Chat messages area (base layer)
-                            Positioned.fill(
-                              child: _isLoading
-                                  ? const Center(
-                                      child: CircularProgressIndicator())
-                                  : ChatMessagesArea(
-                                      chatSession: chatSession,
-                                      scrollController: _scrollController,
-                                    ),
+                    // Use Expanded to make the Stack fill the remaining space
+                    Expanded(
+                      child: Stack(
+                        children: [
+                          // Chat messages area (base layer)
+                          Positioned.fill(
+                            child: _isLoading
+                                ? const Center(
+                                    child: CircularProgressIndicator())
+                                : ChatMessagesArea(
+                                    chatSession: chatSession,
+                                    scrollController: _scrollController,
+                                  ),
+                          ),
+
+                          // Optional prompt selector panel (overlay)
+                          if (_showPrompts)
+                            Positioned(
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              child: Material(
+                                elevation: 2,
+                                child: AnimatedSize(
+                                  duration: const Duration(milliseconds: 200),
+                                  child: PromptSelector(
+                                    prompts: chatSession.availablePrompts,
+                                    selectedPrompt: chatSession.selectedPrompt,
+                                    onPromptSelected: (prompt) {
+                                      chatSession.selectedPrompt = prompt;
+                                    },
+                                    onApplyPrompt: () {
+                                      chatSession.applySelectedPrompt();
+                                      // Show a confirmation
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Applied prompt: ${chatSession.selectedPrompt?.name}',
+                                          ),
+                                          duration: const Duration(seconds: 2),
+                                        ),
+                                      );
+                                    },
+                                    enabled: !chatSession.isGenerating,
+                                  ),
+                                ),
+                              ),
                             ),
 
-                            // Optional prompt selector panel (overlay)
-                            if (_showPrompts)
-                              Positioned(
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                child: Material(
-                                  elevation: 2,
-                                  child: AnimatedSize(
-                                    duration: const Duration(milliseconds: 200),
-                                    child: PromptSelector(
-                                      prompts: chatSession.availablePrompts,
-                                      selectedPrompt:
-                                          chatSession.selectedPrompt,
-                                      onPromptSelected: (prompt) {
-                                        chatSession.selectedPrompt = prompt;
-                                      },
-                                      onApplyPrompt: () {
-                                        chatSession.applySelectedPrompt();
-                                        // Show a confirmation
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              'Applied prompt: ${chatSession.selectedPrompt?.name}',
-                                            ),
-                                            duration:
-                                                const Duration(seconds: 2),
-                                          ),
-                                        );
-                                      },
-                                      enabled: !chatSession.isGenerating,
-                                    ),
+                          // Optional settings panel (overlay)
+                          if (_showSettings)
+                            Positioned(
+                              top: _showPrompts ? null : 0,
+                              left: 0,
+                              right: 0,
+                              child: Material(
+                                elevation: 2,
+                                child: AnimatedSize(
+                                  duration: const Duration(milliseconds: 200),
+                                  child: ChatSettingsPanel(
+                                    availableModels:
+                                        chatSession.availableModels,
+                                    selectedModelId:
+                                        chatSession.selectedModelId,
+                                    temperature: chatSession.temperature,
+                                    onModelChanged: (modelId) {
+                                      chatSession.selectedModelId = modelId;
+                                    },
+                                    onTemperatureChanged: (value) {
+                                      chatSession.temperature = value;
+                                    },
+                                    enabled: !chatSession.isGenerating,
                                   ),
                                 ),
                               ),
-
-                            // Optional settings panel (overlay)
-                            if (_showSettings)
-                              Positioned(
-                                top: _showPrompts ? null : 0,
-                                left: 0,
-                                right: 0,
-                                child: Material(
-                                  elevation: 2,
-                                  child: AnimatedSize(
-                                    duration: const Duration(milliseconds: 200),
-                                    child: ChatSettingsPanel(
-                                      availableModels:
-                                          chatSession.availableModels,
-                                      selectedModelId:
-                                          chatSession.selectedModelId,
-                                      temperature: chatSession.temperature,
-                                      onModelChanged: (modelId) {
-                                        chatSession.selectedModelId = modelId;
-                                      },
-                                      onTemperatureChanged: (value) {
-                                        chatSession.temperature = value;
-                                      },
-                                      enabled: !chatSession.isGenerating,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
+                            ),
+                        ],
                       ),
+                    ),
 
-                      // Input area
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ChatInputField(
-                          onSubmit: _sendMessage,
-                          enabled: !chatSession.isGenerating,
-                          placeholder: chatSession.isGenerating
-                              ? 'Waiting for response...'
-                              : 'Type a message...',
-                        ),
+                    // Input area
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ChatInputField(
+                        onSubmit: _sendMessage,
+                        enabled: !chatSession.isGenerating,
+                        placeholder: chatSession.isGenerating
+                            ? 'Waiting for response...'
+                            : 'Type a message...',
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },

@@ -444,7 +444,7 @@ class _ChatSessionsSidebarState extends State<ChatSessionsSidebar> {
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      width: 280,
+      width: 200,
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         border: Border(right: BorderSide(color: theme.dividerColor)),
@@ -556,54 +556,71 @@ class _ChatSessionsSidebarState extends State<ChatSessionsSidebar> {
     final isSelected = _selectedSessionId == session.id;
     final theme = Theme.of(context);
 
-    return ListTile(
-      title: Text(
-        session.title,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      subtitle: Text(
-        '${session.modelName} • ${_formatDate(session.updatedAt)}',
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: theme.textTheme.bodySmall,
-      ),
-      selected: isSelected,
-      selectedTileColor: theme.colorScheme.secondaryContainer,
-      trailing: PopupMenuButton<String>(
-        icon: const Icon(Icons.more_vert, size: 20),
-        tooltip: 'Options',
-        itemBuilder: (context) => [
-          const PopupMenuItem(
-            value: 'rename',
-            child: Row(
-              children: [
-                Icon(Icons.edit, size: 18),
-                SizedBox(width: 8),
-                Text('Rename'),
-              ],
-            ),
+    return Container(
+      // Wrap ListTile with a Container
+      // Apply theme-based color to the Container when selected
+      color: isSelected ? theme.colorScheme.primary.withOpacity(0.1) : null,
+      child: ListTile(
+        dense: true,
+        contentPadding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
+        title: Text(
+          session.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          // Adjust text color for better contrast on selection
+          style:
+              TextStyle(color: isSelected ? theme.colorScheme.primary : null),
+        ),
+        subtitle: Text(
+          '${session.modelName} • ${_formatDate(session.updatedAt)}',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.bodySmall?.copyWith(
+            // Adjust subtitle color for better contrast on selection
+            color:
+                isSelected ? theme.colorScheme.primary.withOpacity(0.8) : null,
           ),
-          const PopupMenuItem(
-            value: 'delete',
-            child: Row(
-              children: [
-                Icon(Icons.delete_outline, size: 18),
-                SizedBox(width: 8),
-                Text('Delete'),
-              ],
-            ),
+        ),
+        trailing: PopupMenuButton<String>(
+          icon: Icon(
+            Icons.more_vert,
+            size: 20,
+            // Adjust icon color for better contrast on selection
+            color: isSelected ? theme.colorScheme.primary : null,
           ),
-        ],
-        onSelected: (value) {
-          if (value == 'rename') {
-            _renameSession(session.id, session.title);
-          } else if (value == 'delete') {
-            _deleteChatSession(session.id);
-          }
-        },
+          tooltip: 'Options',
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'rename',
+              child: Row(
+                children: [
+                  Icon(Icons.edit, size: 18),
+                  SizedBox(width: 8),
+                  Text('Rename'),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'delete',
+              child: Row(
+                children: [
+                  Icon(Icons.delete_outline, size: 18),
+                  SizedBox(width: 8),
+                  Text('Delete'),
+                ],
+              ),
+            ),
+          ],
+          onSelected: (value) {
+            if (value == 'rename') {
+              _renameSession(session.id, session.title);
+            } else if (value == 'delete') {
+              _deleteChatSession(session.id);
+            }
+          },
+        ),
+        onTap: () => _loadChatSession(session),
       ),
-      onTap: () => _loadChatSession(session),
     );
   }
 

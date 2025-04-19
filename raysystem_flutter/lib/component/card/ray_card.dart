@@ -83,11 +83,7 @@ class RayCard extends StatelessWidget {
             ),
 
           // Content area - Ensure content padding is present
-          Padding(
-            // Use provided padding or a default
-            padding: padding ?? const EdgeInsets.all(12.0),
-            child: content,
-          ),
+          content,
 
           // Footer actions
           if (footerActions != null)
