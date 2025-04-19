@@ -7,7 +7,7 @@ from .api import router as llm_router
 
 __all__ = ["llm_router"]
 
-# Remember to include this router in your main FastAPI application:
+# Remember to include these routers in your main FastAPI application:
 #
 # from fastapi import FastAPI
 # from raysystem.module.llm import llm_router

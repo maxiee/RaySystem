@@ -1,12 +1,23 @@
 # filepath: /Volumes/ssd/Code/RaySystem/raysystem/module/llm/api.py
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 import asyncio
-from typing import AsyncGenerator
+from typing import AsyncGenerator, List, Optional
 from fastapi.responses import StreamingResponse
 from openai import OpenAIError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from module.llm.llm import LLMService
-from .schemas import ChatCompletionRequest, ChatCompletionResponse, ListModelsResponse
+from module.llm.chat_session import kChatSessionManager
+from module.db.db import get_db_session
+from .schemas import (
+    ChatCompletionRequest,
+    ChatCompletionResponse,
+    ListModelsResponse,
+    ChatSessionCreate,
+    ChatSessionUpdate,
+    ChatSessionResponse,
+    ChatSessionsListResponse,
+)
 
 from utils.config import load_config_file
 
@@ -37,6 +48,115 @@ router = APIRouter(
     prefix="/llm",
     tags=["LLM"],  # Tag for OpenAPI documentation grouping
 )
+
+
+# Chat Session CRUD Endpoints
+@router.post(
+    "/chat-sessions/", response_model=ChatSessionResponse, tags=["chat-sessions"]
+)
+async def create_chat_session(
+    chat_session: ChatSessionCreate, session: AsyncSession = Depends(get_db_session)
+):
+    """
+    Create a new chat session with the specified title, model name, and content
+    """
+    async with session:
+        new_session = await kChatSessionManager.create_chat_session(
+            title=chat_session.title,
+            model_name=chat_session.model_name,
+            content_json=chat_session.content_json,
+            session=session,
+        )
+    return ChatSessionResponse.model_validate(new_session, from_attributes=True)
+
+
+@router.get(
+    "/chat-sessions/{session_id}",
+    response_model=ChatSessionResponse,
+    tags=["chat-sessions"],
+)
+async def get_chat_session(
+    session_id: int, session: AsyncSession = Depends(get_db_session)
+):
+    """
+    Get a specific chat session by ID
+    """
+    async with session:
+        chat_session = await kChatSessionManager.get_chat_session_by_id(
+            session_id, session
+        )
+
+    if not chat_session:
+        raise HTTPException(status_code=404, detail="Chat session not found")
+
+    return ChatSessionResponse.model_validate(chat_session, from_attributes=True)
+
+
+@router.put(
+    "/chat-sessions/{session_id}",
+    response_model=ChatSessionResponse,
+    tags=["chat-sessions"],
+)
+async def update_chat_session(
+    session_id: int,
+    update_data: ChatSessionUpdate,
+    session: AsyncSession = Depends(get_db_session),
+):
+    """
+    Update an existing chat session
+    """
+    async with session:
+        updated_session = await kChatSessionManager.update_chat_session(
+            session_id=session_id, update_data=update_data, session=session
+        )
+
+    if not updated_session:
+        raise HTTPException(status_code=404, detail="Chat session not found")
+
+    return ChatSessionResponse.model_validate(updated_session, from_attributes=True)
+
+
+@router.delete(
+    "/chat-sessions/{session_id}", response_model=bool, tags=["chat-sessions"]
+)
+async def delete_chat_session(
+    session_id: int, session: AsyncSession = Depends(get_db_session)
+):
+    """
+    Delete a chat session by ID
+    """
+    async with session:
+        result = await kChatSessionManager.delete_chat_session(session_id, session)
+
+    if not result:
+        raise HTTPException(status_code=404, detail="Chat session not found")
+
+    return True
+
+
+@router.get(
+    "/chat-sessions/", response_model=ChatSessionsListResponse, tags=["chat-sessions"]
+)
+async def list_chat_sessions(
+    limit: int = Query(20, description="Maximum number of chat sessions to return"),
+    offset: int = Query(0, description="Number of chat sessions to skip"),
+    session: AsyncSession = Depends(get_db_session),
+):
+    """
+    List recently updated chat sessions sorted by update time (newest first)
+    """
+    async with session:
+        chat_sessions, total = await kChatSessionManager.get_recent_chat_sessions(
+            limit=limit, offset=offset, session=session
+        )
+
+    return ChatSessionsListResponse(
+        total=total,
+        items=[
+            ChatSessionResponse.model_validate(session, from_attributes=True)
+            for session in chat_sessions
+        ],
+    )
 
 
 @router.post("/chat_stream")

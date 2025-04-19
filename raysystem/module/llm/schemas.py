@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List, Dict, Optional
+from datetime import datetime
 
 
 class ChatMessageInput(BaseModel):
@@ -59,6 +60,47 @@ class ModelInfo(BaseModel):
     description: Optional[str] = Field(
         None, description="Optional description of the model capabilities"
     )
+
+
+# Chat Session Schemas
+class ChatSessionBase(BaseModel):
+    """Base schema for chat sessions."""
+
+    title: str
+    model_name: str
+    content_json: str
+
+
+class ChatSessionCreate(ChatSessionBase):
+    """Schema for creating a new chat session."""
+
+    pass
+
+
+class ChatSessionUpdate(BaseModel):
+    """Schema for updating an existing chat session."""
+
+    title: Optional[str] = None
+    model_name: Optional[str] = None
+    content_json: Optional[str] = None
+
+
+class ChatSessionResponse(ChatSessionBase):
+    """Schema for chat session responses."""
+
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ChatSessionsListResponse(BaseModel):
+    """Schema for listing multiple chat sessions."""
+
+    total: int
+    items: List[ChatSessionResponse]
 
 
 class ListModelsResponse(BaseModel):

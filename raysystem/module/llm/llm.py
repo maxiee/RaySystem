@@ -1,5 +1,8 @@
 import os
+from datetime import datetime
 from typing import List, Optional, Dict, Any, Tuple, Union, cast
+from sqlalchemy import select, or_, desc, func
+from sqlalchemy.ext.asyncio import AsyncSession
 from openai import AsyncOpenAI, OpenAIError
 from openai.types.chat import (
     ChatCompletionMessageParam,
@@ -13,7 +16,11 @@ from .schemas import (
     ChatCompletionResponse,
     ChatMessageOutput,
     ModelInfo,
+    ChatSessionCreate,
+    ChatSessionUpdate,
 )
+from .model import ChatSession
+from module.db.db import db_async_session
 from utils.config import load_config_file
 
 
@@ -49,6 +56,8 @@ class ModelConfig:
 
 
 class LLMService:
+    """Service for interacting with LLM APIs."""
+
     """Handles interaction with multiple OpenAI-compatible LLM services."""
 
     def __init__(
