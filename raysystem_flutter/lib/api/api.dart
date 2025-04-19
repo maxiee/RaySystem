@@ -2,11 +2,10 @@
 import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
-import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:openapi_generator_annotations/openapi_generator_annotations.dart';
 import 'package:openapi/openapi.dart' as generatedAPI;
-import 'package:built_value/serializer.dart';
 
 @Openapi(
     inputSpec: RemoteSpec(path: 'http://127.0.0.1:8000/openapi.json'),
@@ -27,65 +26,49 @@ String getBaseUrl() {
       'http://127.0.0.1:8000';
 }
 
-final api = generatedAPI.Openapi(
-  basePathOverride: getBaseUrl(),
-  dio: (() {
-    final dio = generatedAPI.Openapi(
-      basePathOverride: getBaseUrl(),
-    ).dio;
-    final apiKey = getApiKey();
-    if (apiKey != null) {
-      dio.options.headers['X-API-Key'] = apiKey;
-    }
-    return dio;
-  })(),
-).getDefaultApi();
+/// 创建并配置一个 dio 实例，可选择性地设置自定义超时
+///
+/// [longTimeout] - 是否使用较长的超时时间，适用于 LLM API 等长时间运行的请求
+Dio createConfiguredDio({bool longTimeout = false}) {
+  final dio = generatedAPI.Openapi(
+    basePathOverride: getBaseUrl(),
+  ).dio;
 
-final notesApi = generatedAPI.Openapi(
-  basePathOverride: getBaseUrl(),
-  dio: (() {
-    final dio = generatedAPI.Openapi(
-      basePathOverride: getBaseUrl(),
-    ).dio;
-    final apiKey = getApiKey();
-    if (apiKey != null) {
-      dio.options.headers['X-API-Key'] = apiKey;
-    }
-    return dio;
-  })(),
-).getNotesApi();
+  // 设置 API Key（如果存在）
+  final apiKey = getApiKey();
+  if (apiKey != null) {
+    dio.options.headers['X-API-Key'] = apiKey;
+  }
 
-final notesTitleApi = generatedAPI.Openapi(
-  basePathOverride: getBaseUrl(),
-  dio: (() {
-    final dio = generatedAPI.Openapi(
-      basePathOverride: getBaseUrl(),
-    ).dio;
-    final apiKey = getApiKey();
-    if (apiKey != null) {
-      dio.options.headers['X-API-Key'] = apiKey;
-    }
-    return dio;
-  })(),
-).getNoteTitlesApi();
-
-final llmApi = generatedAPI.Openapi(
-  basePathOverride: getBaseUrl(),
-  dio: (() {
-    final dio = generatedAPI.Openapi(
-      basePathOverride: getBaseUrl(),
-    ).dio;
-    final apiKey = getApiKey();
-    if (apiKey != null) {
-      dio.options.headers['X-API-Key'] = apiKey;
-    }
-    // 为 LLM API 设置较长的超时时间（单位：毫秒）
+  // 如果需要，设置较长的超时时间
+  if (longTimeout) {
     dio.options.connectTimeout = const Duration(milliseconds: 60000); // 60秒连接超时
     dio.options.receiveTimeout =
         const Duration(milliseconds: 240000); // 240秒接收超时
     dio.options.sendTimeout = const Duration(milliseconds: 60000); // 60秒发送超时
-    return dio;
-  })(),
+  }
+
+  return dio;
+}
+
+final api = generatedAPI.Openapi(
+  basePathOverride: getBaseUrl(),
+  dio: createConfiguredDio(),
+).getDefaultApi();
+
+final notesApi = generatedAPI.Openapi(
+  basePathOverride: getBaseUrl(),
+  dio: createConfiguredDio(),
+).getNotesApi();
+
+final notesTitleApi = generatedAPI.Openapi(
+  basePathOverride: getBaseUrl(),
+  dio: createConfiguredDio(),
+).getNoteTitlesApi();
+
+final llmApi = generatedAPI.Openapi(
+  basePathOverride: getBaseUrl(),
+  dio: createConfiguredDio(longTimeout: true),
 ).getLLMApi();
 
 /// SSE event types returned by the server
@@ -274,7 +257,7 @@ class LLMStreamClient {
       try {
         jsonData = json.decode(data);
       } catch (e) {
-        print('Error parsing event data: $e');
+        debugPrint('Error parsing event data: $e');
         // 返回原始数据，即使解析失败
       }
     }
@@ -299,10 +282,6 @@ class LLMStreamClient {
     // 过滤并映射事件为内容字符串
     final controller = StreamController<String>();
 
-    // 跟踪已发送的内容，避免重复
-    String accumulatedContent = '';
-    bool isComplete = false;
-
     sseStream.listen(
       (event) {
         // 处理内容事件
@@ -311,8 +290,7 @@ class LLMStreamClient {
         }
         // 处理完成事件 - 完成事件中可能包含完整内容，导致重复，所以要避免
         else if (event.type == SSEEventType.complete) {
-          // 标记流已完成，但不重复发送内容
-          isComplete = true;
+          // 流已完成，但不做额外处理，避免重复发送内容
         }
         // 处理错误事件
         else if (event.type == SSEEventType.error && event.error != null) {
