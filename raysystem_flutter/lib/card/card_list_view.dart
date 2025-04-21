@@ -6,46 +6,36 @@ class CardListView extends StatelessWidget {
   const CardListView({super.key});
 
   // Helper to build a single list view column
-  Widget _buildColumn(BuildContext context, List<Widget> cards, int columnIndex,
-      bool isActive) {
-    final cardManager = context.read<CardManager>(); // Use read for callbacks
+  Widget _buildColumn(
+      BuildContext context, List<Widget> cards, int columnIndex, bool isActive,
+      {bool showBorder = false}) {
+    final cardManager = context.read<CardManager>();
     final theme = Theme.of(context);
     final activeBorderColor = theme.colorScheme.primary.withOpacity(0.6);
 
     return GestureDetector(
       onTap: () {
-        // Set this column as active when tapped
         cardManager.setActiveColumn(columnIndex);
       },
       child: Container(
-        // Add a border if this column is active in dual-column mode
         decoration: BoxDecoration(
-          border:
-              isActive && cardManager.layoutMode == CardLayoutMode.dualColumn
-                  ? Border.all(color: activeBorderColor, width: 2.0)
-                  : null,
+          border: isActive && showBorder
+              ? Border.all(color: activeBorderColor, width: 2.0)
+              : null,
           borderRadius:
-              isActive && cardManager.layoutMode == CardLayoutMode.dualColumn
-                  ? BorderRadius.circular(
-                      4.0) // Optional: rounded corners for the border
-                  : null,
+              isActive && showBorder ? BorderRadius.circular(4.0) : null,
         ),
-        padding: isActive && cardManager.layoutMode == CardLayoutMode.dualColumn
-            ? const EdgeInsets.all(2.0) // Padding inside the border
+        padding: isActive && showBorder
+            ? const EdgeInsets.all(2.0)
             : EdgeInsets.zero,
         child: ListView.builder(
-          addAutomaticKeepAlives: true, // Keep state
+          addAutomaticKeepAlives: true,
           itemCount: cards.length,
           itemBuilder: (context, index) {
-            // Use a smaller vertical padding for dual column potentially
-            final verticalPadding =
-                cardManager.layoutMode == CardLayoutMode.dualColumn ? 4.0 : 8.0;
+            final verticalPadding = showBorder ? 4.0 : 8.0;
             return Padding(
               padding: EdgeInsets.symmetric(vertical: verticalPadding),
-              // KeepAliveWrapper is still useful
-              child: KeepAliveWrapper(
-                child: cards[index],
-              ),
+              child: KeepAliveWrapper(child: cards[index]),
             );
           },
         ),
@@ -55,38 +45,29 @@ class CardListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Watch for changes in CardManager (layout mode, active column, card lists)
     final cardManager = context.watch<CardManager>();
-
-    if (cardManager.layoutMode == CardLayoutMode.singleColumn) {
-      // Single Column Layout: Display only the left list
-      return _buildColumn(context, cardManager.leftCards, 0,
-          true); // Always active in single mode
-    } else {
-      // Dual Column Layout: Display left and right lists side-by-side
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
+    final columns = cardManager.columns;
+    final active = cardManager.activeColumnIndex;
+    final colCount = cardManager.columnCount;
+    // 多列布局
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: List.generate(
+        colCount,
+        (i) => Expanded(
+          child: Padding(
+            padding: i == 0 ? EdgeInsets.zero : const EdgeInsets.only(left: 8),
             child: _buildColumn(
               context,
-              cardManager.leftCards,
-              0, // Column index 0
-              cardManager.activeColumnIndex == 0, // Is active?
+              columns[i],
+              i,
+              active == i,
+              showBorder: colCount > 1,
             ),
           ),
-          const SizedBox(width: 8), // Spacer between columns
-          Expanded(
-            child: _buildColumn(
-              context,
-              cardManager.rightCards,
-              1, // Column index 1
-              cardManager.activeColumnIndex == 1, // Is active?
-            ),
-          ),
-        ],
-      );
-    }
+        ),
+      ),
+    );
   }
 }
 

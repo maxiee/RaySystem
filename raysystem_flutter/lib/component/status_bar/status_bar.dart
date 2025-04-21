@@ -130,29 +130,52 @@ class StatusBar extends StatelessWidget {
     // Watch CardManager for layout mode changes
     final cardManager = context.watch<CardManager>();
 
-    // Determine the icon based on the current layout mode
-    final layoutIcon = cardManager.layoutMode == CardLayoutMode.singleColumn
-        ? Icons.view_agenda_outlined // Icon for single column
-        : Icons.view_module_outlined; // Icon for dual column
-
-    // Create the layout toggle button
-    Widget layoutToggleButton = Tooltip(
-      message: cardManager.layoutMode == CardLayoutMode.singleColumn
-          ? 'Switch to Dual Column View'
-          : 'Switch to Single Column View',
-      child: IconButton(
-        iconSize: 16,
-        padding: EdgeInsets.zero,
-        constraints: BoxConstraints(), // Remove default padding
-        icon: Icon(layoutIcon),
-        onPressed: () {
-          final currentMode = cardManager.layoutMode;
-          cardManager.setLayoutMode(
-            currentMode == CardLayoutMode.singleColumn
-                ? CardLayoutMode.dualColumn
-                : CardLayoutMode.singleColumn,
-          );
-        },
+    // 多列切换按钮（横向排布 1/2/3/4），自适应缩放
+    Widget layoutToggleButtons = Tooltip(
+      message: '切换卡片列数',
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(4, (i) {
+            final colNum = i + 1;
+            final isActive = cardManager.columnCount == colNum;
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: TextButton(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  visualDensity: VisualDensity.compact,
+                  backgroundColor: isActive
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.surface,
+                  foregroundColor: isActive
+                      ? theme.colorScheme.onPrimary
+                      : theme.colorScheme.onSurface,
+                  minimumSize: const Size(24, 16),
+                  maximumSize: const Size(32, 20),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                    side: BorderSide(
+                      color: isActive
+                          ? theme.colorScheme.primary
+                          : theme.dividerColor,
+                      width: isActive ? 2 : 1,
+                    ),
+                  ),
+                  elevation: isActive ? 2 : 0,
+                ),
+                onPressed: () => cardManager.setColumnCount(colNum),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text('$colNum',
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+            );
+          }),
+        ),
       ),
     );
 
@@ -183,7 +206,7 @@ class StatusBar extends StatelessWidget {
             Row(children: [
               StatusBarItem(child: _buildMetricsSection(context)),
               // Add the layout toggle button here
-              StatusBarItem(child: layoutToggleButton),
+              StatusBarItem(child: layoutToggleButtons),
               StatusBarItem(child: AlwaysOnTopItem()),
               ...right.map((w) => StatusBarItem(child: w))
             ]),

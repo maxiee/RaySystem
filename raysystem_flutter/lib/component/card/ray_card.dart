@@ -32,14 +32,25 @@ class RayCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final cardManager = context
-        .watch<CardManager>(); // Access layout mode if needed for styling
-    final defaultMargin = cardManager.layoutMode == CardLayoutMode.dualColumn
-        ? const EdgeInsets.symmetric(
-            horizontal: 4,
-            vertical: 0) // Smaller horizontal margin for dual column
-        : const EdgeInsets.all(8);
-
+    final cardManager = context.watch<CardManager>();
+    // 动态 margin: 列数越多，横向 margin 越小
+    EdgeInsetsGeometry defaultMargin;
+    switch (cardManager.columnCount) {
+      case 1:
+        defaultMargin = const EdgeInsets.all(8);
+        break;
+      case 2:
+        defaultMargin = const EdgeInsets.symmetric(horizontal: 4, vertical: 0);
+        break;
+      case 3:
+        defaultMargin = const EdgeInsets.symmetric(horizontal: 2, vertical: 0);
+        break;
+      case 4:
+        defaultMargin = const EdgeInsets.symmetric(horizontal: 1, vertical: 0);
+        break;
+      default:
+        defaultMargin = const EdgeInsets.all(8);
+    }
     return Card(
       elevation: elevation ?? 1,
       margin: margin ?? defaultMargin,
