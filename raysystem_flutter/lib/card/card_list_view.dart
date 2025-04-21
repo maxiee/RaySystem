@@ -21,7 +21,9 @@ class CardListView extends StatelessWidget {
         decoration: BoxDecoration(
           border: isActive && showBorder
               ? Border.all(color: activeBorderColor, width: 2.0)
-              : null,
+              : Border.all(
+                  color: theme.colorScheme.onSurface.withOpacity(0.2),
+                  width: 1.0),
           borderRadius:
               isActive && showBorder ? BorderRadius.circular(4.0) : null,
         ),
