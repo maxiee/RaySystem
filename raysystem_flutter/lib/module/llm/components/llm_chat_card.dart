@@ -226,7 +226,7 @@ class _LLMChatCardState extends State<LLMChatCard> {
     return Consumer<ChatSession>(
       builder: (context, chatSession, _) {
         return SizedBox(
-          height: 500, // Fixed height to prevent unbounded height error
+          height: MediaQuery.of(context).size.height - 200,
           child: Row(
             children: [
               // Chat Session Management Sidebar
