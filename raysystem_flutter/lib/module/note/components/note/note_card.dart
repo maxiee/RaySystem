@@ -469,36 +469,33 @@ class _NoteCardState extends State<NoteCard> {
       );
     }
 
-    return SizedBox(
-      height: MediaQuery.of(context).size.height - 200,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Primary title area with UI enhancements
-          _buildPrimaryTitleSection(),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Primary title area with UI enhancements
+        _buildPrimaryTitleSection(),
 
-          // Secondary titles section (collapsible)
-          if (!_isNew) _buildSecondaryTitlesSection(),
+        // Secondary titles section (collapsible)
+        if (!_isNew) _buildSecondaryTitlesSection(),
 
-          const Divider(),
+        const Divider(),
 
-          // Editor area
-          Expanded(
-            child: Padding(
-              // 减少水平方向的内边距，让编辑区域更宽
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: _editorState != null && _editorScrollController != null
-                  ? CustomAppFlowyEditor(
-                      editorState: _editorState!,
-                      editorScrollController: _editorScrollController,
-                      editable: true,
-                      shrinkWrap: false,
-                    )
-                  : const Center(child: CircularProgressIndicator()),
-            ),
+        // Editor area
+        Expanded(
+          child: Padding(
+            // 减少水平方向的内边距，让编辑区域更宽
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: _editorState != null && _editorScrollController != null
+                ? CustomAppFlowyEditor(
+                    editorState: _editorState!,
+                    editorScrollController: _editorScrollController,
+                    editable: true,
+                    shrinkWrap: false,
+                  )
+                : const Center(child: CircularProgressIndicator()),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

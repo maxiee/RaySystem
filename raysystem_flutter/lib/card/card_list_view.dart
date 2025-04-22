@@ -28,10 +28,13 @@ class CardListView extends StatelessWidget {
 
       if (isMinimized) {
         // Minimized cards just take their minimal space
-        columnChildren.add(Padding(
-          padding: EdgeInsets.symmetric(
-              vertical: showBorder ? 1.0 : 1.0), // Minimal padding
-          child: cardWidget,
+        columnChildren.add(Flexible(
+          fit: FlexFit.tight,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+                vertical: showBorder ? 1.0 : 1.0), // Minimal padding
+            child: cardWidget,
+          ),
         ));
       } else {
         // Maximized cards

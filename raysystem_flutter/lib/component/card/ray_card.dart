@@ -67,66 +67,70 @@ class RayCard extends StatelessWidget {
       elevation: elevation ?? 1,
       margin: margin ?? defaultMargin,
       color: color ?? theme.cardColor,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Title bar with leading and trailing actions
-          if (title != null ||
-              leadingActions != null ||
-              trailingActions != null)
-            Container(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
-              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-              child: Row(
-                children: [
-                  if (leadingActions != null) ...[
-                    ...leadingActions!,
-                    const SizedBox(width: 8),
-                  ],
-                  if (title != null)
-                    Expanded(
-                      child: DefaultTextStyle(
-                        style: theme.textTheme.titleSmall ?? TextStyle(),
-                        textAlign: TextAlign.center,
-                        child: title!,
-                      ),
-                    ),
-
-                  // Spacer to push trailing actions right if no title but leading actions exist
-                  if (title == null && leadingActions != null) Spacer(),
-                  if (trailingActions != null) ...[
-                    // Add spacer only if title or leading actions are present
-                    if (title != null || leadingActions != null)
+      child: Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Title bar with leading and trailing actions
+            if (title != null ||
+                leadingActions != null ||
+                trailingActions != null)
+              Container(
+                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                child: Row(
+                  children: [
+                    if (leadingActions != null) ...[
+                      ...leadingActions!,
                       const SizedBox(width: 8),
-                    ...trailingActions!,
+                    ],
+                    if (title != null)
+                      Expanded(
+                        child: DefaultTextStyle(
+                          style: theme.textTheme.titleSmall ?? TextStyle(),
+                          textAlign: TextAlign.center,
+                          child: title!,
+                        ),
+                      ),
+
+                    // Spacer to push trailing actions right if no title but leading actions exist
+                    if (title == null && leadingActions != null) Spacer(),
+                    if (trailingActions != null) ...[
+                      // Add spacer only if title or leading actions are present
+                      if (title != null || leadingActions != null)
+                        const SizedBox(width: 8),
+                      ...trailingActions!,
+                    ],
                   ],
-                ],
+                ),
+              ),
+
+            // Content area - Only show if not minimized
+            // We use Visibility instead of conditional rendering to maintain state
+            Expanded(
+              child: Visibility(
+                // Check if this card is minimized by finding its key and checking state
+                visible: !_isCardMinimized(context),
+                // Maintain state even when not visible
+                maintainState: true,
+                // Content
+                child: content,
               ),
             ),
 
-          // Content area - Only show if not minimized
-          // We use Visibility instead of conditional rendering to maintain state
-          Visibility(
-            // Check if this card is minimized by finding its key and checking state
-            visible: !_isCardMinimized(context),
-            // Maintain state even when not visible
-            maintainState: true,
-            // Content
-            child: content,
-          ),
-
-          // Footer actions - Only show if not minimized
-          if (footerActions != null && !_isCardMinimized(context))
-            Padding(
-              padding:
-                  const EdgeInsets.fromLTRB(12, 0, 12, 8), // Padding for footer
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: footerActions!,
+            // Footer actions - Only show if not minimized
+            if (footerActions != null && !_isCardMinimized(context))
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                    12, 0, 12, 8), // Padding for footer
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: footerActions!,
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
