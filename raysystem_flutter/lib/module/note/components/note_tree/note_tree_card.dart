@@ -39,42 +39,41 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Tree View
-        Expanded(
-          child: Stack(
-            children: [
-              NoteTreeViewClassic(
-                key: _controller.treeViewKey, // Use the key from the controller
-                treeService: _controller.treeService,
-                autoLoadInitialData: true,
-                onItemSelected: (item) {
-                  setState(() {
-                    _controller.handleItemSelected(item);
-                  });
-                },
-                onAddChildNote: _controller.handleAddChildNote,
-                onItemDoubleClicked: (item) => _controller
-                    .handleItemDoubleClicked(item, widget.cardManager),
-                onDeleteNote: _controller.handleDeleteNote,
-                // Connect drag and drop event handlers
-                onStartDrag: _controller.handleStartDrag,
-                onEndDrag: _controller.handleEndDrag,
-                canAcceptDrop: _controller.canAcceptDrop,
-                onDropNote: _controller.handleDrop,
-              ),
+        Stack(
+          children: [
+            NoteTreeViewClassic(
+              key: _controller.treeViewKey, // Use the key from the controller
+              treeService: _controller.treeService,
+              autoLoadInitialData: true,
+              onItemSelected: (item) {
+                setState(() {
+                  _controller.handleItemSelected(item);
+                });
+              },
+              onAddChildNote: _controller.handleAddChildNote,
+              onItemDoubleClicked: (item) =>
+                  _controller.handleItemDoubleClicked(item, widget.cardManager),
+              onDeleteNote: _controller.handleDeleteNote,
+              // Connect drag and drop event handlers
+              onStartDrag: _controller.handleStartDrag,
+              onEndDrag: _controller.handleEndDrag,
+              canAcceptDrop: _controller.canAcceptDrop,
+              onDropNote: _controller.handleDrop,
+            ),
 
-              // Show loading indicator during refresh
-              if (_controller.isRefreshing)
-                Container(
-                  color: Colors.black12,
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
+            // Show loading indicator during refresh
+            if (_controller.isRefreshing)
+              Container(
+                color: Colors.black12,
+                child: const Center(
+                  child: CircularProgressIndicator(),
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
 
         // Actions bar

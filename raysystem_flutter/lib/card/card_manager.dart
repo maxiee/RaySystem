@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:raysystem_flutter/card/card_list_view.dart';
 import 'package:raysystem_flutter/component/card/ray_card.dart';
 import 'package:raysystem_flutter/component/widgets/mac_os_buttons.dart';
 
@@ -124,20 +123,16 @@ class CardManager with ChangeNotifier {
     ];
     final card = RepaintBoundary(
       key: cardKey,
-      child: SizedBox(
-        // Keep SizedBox for potential width constraints if needed later
-        // width: double.infinity, // Width is now determined by the parent Column/Expanded
-        child: RayCard(
-          content: cardContent,
-          title: title,
-          leadingActions: allLeadingActions,
-          trailingActions: trailingActions,
-          footerActions: footerActions,
-          color: color,
-          padding: padding,
-          margin: margin, // Margin might need adjustment based on Column layout
-          elevation: elevation,
-        ),
+      child: RayCard(
+        content: cardContent,
+        title: title,
+        leadingActions: allLeadingActions,
+        trailingActions: trailingActions,
+        footerActions: footerActions,
+        color: color,
+        padding: padding,
+        margin: margin, // Margin might need adjustment based on Column layout
+        elevation: elevation,
       ),
     );
     targetList.add(card);

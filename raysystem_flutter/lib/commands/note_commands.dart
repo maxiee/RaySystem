@@ -20,11 +20,8 @@ final noteCommands = Command(
       icon: Icons.account_tree,
       callback: (context, cardManager) async {
         cardManager.addCard(
-            SizedBox(
-              height: MediaQuery.of(context).size.height - 200,
-              child: NoteTreeCard(
-                treeService: ApiNoteTreeService(notesApi: notesApi),
-              ),
+            NoteTreeCard(
+              treeService: ApiNoteTreeService(notesApi: notesApi),
             ),
             title: Text('笔记目录树'));
       },
