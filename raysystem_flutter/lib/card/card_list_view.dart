@@ -5,13 +5,59 @@ import 'package:raysystem_flutter/card/card_manager.dart';
 class CardListView extends StatelessWidget {
   const CardListView({super.key});
 
-  // Helper to build a single list view column
+  // Helper to build a single column
   Widget _buildColumn(
       BuildContext context, List<Widget> cards, int columnIndex, bool isActive,
       {bool showBorder = false}) {
     final cardManager = context.read<CardManager>();
     final theme = Theme.of(context);
     final activeBorderColor = theme.colorScheme.primary.withOpacity(0.6);
+
+    // Build the list of children for the Column, wrapping adaptive cards in Expanded
+    List<Widget> columnChildren = [];
+    for (final cardWidget in cards) {
+      // The cardWidget is expected to be the RepaintBoundary wrapping RayCard
+      final cardKey = cardWidget.key;
+      if (cardKey == null) {
+        // Should not happen if added via CardManager.addCard
+        columnChildren.add(cardWidget);
+        continue;
+      }
+
+      final isMinimized = cardManager.isCardMinimized(cardKey);
+
+      if (isMinimized) {
+        // Minimized cards just take their minimal space
+        columnChildren.add(Padding(
+          padding: EdgeInsets.symmetric(
+              vertical: showBorder ? 1.0 : 1.0), // Minimal padding
+          child: cardWidget,
+        ));
+      } else {
+        // Maximized cards
+        final isAdaptive = cardManager.isCardAdaptive(cardKey);
+        if (isAdaptive) {
+          // Adaptive cards expand
+          final flex = cardManager.getCardFlexFactor(cardKey);
+          columnChildren.add(
+            Expanded(
+                flex: flex,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: showBorder ? 1.0 : 1.0), // Minimal padding
+                  child: cardWidget,
+                )),
+          );
+        } else {
+          // Fixed-height cards take their required space
+          columnChildren.add(Padding(
+            padding: EdgeInsets.symmetric(
+                vertical: showBorder ? 1.0 : 1.0), // Minimal padding
+            child: cardWidget,
+          ));
+        }
+      }
+    }
 
     return GestureDetector(
       onTap: () {
@@ -30,16 +76,11 @@ class CardListView extends StatelessWidget {
         padding: isActive && showBorder
             ? const EdgeInsets.all(2.0)
             : EdgeInsets.zero,
-        child: ListView.builder(
-          addAutomaticKeepAlives: true,
-          itemCount: cards.length,
-          itemBuilder: (context, index) {
-            final verticalPadding = showBorder ? 2.0 : 2.0;
-            return Padding(
-              padding: EdgeInsets.symmetric(vertical: verticalPadding),
-              child: KeepAliveWrapper(child: cards[index]),
-            );
-          },
+        // Replace ListView.builder with a Column
+        child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.stretch, // Stretch cards horizontally
+          children: columnChildren,
         ),
       ),
     );
@@ -53,7 +94,7 @@ class CardListView extends StatelessWidget {
     final colCount = cardManager.columnCount;
     // 多列布局
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start, // Align columns to the top
       children: List.generate(
         colCount,
         (i) => Expanded(
@@ -71,31 +112,4 @@ class CardListView extends StatelessWidget {
       ),
     );
   }
-}
-
-/// 用于保持卡片在滑出屏幕时不被销毁的包装器
-class KeepAliveWrapper extends StatefulWidget {
-  final Widget child;
-
-  const KeepAliveWrapper({
-    Key? key,
-    required this.child,
-  }) : super(key: key);
-
-  @override
-  State<KeepAliveWrapper> createState() => _KeepAliveWrapperState();
-}
-
-class _KeepAliveWrapperState extends State<KeepAliveWrapper>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  Widget build(BuildContext context) {
-    // 必须调用 super.build
-    super.build(context);
-    return widget.child;
-  }
-
-  @override
-  // 返回 true 以保持此组件活着
-  bool get wantKeepAlive => true;
 }

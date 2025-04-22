@@ -7,6 +7,9 @@ import 'package:raysystem_flutter/component/widgets/mac_os_buttons.dart';
 const int kMinCardColumns = 1;
 const int kMaxCardColumns = 4;
 
+// Default flex factor for adaptive cards
+const int kDefaultFlexFactor = 1;
+
 class CardManager with ChangeNotifier {
   final int _maxCardsPerColumn;
   int _columnCount = 1; // 当前列数，1~4
@@ -19,6 +22,10 @@ class CardManager with ChangeNotifier {
 
   // 存储卡片是否处于最小化状态
   final Map<Key, bool> _minimizedStates = {};
+  // 存储卡片内容是否自适应高度
+  final Map<Key, bool> _isAdaptiveMap = {};
+  // 存储自适应卡片的 Flex 比例
+  final Map<Key, int> _flexFactorMap = {};
 
   CardManager({int maxCardsPerColumn = 20})
       : _maxCardsPerColumn = maxCardsPerColumn;
@@ -75,6 +82,9 @@ class CardManager with ChangeNotifier {
     EdgeInsetsGeometry? padding,
     EdgeInsetsGeometry? margin,
     double? elevation,
+    bool isContentAdaptive = true, // New: Is the content adaptive?
+    int flexFactor =
+        kDefaultFlexFactor, // New: Flex factor for adaptive content
   }) {
     final targetList = _columns[_activeColumnIndex];
     final targetMap = _keyToIndexMaps[_activeColumnIndex];
@@ -87,6 +97,9 @@ class CardManager with ChangeNotifier {
         targetMap.remove(firstCardKey);
         // 同时移除最小化状态
         _minimizedStates.remove(firstCardKey);
+        // 同时移除自适应和 Flex 状态
+        _isAdaptiveMap.remove(firstCardKey);
+        _flexFactorMap.remove(firstCardKey);
       }
       targetList.removeAt(0);
       _updateIndices(currentColumnIndex);
@@ -95,6 +108,10 @@ class CardManager with ChangeNotifier {
     final cardKey = UniqueKey();
     // 初始状态为非最小化
     _minimizedStates[cardKey] = false;
+    // 存储自适应和 Flex 状态
+    _isAdaptiveMap[cardKey] = isContentAdaptive;
+    _flexFactorMap[cardKey] = flexFactor > 0 ? flexFactor : kDefaultFlexFactor;
+
     final List<Widget> allLeadingActions = [
       MacOSCloseButton(
         onPressed: () => removeCardByKey(cardKey),
@@ -108,7 +125,8 @@ class CardManager with ChangeNotifier {
     final card = RepaintBoundary(
       key: cardKey,
       child: SizedBox(
-        width: double.infinity,
+        // Keep SizedBox for potential width constraints if needed later
+        // width: double.infinity, // Width is now determined by the parent Column/Expanded
         child: RayCard(
           content: cardContent,
           title: title,
@@ -117,7 +135,7 @@ class CardManager with ChangeNotifier {
           footerActions: footerActions,
           color: color,
           padding: padding,
-          margin: margin,
+          margin: margin, // Margin might need adjustment based on Column layout
           elevation: elevation,
         ),
       ),
@@ -154,6 +172,9 @@ class CardManager with ChangeNotifier {
       targetMap.remove(key);
       // 移除最小化状态记录
       _minimizedStates.remove(key);
+      // 移除自适应和 Flex 状态记录
+      _isAdaptiveMap.remove(key);
+      _flexFactorMap.remove(key);
       _updateIndices(location.columnIndex);
       notifyListeners();
     }
@@ -169,6 +190,9 @@ class CardManager with ChangeNotifier {
     }
     // 清空所有最小化状态
     _minimizedStates.clear();
+    // 清空自适应和 Flex 状态
+    _isAdaptiveMap.clear();
+    _flexFactorMap.clear();
     notifyListeners();
   }
 
@@ -196,6 +220,17 @@ class CardManager with ChangeNotifier {
   // 检查卡片是否处于最小化状态
   bool isCardMinimized(Key key) {
     return _minimizedStates[key] ?? false;
+  }
+
+  // 检查卡片内容是否自适应
+  bool isCardAdaptive(Key key) {
+    return _isAdaptiveMap[key] ?? true; // Default to true if not found
+  }
+
+  // 获取卡片的 Flex 比例
+  int getCardFlexFactor(Key key) {
+    return _flexFactorMap[key] ??
+        kDefaultFlexFactor; // Default to 1 if not found
   }
 
   // 最小化卡片
