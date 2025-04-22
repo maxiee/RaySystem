@@ -34,7 +34,7 @@ class CardListView extends StatelessWidget {
           addAutomaticKeepAlives: true,
           itemCount: cards.length,
           itemBuilder: (context, index) {
-            final verticalPadding = showBorder ? 4.0 : 8.0;
+            final verticalPadding = showBorder ? 2.0 : 2.0;
             return Padding(
               padding: EdgeInsets.symmetric(vertical: verticalPadding),
               child: KeepAliveWrapper(child: cards[index]),
@@ -58,7 +58,7 @@ class CardListView extends StatelessWidget {
         colCount,
         (i) => Expanded(
           child: Padding(
-            padding: i == 0 ? EdgeInsets.zero : const EdgeInsets.only(left: 8),
+            padding: i == 0 ? EdgeInsets.zero : const EdgeInsets.only(left: 2),
             child: _buildColumn(
               context,
               columns[i],

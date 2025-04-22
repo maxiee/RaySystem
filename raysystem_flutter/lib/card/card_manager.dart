@@ -17,6 +17,9 @@ class CardManager with ChangeNotifier {
   final List<Map<Key, int>> _keyToIndexMaps =
       List.generate(kMaxCardColumns, (_) => {});
 
+  // 存储卡片是否处于最小化状态
+  final Map<Key, bool> _minimizedStates = {};
+
   CardManager({int maxCardsPerColumn = 20})
       : _maxCardsPerColumn = maxCardsPerColumn;
 
@@ -82,20 +85,24 @@ class CardManager with ChangeNotifier {
       final firstCardKey = _findKeyInWidget(firstCardWidget);
       if (firstCardKey != null) {
         targetMap.remove(firstCardKey);
+        // 同时移除最小化状态
+        _minimizedStates.remove(firstCardKey);
       }
       targetList.removeAt(0);
       _updateIndices(currentColumnIndex);
     }
 
     final cardKey = UniqueKey();
+    // 初始状态为非最小化
+    _minimizedStates[cardKey] = false;
     final List<Widget> allLeadingActions = [
       MacOSCloseButton(
         onPressed: () => removeCardByKey(cardKey),
       ),
       SizedBox(width: 8),
-      MacOSMinimizeButton(onPressed: () {}),
+      MacOSMinimizeButton(onPressed: () => minimizeCard(cardKey)),
       SizedBox(width: 8),
-      MacOSMaximizeButton(onPressed: () {}),
+      MacOSMaximizeButton(onPressed: () => maximizeCard(cardKey)),
       if (leadingActions != null) ...leadingActions,
     ];
     final card = RepaintBoundary(
@@ -145,6 +152,8 @@ class CardManager with ChangeNotifier {
       final targetMap = _keyToIndexMaps[location.columnIndex];
       targetList.removeAt(location.index);
       targetMap.remove(key);
+      // 移除最小化状态记录
+      _minimizedStates.remove(key);
       _updateIndices(location.columnIndex);
       notifyListeners();
     }
@@ -158,6 +167,8 @@ class CardManager with ChangeNotifier {
     for (var map in _keyToIndexMaps) {
       map.clear();
     }
+    // 清空所有最小化状态
+    _minimizedStates.clear();
     notifyListeners();
   }
 
@@ -180,5 +191,32 @@ class CardManager with ChangeNotifier {
 
   Key? _findKeyInWidget(Widget widget) {
     return widget.key;
+  }
+
+  // 检查卡片是否处于最小化状态
+  bool isCardMinimized(Key key) {
+    return _minimizedStates[key] ?? false;
+  }
+
+  // 最小化卡片
+  void minimizeCard(Key key) {
+    if (_minimizedStates[key] != true) {
+      _minimizedStates[key] = true;
+      notifyListeners();
+    }
+  }
+
+  // 还原卡片
+  void maximizeCard(Key key) {
+    if (_minimizedStates[key] == true) {
+      _minimizedStates[key] = false;
+      notifyListeners();
+    }
+  }
+
+  // 切换卡片最小化状态
+  void toggleCardMinimized(Key key) {
+    _minimizedStates[key] = !(_minimizedStates[key] ?? false);
+    notifyListeners();
   }
 }

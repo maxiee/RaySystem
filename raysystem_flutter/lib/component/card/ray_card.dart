@@ -29,6 +29,18 @@ class RayCard extends StatelessWidget {
     this.elevation,
   });
 
+  // Helper method to check if this card is minimized
+  bool _isCardMinimized(BuildContext context) {
+    // Try to find the nearest parent key
+    final Key? parentKey =
+        context.findAncestorWidgetOfExactType<RepaintBoundary>()?.key;
+    if (parentKey != null) {
+      final cardManager = context.read<CardManager>();
+      return cardManager.isCardMinimized(parentKey);
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -37,7 +49,7 @@ class RayCard extends StatelessWidget {
     EdgeInsetsGeometry defaultMargin;
     switch (cardManager.columnCount) {
       case 1:
-        defaultMargin = const EdgeInsets.all(8);
+        defaultMargin = const EdgeInsets.all(2);
         break;
       case 2:
         defaultMargin = const EdgeInsets.symmetric(horizontal: 4, vertical: 0);
@@ -93,11 +105,19 @@ class RayCard extends StatelessWidget {
               ),
             ),
 
-          // Content area - Ensure content padding is present
-          content,
+          // Content area - Only show if not minimized
+          // We use Visibility instead of conditional rendering to maintain state
+          Visibility(
+            // Check if this card is minimized by finding its key and checking state
+            visible: !_isCardMinimized(context),
+            // Maintain state even when not visible
+            maintainState: true,
+            // Content
+            child: content,
+          ),
 
-          // Footer actions
-          if (footerActions != null)
+          // Footer actions - Only show if not minimized
+          if (footerActions != null && !_isCardMinimized(context))
             Padding(
               padding:
                   const EdgeInsets.fromLTRB(12, 0, 12, 8), // Padding for footer
