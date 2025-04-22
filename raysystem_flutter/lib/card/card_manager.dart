@@ -88,11 +88,15 @@ class CardManager with ChangeNotifier {
     }
 
     final cardKey = UniqueKey();
-    final List<Widget> allTrailingActions = [
+    final List<Widget> allLeadingActions = [
       MacOSCloseButton(
         onPressed: () => removeCardByKey(cardKey),
       ),
-      if (trailingActions != null) ...trailingActions,
+      SizedBox(width: 8),
+      MacOSMinimizeButton(onPressed: () {}),
+      SizedBox(width: 8),
+      MacOSMaximizeButton(onPressed: () {}),
+      if (leadingActions != null) ...leadingActions,
     ];
     final card = RepaintBoundary(
       key: cardKey,
@@ -101,8 +105,8 @@ class CardManager with ChangeNotifier {
         child: RayCard(
           content: cardContent,
           title: title,
-          leadingActions: leadingActions,
-          trailingActions: allTrailingActions,
+          leadingActions: allLeadingActions,
+          trailingActions: trailingActions,
           footerActions: footerActions,
           color: color,
           padding: padding,

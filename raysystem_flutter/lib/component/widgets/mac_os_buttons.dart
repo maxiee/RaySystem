@@ -33,8 +33,8 @@ class _MacOSWindowButtonState extends State<_MacOSWindowButton> {
         onTap: widget.onPressed,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
-          width: 16,
-          height: 16,
+          width: 14,
+          height: 14,
           decoration: BoxDecoration(
             color: _isHovered ? widget.hoverColor : widget.color,
             shape: BoxShape.circle,
