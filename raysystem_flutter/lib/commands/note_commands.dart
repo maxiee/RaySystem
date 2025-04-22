@@ -22,6 +22,7 @@ final noteCommands = Command(
         cardManager.addCard(
             NoteTreeCard(
               treeService: ApiNoteTreeService(notesApi: notesApi),
+              cardManager: cardManager,
             ),
             title: Text('笔记目录树'));
       },
@@ -33,10 +34,7 @@ final noteCommands = Command(
       callback: (context, cardManager) {
         // Create a new blank note card
         cardManager.addCard(
-          SizedBox(
-            height: 400,
-            child: NoteCard(),
-          ),
+          NoteCard(),
         );
       },
     ),

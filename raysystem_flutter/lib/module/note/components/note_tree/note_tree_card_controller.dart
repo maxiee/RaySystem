@@ -45,10 +45,10 @@ class NoteTreeCardController {
 
     // Add new note card to the card flow
     manager.addCard(
-      NoteCard(
-        noteId: item.id,
-      ),
-    );
+        NoteCard(
+          noteId: item.id,
+        ),
+        flexFactor: 3);
   }
 
   /// Get CardManager from context
