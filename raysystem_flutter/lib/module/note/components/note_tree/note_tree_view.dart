@@ -440,16 +440,20 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: _isInitialLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: _buildTreeNodes(_items, isLast: []),
+    return Expanded(
+      child: Container(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: _isInitialLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _buildTreeNodes(_items, isLast: []),
+                  ),
+                ),
               ),
-            ),
+      ),
     );
   }
 

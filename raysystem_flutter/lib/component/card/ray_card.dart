@@ -124,7 +124,9 @@ class RayCard extends StatelessWidget {
                 ),
 
           // Footer actions - Only show if not minimized
-          if (footerActions != null && !_isCardMinimized(context))
+          if (footerActions != null &&
+              footerActions!.isNotEmpty &&
+              !_isCardMinimized(context))
             Padding(
               padding:
                   const EdgeInsets.fromLTRB(12, 0, 12, 8), // Padding for footer
