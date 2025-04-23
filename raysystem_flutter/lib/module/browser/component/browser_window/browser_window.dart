@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:raysystem_flutter/module/browser/utils/browser_utils.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class BrowserWindow extends StatefulWidget {
@@ -39,6 +40,21 @@ class _BrowserWindowState extends State<BrowserWindow> {
         },
         onNavigationRequest: (navigationRequest) {
           debugPrint('Navigation request: $navigationRequest');
+          if (navigationRequest.url == 'about:blank') {
+            debugPrint('Blocking navigation to about:blank');
+            return NavigationDecision.prevent;
+          }
+
+          // 强制将 HTTP 请求转换为 HTTPS
+          // 如果检测到原始请求是 HTTP，就阻止这次导航
+          // 然后通过 _loadUrl() 方法重新使用 HTTPS 发起请求
+          if (navigationRequest.url.startsWith('http://')) {
+            debugPrint('Redirecting HTTP to HTTPS: ${navigationRequest.url}');
+            _loadUrl(BrowserUtils.ensureHttps(navigationRequest.url));
+            return NavigationDecision.prevent;
+          }
+
+          debugPrint('Allowing navigation to: ${navigationRequest.url}');
           return NavigationDecision.navigate;
         },
       ))
@@ -53,6 +69,11 @@ class _BrowserWindowState extends State<BrowserWindow> {
       _currentUrl = widget.initialUrl;
       _webViewController.loadRequest(Uri.parse(_currentUrl));
     }
+  }
+
+  void _loadUrl(String url) {
+    debugPrint('Loading URL: $url');
+    _webViewController.loadRequest(Uri.parse(url));
   }
 
   @override
