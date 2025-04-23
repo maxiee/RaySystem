@@ -11,35 +11,48 @@ class BrowserWindow extends StatefulWidget {
 
 class _BrowserWindowState extends State<BrowserWindow> {
   late WebViewController _webViewController;
+  late String _currentUrl;
 
   @override
   void initState() {
     super.initState();
 
+    _currentUrl = widget.initialUrl;
+
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(NavigationDelegate(
         onProgress: (progress) {
-          print('WebView is loading (progress: $progress%)');
+          debugPrint('WebView is loading (progress: $progress%)');
         },
         onPageStarted: (url) {
-          print('Page started loading: $url');
+          debugPrint('Page started loading: $url');
         },
         onPageFinished: (url) {
-          print('Page finished loading: $url');
+          debugPrint('Page finished loading: $url');
         },
         onWebResourceError: (error) {
-          print('Web resource error: $error');
+          debugPrint('Web resource error: $error');
         },
         onHttpError: (error) {
-          print('HTTP error: $error');
+          debugPrint('HTTP error: $error');
         },
         onNavigationRequest: (navigationRequest) {
-          print('Navigation request: $navigationRequest');
+          debugPrint('Navigation request: $navigationRequest');
           return NavigationDecision.navigate;
         },
       ))
       ..loadRequest(Uri.parse(widget.initialUrl));
+  }
+
+  @override
+  void didUpdateWidget(covariant BrowserWindow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialUrl != widget.initialUrl) {
+      debugPrint('BrowserWindow URL changed: ${widget.initialUrl}');
+      _currentUrl = widget.initialUrl;
+      _webViewController.loadRequest(Uri.parse(_currentUrl));
+    }
   }
 
   @override
