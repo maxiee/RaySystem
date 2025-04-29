@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' as rivepod;
 import 'package:provider/provider.dart';
 import 'package:raysystem_flutter/card/card_list_view.dart';
 import 'package:raysystem_flutter/card/card_manager.dart';
@@ -21,7 +22,8 @@ void main() async {
     await windowManager.show();
     await windowManager.focus();
   });
-  runApp(MultiProvider(
+  runApp(rivepod.ProviderScope(
+      child: MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => CardManager(maxCardsPerColumn: 20)),
       ChangeNotifierProvider(create: (_) => ThemeNotifier()),
@@ -30,7 +32,7 @@ void main() async {
       ChangeNotifierProvider(create: (_) => ChatSession()), // 全局注入 ChatSession
     ],
     child: const MyApp(),
-  ));
+  )));
 }
 
 class MyApp extends StatelessWidget {
