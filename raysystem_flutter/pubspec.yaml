@@ -49,6 +49,8 @@ dependencies:
   window_manager: ^0.4.3
   infinite_scroll_pagination: ^5.0.0
   webview_flutter: ^4.11.0
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
 
 dev_dependencies:
   flutter_test:
@@ -60,8 +62,11 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
-  build_runner: ^2.4.14
+  build_runner: ^2.4.15
   openapi_generator: ^6.1.0
+  riverpod_generator: ^2.6.3
+  custom_lint: ^0.7.0
+  riverpod_lint: ^2.6.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
