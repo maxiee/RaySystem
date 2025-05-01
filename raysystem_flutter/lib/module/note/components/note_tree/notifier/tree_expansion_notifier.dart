@@ -6,58 +6,13 @@ import 'package:raysystem_flutter/module/note/components/note_tree/notifier/tree
 import 'package:raysystem_flutter/module/note/components/note_tree/provider/note_tree_service_provider.dart';
 import 'package:raysystem_flutter/module/note/model/note_tree_model.dart';
 
-/// 管理树节点展开状态的提供者
-final noteTreeExpansionProvider =
-    NotifierProvider<NoteTreeExpansionNotifier, NoteTreeExpansionState>(
-  () => NoteTreeExpansionNotifier(),
-);
-
-class NoteTreeExpansionNotifier extends Notifier<NoteTreeExpansionState> {
+class NoteTreeExpansionNotifierDeprecated
+    extends Notifier<NoteTreeExpansionState> {
   NoteTreeService get _treeService => ref.read(noteTreeServiceProvider);
 
   @override
   NoteTreeExpansionState build() {
     return const NoteTreeExpansionState();
-  }
-
-  /// 切换节点的展开/折叠状态
-  Future<void> toggleExpand(NoteTreeItem item) async {
-    if (!item.isFolder) return;
-
-    final currentExpandedIds = Set<int>.from(state.expandedFolderIds);
-    final currentLoadingIds = Set<int>.from(state.loadingFolderIds);
-    bool needsLoading = false;
-
-    if (currentExpandedIds.contains(item.id)) {
-      // 折叠
-      currentExpandedIds.remove(item.id);
-      state = state.copyWith(expandedFolderIds: currentExpandedIds);
-    } else {
-      // 展开
-      currentExpandedIds.add(item.id);
-
-      // 检查是否需要加载子节点
-      final baseNotifier = ref.read(noteTreeBaseProvider.notifier);
-      final existingItem = baseNotifier.findItemById(item.id);
-
-      // 仅当它是一个文件夹且子节点尚未加载时才加载
-      if (existingItem != null &&
-          existingItem.isFolder &&
-          existingItem.children.isEmpty) {
-        needsLoading = true;
-        currentLoadingIds.add(item.id); // 标记为正在加载
-      }
-
-      // 立即更新展开状态以提高响应性
-      state = state.copyWith(
-        expandedFolderIds: currentExpandedIds,
-        loadingFolderIds: currentLoadingIds,
-      );
-
-      if (needsLoading) {
-        await _loadChildrenAndUpdateState(item.id);
-      }
-    }
   }
 
   /// 加载子节点并更新状态
