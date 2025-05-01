@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:raysystem_flutter/module/note/components/note_tree/notifier/new/base/note_tree_provider.dart';
+import 'package:raysystem_flutter/module/note/components/note_tree/notifier/tree_state.dart';
 import 'package:raysystem_flutter/module/note/components/note_tree/painters.dart';
 import '../../model/note_tree_model.dart';
 
 /// A widget that shows a classic tree view with connecting lines
 class NoteTreeViewClassic extends ConsumerWidget {
-  /// The current list of tree items to display.
-  final List<NoteTreeItem> items;
-
   /// The ID of the currently selected item, or null if none is selected.
   final int? selectedItemId;
 
@@ -64,7 +63,6 @@ class NoteTreeViewClassic extends ConsumerWidget {
 
   const NoteTreeViewClassic({
     Key? key,
-    required this.items,
     this.selectedItemId,
     required this.expandedFolderIds,
     required this.loadingFolderIds,
@@ -132,6 +130,9 @@ class NoteTreeViewClassic extends ConsumerWidget {
   // --- Build Methods ---
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(noteTreeProvider);
+    final notifier = ref.read(noteTreeProvider.notifier);
+
     // Added WidgetRef
     // Removed _isInitialLoading check, parent handles loading state
     return Container(
@@ -141,10 +142,16 @@ class NoteTreeViewClassic extends ConsumerWidget {
         // Removed inner Expanded, Column takes needed space
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: _buildTreeNodes(context, items, isLast: []),
+          children:
+              _buildTreeNodes(context, notifier.getRootItems(), isLast: []),
         ),
       ),
     );
+  }
+
+  List<Widget> _buildNodes(
+      BuildContext context, List<NoteTreeItem> items) {
+    return items.map((item) => _)
   }
 
   /// Recursively builds the list of Widgets for the tree nodes.
@@ -181,10 +188,10 @@ class NoteTreeViewClassic extends ConsumerWidget {
   }
 
   /// Builds the UI for a single tree node, including lines, icon, text, and drag/drop wrappers.
-  Widget _buildTreeNode(BuildContext context, NoteTreeItem item,
+  Widget _buildTreeNode(BuildContext context, NoteTreeState state, NoteTreeItem item,
       {required List<bool> isLast, required bool isLastInLevel}) {
     // Determine state based on passed props
-    final bool isSelected = selectedItemId == item.id;
+    final bool isSelected = state.selectedItem?.id == item.id;
     final bool isLoading = loadingFolderIds.contains(item.id);
     // A folder *can* be expanded if it's marked as a folder.
     // The actual icon (+/-) depends on whether it *is* expanded (in expandedFolderIds).
@@ -360,8 +367,8 @@ class NoteTreeViewClassic extends ConsumerWidget {
   Widget _buildNodeContent(
     BuildContext context, {
     required NoteTreeItem item,
-    required List<bool> isLast,
-    required bool isLastInLevel,
+    required List<bool> isLast, // List of booleans indicating if ancestors are last in their level
+    required bool isLastInLevel, // If this item is the last in its level
     required bool isSelected,
     required bool isLoading,
     required bool canExpand, // If it's a folder type

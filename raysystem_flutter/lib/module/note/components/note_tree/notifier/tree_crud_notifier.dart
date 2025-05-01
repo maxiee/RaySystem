@@ -14,10 +14,10 @@ import 'package:raysystem_flutter/module/note/components/note_tree/notifier/tree
 import 'package:raysystem_flutter/module/note/components/note_tree/provider/note_tree_service_provider.dart';
 import 'package:raysystem_flutter/module/note/model/note_tree_model.dart';
 
-/// 管理笔记的CRUD操作的提供者
-final noteTreeCrudProvider = NotifierProvider<NoteTreeCrudNotifier, void>(
-  () => NoteTreeCrudNotifier(),
-);
+// /// 管理笔记的CRUD操作的提供者
+// final noteTreeCrudProvider = NotifierProvider<NoteTreeCrudNotifier, void>(
+//   () => NoteTreeCrudNotifier(),
+// );
 
 class NoteTreeCrudNotifier extends Notifier<void> {
   NotesApi get _notesApi => ref.read(notesApiProvider);

@@ -7,7 +7,7 @@ part 'note_tree_state.freezed.dart';
 @freezed
 abstract class NoteTreeState with _$NoteTreeState {
   const factory NoteTreeState({
-    NoteTreeItem? selectedItem,
+    @Default([]) List<NoteTreeItem> selectedItems,
 
     /// 所有已知笔记的映射，以ID为键
     @Default({}) Map<int, NoteTreeItem> notesMap,

@@ -4,6 +4,7 @@ import 'package:raysystem_flutter/card/card_manager.dart';
 import 'package:raysystem_flutter/form/form_field.dart';
 import 'package:raysystem_flutter/form/form_manager.dart';
 import 'package:raysystem_flutter/module/note/components/note_tree/note_tree_view.dart';
+import 'package:raysystem_flutter/module/note/components/note_tree/notifier/new/base/note_tree_provider.dart';
 import 'package:raysystem_flutter/module/note/components/note_tree/notifier/note_tree.dart';
 
 /// A card widget that displays a note tree explorer
@@ -107,132 +108,109 @@ class NoteTreeCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Added WidgetRef
-    final noteTreeAsyncValue =
-        ref.watch(noteTreeProvider); // Watch the provider state
-    final notifier =
-        ref.read(noteTreeProvider.notifier); // Get the notifier instance
+    final state = ref.watch(noteTreeProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
-          child: noteTreeAsyncValue.when(
-            data: (treeState) => Stack(
-              children: [
-                NoteTreeViewClassic(
-                  // Pass data and callbacks
-                  items: treeState.items,
-                  selectedItemId: treeState.selectedItem?.id,
-                  expandedFolderIds: treeState.expandedFolderIds,
-                  loadingFolderIds: treeState.loadingFolderIds, // Added
-                  draggedItemId: treeState.draggedItem?.id, // Added
-                  isDragging: treeState.isDragging, // Added
-                  hoveredTargetId: treeState.hoveredTargetId, // Added
-                  isHoverTargetValid: treeState.isHoverTargetValid, // Added
-                  // --- Callbacks connected to notifier ---
-                  onItemSelected: notifier.selectItem,
-                  onToggleExpand: notifier.toggleExpand,
-                  onItemDoubleClicked: (item) {
-                    // Handle double click - potentially call CardManager
-                    // Consider using ref.read for CardManager if it's a provider
-                    // final manager = cardManager ?? ProviderScope.containerOf(context).read(cardManagerProvider); // Example if CardManager is a provider - Commented out to fix error
-                    // Or handle null case if CardManager is optional and not provided
-                    // if (manager != null) {
-                    //    manager.addCard(NoteCard(noteId: item.id), flexFactor: 3);
-                    // }
-                    // TODO: Replace Provider.of with a Riverpod-friendly way to access CardManager
-                    // For now, assuming cardManager is passed or available via context extension/provider
-                    final resolvedCardManager =
-                        cardManager; // Simplified for now
-                    if (resolvedCardManager != null) {
-                      // Need to define NoteCard or import it
-                      // resolvedCardManager.addCard(NoteCard(noteId: item.id), flexFactor: 3);
-                      print("TODO: Implement opening NoteCard for ${item.id}");
+          child: Stack(
+            children: [
+              NoteTreeViewClassic(
+                // Pass data and callbacks
+                selectedItemId: treeState.selectedItem?.id,
+                expandedFolderIds: treeState.expandedFolderIds,
+                loadingFolderIds: treeState.loadingFolderIds, // Added
+                draggedItemId: treeState.draggedItem?.id, // Added
+                isDragging: treeState.isDragging, // Added
+                hoveredTargetId: treeState.hoveredTargetId, // Added
+                isHoverTargetValid: treeState.isHoverTargetValid, // Added
+                // --- Callbacks connected to notifier ---
+                onItemSelected: notifier.selectItem,
+                onToggleExpand: notifier.toggleExpand,
+                onItemDoubleClicked: (item) {
+                  // Handle double click - potentially call CardManager
+                  // Consider using ref.read for CardManager if it's a provider
+                  // final manager = cardManager ?? ProviderScope.containerOf(context).read(cardManagerProvider); // Example if CardManager is a provider - Commented out to fix error
+                  // Or handle null case if CardManager is optional and not provided
+                  // if (manager != null) {
+                  //    manager.addCard(NoteCard(noteId: item.id), flexFactor: 3);
+                  // }
+                  // TODO: Replace Provider.of with a Riverpod-friendly way to access CardManager
+                  // For now, assuming cardManager is passed or available via context extension/provider
+                  final resolvedCardManager = cardManager; // Simplified for now
+                  if (resolvedCardManager != null) {
+                    // Need to define NoteCard or import it
+                    // resolvedCardManager.addCard(NoteCard(noteId: item.id), flexFactor: 3);
+                    print("TODO: Implement opening NoteCard for ${item.id}");
+                  } else {
+                    print("CardManager not available to open NoteCard");
+                  }
+                },
+                onAddChildNote: (item) async {
+                  final formResult = await _showAddNoteDialog(context);
+                  final title = formResult?['title'] as String?;
+                  if (title != null && title.isNotEmpty) {
+                    _showLoadingDialog(context, 'Creating note...');
+                    final successId = await notifier.addChildNote(item, title);
+                    _hideLoadingDialog(context);
+                    if (successId != null) {
+                      _showSuccessSnackBar(context, 'Note "$title" created');
                     } else {
-                      print("CardManager not available to open NoteCard");
+                      _showErrorSnackBar(context, 'Failed to create note');
                     }
-                  },
-                  onAddChildNote: (item) async {
-                    final formResult = await _showAddNoteDialog(context);
-                    final title = formResult?['title'] as String?;
-                    if (title != null && title.isNotEmpty) {
-                      _showLoadingDialog(context, 'Creating note...');
-                      final successId =
-                          await notifier.addChildNote(item, title);
-                      _hideLoadingDialog(context);
-                      if (successId != null) {
-                        _showSuccessSnackBar(context, 'Note "$title" created');
-                      } else {
-                        _showErrorSnackBar(context, 'Failed to create note');
-                      }
-                    }
-                  },
-                  onDeleteNote: (item) async {
-                    final confirm =
-                        await _showDeleteConfirmDialog(context, item.name);
-                    if (confirm) {
-                      _showLoadingDialog(context, 'Deleting note...');
-                      final success = await notifier.deleteNote(item);
-                      _hideLoadingDialog(context);
-                      if (success) {
-                        _showSuccessSnackBar(
-                            context, 'Note "${item.name}" deleted');
-                      } else {
-                        _showErrorSnackBar(context, 'Failed to delete note');
-                      }
-                    }
-                  },
-                  // --- Drag and Drop Callbacks ---
-                  onStartDrag: notifier.startDrag,
-                  onEndDrag: notifier.endDrag,
-                  onHoverTarget: notifier.hoverTarget, // Added
-                  onLeaveTarget: notifier.leaveTarget, // Added
-                  onDropNote: (targetItem) async {
-                    // Renamed from onDropNote to match view
-                    _showLoadingDialog(context, 'Moving note...');
-                    final success = await notifier.moveNote(targetItem);
+                  }
+                },
+                onDeleteNote: (item) async {
+                  final confirm =
+                      await _showDeleteConfirmDialog(context, item.name);
+                  if (confirm) {
+                    _showLoadingDialog(context, 'Deleting note...');
+                    final success = await notifier.deleteNote(item);
                     _hideLoadingDialog(context);
                     if (success) {
-                      _showSuccessSnackBar(context, 'Note moved successfully');
+                      _showSuccessSnackBar(
+                          context, 'Note "${item.name}" deleted');
                     } else {
-                      _showErrorSnackBar(context, 'Failed to move note');
+                      _showErrorSnackBar(context, 'Failed to delete note');
                     }
-                  },
-                  // Removed: canAcceptDrop
-                ),
-                // Refresh Button
-                Positioned(
-                  bottom: 8, // Adjust position as needed
-                  right: 8,
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.refresh, size: 16),
-                    label: const Text('Refresh'),
-                    // Use notifier's refresh method
-                    onPressed: () => notifier.refreshTree(),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      textStyle: const TextStyle(fontSize: 12),
-                    ),
+                  }
+                },
+                // --- Drag and Drop Callbacks ---
+                onStartDrag: notifier.startDrag,
+                onEndDrag: notifier.endDrag,
+                onHoverTarget: notifier.hoverTarget, // Added
+                onLeaveTarget: notifier.leaveTarget, // Added
+                onDropNote: (targetItem) async {
+                  // Renamed from onDropNote to match view
+                  _showLoadingDialog(context, 'Moving note...');
+                  final success = await notifier.moveNote(targetItem);
+                  _hideLoadingDialog(context);
+                  if (success) {
+                    _showSuccessSnackBar(context, 'Note moved successfully');
+                  } else {
+                    _showErrorSnackBar(context, 'Failed to move note');
+                  }
+                },
+                // Removed: canAcceptDrop
+              ),
+              // Refresh Button
+              Positioned(
+                bottom: 8, // Adjust position as needed
+                right: 8,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.refresh, size: 16),
+                  label: const Text('Refresh'),
+                  // Use notifier's refresh method
+                  onPressed: () => notifier.refreshTree(),
+                  style: ElevatedButton.styleFrom(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    textStyle: const TextStyle(fontSize: 12),
                   ),
                 ),
-              ],
-            ),
-            // ... (loading and error states remain the same)
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stackTrace) => Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Error loading notes: $error'),
-                  ElevatedButton(
-                    onPressed: () => notifier.refreshTree(), // Allow retry
-                    child: const Text('Retry'),
-                  )
-                ],
               ),
-            ),
+            ],
           ),
         ),
       ],

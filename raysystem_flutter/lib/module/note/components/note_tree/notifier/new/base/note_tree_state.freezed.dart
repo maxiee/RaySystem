@@ -16,7 +16,7 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$NoteTreeState {
-  NoteTreeItem? get selectedItem => throw _privateConstructorUsedError;
+  List<NoteTreeItem> get selectedItems => throw _privateConstructorUsedError;
 
   /// 所有已知笔记的映射，以ID为键
   Map<int, NoteTreeItem> get notesMap => throw _privateConstructorUsedError;
@@ -47,7 +47,7 @@ abstract class $NoteTreeStateCopyWith<$Res> {
       _$NoteTreeStateCopyWithImpl<$Res, NoteTreeState>;
   @useResult
   $Res call(
-      {NoteTreeItem? selectedItem,
+      {List<NoteTreeItem> selectedItems,
       Map<int, NoteTreeItem> notesMap,
       Map<int, List<int>> childrenMap,
       List<int> rootIds,
@@ -70,7 +70,7 @@ class _$NoteTreeStateCopyWithImpl<$Res, $Val extends NoteTreeState>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? selectedItem = freezed,
+    Object? selectedItems = null,
     Object? notesMap = null,
     Object? childrenMap = null,
     Object? rootIds = null,
@@ -78,10 +78,10 @@ class _$NoteTreeStateCopyWithImpl<$Res, $Val extends NoteTreeState>
     Object? loadingFolderIds = null,
   }) {
     return _then(_value.copyWith(
-      selectedItem: freezed == selectedItem
-          ? _value.selectedItem
-          : selectedItem // ignore: cast_nullable_to_non_nullable
-              as NoteTreeItem?,
+      selectedItems: null == selectedItems
+          ? _value.selectedItems
+          : selectedItems // ignore: cast_nullable_to_non_nullable
+              as List<NoteTreeItem>,
       notesMap: null == notesMap
           ? _value.notesMap
           : notesMap // ignore: cast_nullable_to_non_nullable
@@ -115,7 +115,7 @@ abstract class _$$NoteTreeStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {NoteTreeItem? selectedItem,
+      {List<NoteTreeItem> selectedItems,
       Map<int, NoteTreeItem> notesMap,
       Map<int, List<int>> childrenMap,
       List<int> rootIds,
@@ -136,7 +136,7 @@ class __$$NoteTreeStateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? selectedItem = freezed,
+    Object? selectedItems = null,
     Object? notesMap = null,
     Object? childrenMap = null,
     Object? rootIds = null,
@@ -144,10 +144,10 @@ class __$$NoteTreeStateImplCopyWithImpl<$Res>
     Object? loadingFolderIds = null,
   }) {
     return _then(_$NoteTreeStateImpl(
-      selectedItem: freezed == selectedItem
-          ? _value.selectedItem
-          : selectedItem // ignore: cast_nullable_to_non_nullable
-              as NoteTreeItem?,
+      selectedItems: null == selectedItems
+          ? _value._selectedItems
+          : selectedItems // ignore: cast_nullable_to_non_nullable
+              as List<NoteTreeItem>,
       notesMap: null == notesMap
           ? _value._notesMap
           : notesMap // ignore: cast_nullable_to_non_nullable
@@ -176,20 +176,27 @@ class __$$NoteTreeStateImplCopyWithImpl<$Res>
 
 class _$NoteTreeStateImpl implements _NoteTreeState {
   const _$NoteTreeStateImpl(
-      {this.selectedItem,
+      {final List<NoteTreeItem> selectedItems = const [],
       final Map<int, NoteTreeItem> notesMap = const {},
       final Map<int, List<int>> childrenMap = const {},
       final List<int> rootIds = const [],
       final Set<int> expandedFolderIds = const {},
       final Set<int> loadingFolderIds = const {}})
-      : _notesMap = notesMap,
+      : _selectedItems = selectedItems,
+        _notesMap = notesMap,
         _childrenMap = childrenMap,
         _rootIds = rootIds,
         _expandedFolderIds = expandedFolderIds,
         _loadingFolderIds = loadingFolderIds;
 
+  final List<NoteTreeItem> _selectedItems;
   @override
-  final NoteTreeItem? selectedItem;
+  @JsonKey()
+  List<NoteTreeItem> get selectedItems {
+    if (_selectedItems is EqualUnmodifiableListView) return _selectedItems;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_selectedItems);
+  }
 
   /// 所有已知笔记的映射，以ID为键
   final Map<int, NoteTreeItem> _notesMap;
@@ -254,7 +261,7 @@ class _$NoteTreeStateImpl implements _NoteTreeState {
 
   @override
   String toString() {
-    return 'NoteTreeState(selectedItem: $selectedItem, notesMap: $notesMap, childrenMap: $childrenMap, rootIds: $rootIds, expandedFolderIds: $expandedFolderIds, loadingFolderIds: $loadingFolderIds)';
+    return 'NoteTreeState(selectedItems: $selectedItems, notesMap: $notesMap, childrenMap: $childrenMap, rootIds: $rootIds, expandedFolderIds: $expandedFolderIds, loadingFolderIds: $loadingFolderIds)';
   }
 
   @override
@@ -262,8 +269,8 @@ class _$NoteTreeStateImpl implements _NoteTreeState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$NoteTreeStateImpl &&
-            (identical(other.selectedItem, selectedItem) ||
-                other.selectedItem == selectedItem) &&
+            const DeepCollectionEquality()
+                .equals(other._selectedItems, _selectedItems) &&
             const DeepCollectionEquality().equals(other._notesMap, _notesMap) &&
             const DeepCollectionEquality()
                 .equals(other._childrenMap, _childrenMap) &&
@@ -277,7 +284,7 @@ class _$NoteTreeStateImpl implements _NoteTreeState {
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      selectedItem,
+      const DeepCollectionEquality().hash(_selectedItems),
       const DeepCollectionEquality().hash(_notesMap),
       const DeepCollectionEquality().hash(_childrenMap),
       const DeepCollectionEquality().hash(_rootIds),
@@ -295,7 +302,7 @@ class _$NoteTreeStateImpl implements _NoteTreeState {
 
 abstract class _NoteTreeState implements NoteTreeState {
   const factory _NoteTreeState(
-      {final NoteTreeItem? selectedItem,
+      {final List<NoteTreeItem> selectedItems,
       final Map<int, NoteTreeItem> notesMap,
       final Map<int, List<int>> childrenMap,
       final List<int> rootIds,
@@ -303,7 +310,7 @@ abstract class _NoteTreeState implements NoteTreeState {
       final Set<int> loadingFolderIds}) = _$NoteTreeStateImpl;
 
   @override
-  NoteTreeItem? get selectedItem;
+  List<NoteTreeItem> get selectedItems;
 
   /// 所有已知笔记的映射，以ID为键
   @override

@@ -17,6 +17,13 @@ class NoteTreeProvider extends StateNotifier<NoteTreeState> {
     state = state.copyWith(selectedItem: item);
   }
 
+  List<NoteTreeItem> getRootItems() {
+    return state.rootIds
+        .map((id) => state.notesMap[id])
+        .whereType<NoteTreeItem>()
+        .toList();
+  }
+
   void addNote(NoteTreeItem newNote, {int? parentId}) {
     final updatedNotesMap = Map<int, NoteTreeItem>.from(state.notesMap);
     updatedNotesMap[newNote.id] = newNote;
