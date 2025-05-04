@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:raysystem_flutter/component/card/ray_card.dart';
-import 'package:raysystem_flutter/component/widgets/mac_os_buttons.dart';
 
 // 支持 1~4 列
 const int kMinCardColumns = 1;
@@ -111,27 +110,18 @@ class CardManager with ChangeNotifier {
     _isAdaptiveMap[cardKey] = isContentAdaptive;
     _flexFactorMap[cardKey] = flexFactor > 0 ? flexFactor : kDefaultFlexFactor;
 
-    final List<Widget> allLeadingActions = [
-      MacOSCloseButton(
-        onPressed: () => removeCardByKey(cardKey),
-      ),
-      SizedBox(width: 8),
-      MacOSMinimizeButton(onPressed: () => minimizeCard(cardKey)),
-      SizedBox(width: 8),
-      MacOSMaximizeButton(onPressed: () => maximizeCard(cardKey)),
-      if (leadingActions != null) ...leadingActions,
-    ];
+    // 不再在这里创建 MacOS 按钮，而是直接使用用户提供的 leadingActions
     final card = RepaintBoundary(
       key: cardKey,
       child: RayCard(
         content: cardContent,
         title: title,
-        leadingActions: allLeadingActions,
+        leadingActions: leadingActions,
         trailingActions: trailingActions,
         footerActions: footerActions,
         color: color,
         padding: padding,
-        margin: margin, // Margin might need adjustment based on Column layout
+        margin: margin,
         elevation: elevation,
       ),
     );

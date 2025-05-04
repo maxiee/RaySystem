@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:raysystem_flutter/card/card_manager.dart';
+import 'package:raysystem_flutter/component/widgets/mac_os_buttons.dart';
 
 class RayCard extends StatelessWidget {
   // Properties for the three main sections
@@ -63,6 +64,11 @@ class RayCard extends StatelessWidget {
       default:
         defaultMargin = const EdgeInsets.all(8);
     }
+
+    // 获取父级 RepaintBoundary 的 key，用于识别卡片身份
+    final Key? parentKey =
+        context.findAncestorWidgetOfExactType<RepaintBoundary>()?.key;
+
     return Card(
       elevation: elevation ?? 1,
       margin: margin ?? defaultMargin,
@@ -74,12 +80,29 @@ class RayCard extends StatelessWidget {
           // Title bar with leading and trailing actions
           if (title != null ||
               leadingActions != null ||
-              trailingActions != null)
+              trailingActions != null ||
+              parentKey != null)
             Container(
               color: Theme.of(context).primaryColor.withOpacity(0.1),
               padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
               child: Row(
                 children: [
+                  // 内置 MacOS 按钮
+                  if (parentKey != null) ...[
+                    MacOSCloseButton(
+                      onPressed: () => cardManager.removeCardByKey(parentKey),
+                    ),
+                    const SizedBox(width: 8),
+                    MacOSMinimizeButton(
+                      onPressed: () => cardManager.minimizeCard(parentKey),
+                    ),
+                    const SizedBox(width: 8),
+                    MacOSMaximizeButton(
+                      onPressed: () => cardManager.maximizeCard(parentKey),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                  // 用户提供的额外 leading actions
                   if (leadingActions != null) ...[
                     ...leadingActions!,
                     const SizedBox(width: 8),
