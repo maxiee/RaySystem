@@ -49,6 +49,7 @@ class _NoteTreeCardState extends State<NoteTreeCard> {
               NoteTreeViewClassic(
                 key: _controller.treeViewKey, // Use the key from the controller
                 treeService: _controller.treeService,
+                cardManager: widget.cardManager,
                 autoLoadInitialData: true,
                 onItemSelected: (item) {
                   setState(() {

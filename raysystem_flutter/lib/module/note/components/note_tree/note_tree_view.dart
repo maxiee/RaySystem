@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:raysystem_flutter/module/note/components/note_tree/painters.dart';
+import 'package:raysystem_flutter/card/card_manager.dart';
 import '../../model/note_tree_model.dart';
 import '../../api/note_tree/note_tree_service.dart';
 
@@ -38,6 +39,9 @@ class NoteTreeViewClassic extends StatefulWidget {
   /// Service to load tree data (optional, will create a mock one if not provided)
   final NoteTreeService treeService;
 
+  /// Card manager to access column information and control
+  final CardManager? cardManager;
+
   const NoteTreeViewClassic({
     Key? key,
     this.initialItems,
@@ -51,6 +55,7 @@ class NoteTreeViewClassic extends StatefulWidget {
     this.onDropNote,
     this.autoLoadInitialData = true,
     required this.treeService,
+    this.cardManager,
   }) : super(key: key);
 
   @override
@@ -313,39 +318,79 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
     final RenderBox overlay =
         Overlay.of(context).context.findRenderObject() as RenderBox;
 
+    // 生成菜单项列表
+    List<PopupMenuEntry<String>> menuItems = [
+      PopupMenuItem(
+        value: 'add_child',
+        child: Row(
+          children: const [
+            Icon(Icons.add, size: 16),
+            SizedBox(width: 8),
+            Text('Add Child Note'),
+          ],
+        ),
+      ),
+      PopupMenuItem(
+        value: 'delete_note',
+        child: Row(
+          children: const [
+            Icon(Icons.delete, size: 16, color: Colors.red),
+            SizedBox(width: 8),
+            Text('Delete Note', style: TextStyle(color: Colors.red)),
+          ],
+        ),
+      ),
+    ];
+
+    // 如果有CardManager并且onItemDoubleClicked回调存在，添加"在第N列打开"的选项
+    if (widget.cardManager != null && widget.onItemDoubleClicked != null) {
+      // 添加分隔线
+      menuItems.add(const PopupMenuDivider());
+
+      // 获取当前列数
+      final int columnCount = widget.cardManager!.columnCount;
+
+      // 为每一列添加菜单项
+      for (int i = 0; i < columnCount; i++) {
+        menuItems.add(
+          PopupMenuItem(
+            value: 'open_in_column_$i',
+            child: Row(
+              children: [
+                Icon(Icons.open_in_new, size: 16),
+                SizedBox(width: 8),
+                Text('在第${i + 1}列打开'),
+              ],
+            ),
+          ),
+        );
+      }
+    }
+
     showMenu(
       context: context,
       position: RelativeRect.fromRect(
         position & const Size(1, 1),
         Offset.zero & overlay.size,
       ),
-      items: [
-        PopupMenuItem(
-          value: 'add_child',
-          child: Row(
-            children: const [
-              Icon(Icons.add, size: 16),
-              SizedBox(width: 8),
-              Text('Add Child Note'),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: 'delete_note',
-          child: Row(
-            children: const [
-              Icon(Icons.delete, size: 16, color: Colors.red),
-              SizedBox(width: 8),
-              Text('Delete Note', style: TextStyle(color: Colors.red)),
-            ],
-          ),
-        ),
-      ],
+      items: menuItems,
     ).then((value) {
+      if (value == null) return;
+
       if (value == 'add_child' && widget.onAddChildNote != null) {
         widget.onAddChildNote!(item);
       } else if (value == 'delete_note' && widget.onDeleteNote != null) {
         widget.onDeleteNote!(item);
+      } else if (value.startsWith('open_in_column_') &&
+          widget.cardManager != null &&
+          widget.onItemDoubleClicked != null) {
+        // 解析要打开的列索引
+        final int columnIndex =
+            int.parse(value.substring('open_in_column_'.length));
+        // 设置活跃列
+        widget.cardManager!.setActiveColumn(columnIndex);
+        // 打开笔记
+        widget.onItemDoubleClicked!(item);
       }
     });
   }
