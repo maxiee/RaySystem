@@ -98,6 +98,7 @@ class CardListView extends StatelessWidget {
       children: List.generate(
         colCount,
         (i) => Expanded(
+          flex: i == 0 ? 3 : 5, // Set flex factor based on index
           child: Padding(
             padding: i == 0 ? EdgeInsets.zero : const EdgeInsets.only(left: 2),
             child: _buildColumn(
