@@ -485,20 +485,16 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        child: _isInitialLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                child: Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: _buildTreeNodes(_items, isLast: []),
-                  ),
-                ),
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: _isInitialLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: _buildTreeNodes(_items, isLast: []),
               ),
-      ),
+            ),
     );
   }
 
@@ -900,17 +896,15 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
                   const SizedBox(width: 4),
 
                   // 节点名称文本
-                  Expanded(
-                    child: Text(
-                      item.name,
-                      style: TextStyle(
-                        fontSize: 13,
-                        // 选中状态使用粗体显示
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.normal,
-                      ),
-                      overflow: TextOverflow.ellipsis, // 文本过长时显示省略号
+                  Text(
+                    item.name,
+                    style: TextStyle(
+                      fontSize: 13,
+                      // 选中状态使用粗体显示
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
+                    overflow: TextOverflow.ellipsis, // 文本过长时显示省略号
                   ),
                 ],
               ),
