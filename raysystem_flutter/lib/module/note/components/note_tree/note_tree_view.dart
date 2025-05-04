@@ -1,89 +1,312 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:raysystem_flutter/module/note/components/note_tree/notifier/new/base/note_tree_provider.dart';
-import 'package:raysystem_flutter/module/note/components/note_tree/notifier/tree_state.dart';
 import 'package:raysystem_flutter/module/note/components/note_tree/painters.dart';
 import '../../model/note_tree_model.dart';
+import '../../api/note_tree/note_tree_service.dart';
 
 /// A widget that shows a classic tree view with connecting lines
-class NoteTreeViewClassic extends ConsumerWidget {
-  /// The ID of the currently selected item, or null if none is selected.
-  final int? selectedItemId;
+class NoteTreeViewClassic extends StatefulWidget {
+  /// Initial items to show in the tree (typically root level items)
+  final List<NoteTreeItem>? initialItems;
 
-  /// A set of IDs for folders that are currently expanded.
-  final Set<int> expandedFolderIds;
+  /// Callback when an item is selected
+  final Function(NoteTreeItem)? onItemSelected;
 
-  /// A set of IDs for folders that are currently loading children.
-  final Set<int> loadingFolderIds;
+  /// Callback when add child note is requested
+  final Function(NoteTreeItem)? onAddChildNote;
 
-  /// The ID of the item currently being dragged, or null.
-  final int? draggedItemId;
+  /// Callback when a note is double-clicked
+  final Function(NoteTreeItem)? onItemDoubleClicked;
 
-  /// Indicates if a drag operation is currently in progress.
-  final bool isDragging;
+  /// Callback when delete note is requested
+  final Function(NoteTreeItem)? onDeleteNote;
 
-  /// The ID of the potential drop target currently being hovered over, or null.
-  final int? hoveredTargetId;
+  /// Callback when a note starts being dragged
+  final Function(NoteTreeItem)? onStartDrag;
 
-  /// Indicates if the currently hovered drop target is valid.
-  final bool isHoverTargetValid;
+  /// Callback when drag ends without dropping
+  final Function()? onEndDrag;
 
-  /// Callback when an item is selected.
-  final Function(NoteTreeItem) onItemSelected;
+  /// Callback to check if a drop target is valid
+  final Future<bool> Function(NoteTreeItem)? canAcceptDrop;
 
-  /// Callback to toggle the expansion state of a folder.
-  final Function(NoteTreeItem) onToggleExpand;
+  /// Callback when a note is dropped onto another note
+  final Function(NoteTreeItem)? onDropNote;
 
-  /// Callback when add child note is requested via context menu.
-  final Function(NoteTreeItem) onAddChildNote;
+  /// Flag to determine if the widget should load initial data itself
+  final bool autoLoadInitialData;
 
-  /// Callback when a note is double-clicked.
-  final Function(NoteTreeItem) onItemDoubleClicked;
-
-  /// Callback when delete note is requested via context menu.
-  final Function(NoteTreeItem) onDeleteNote;
-
-  /// Callback when a note starts being dragged.
-  final Function(NoteTreeItem) onStartDrag;
-
-  /// Callback when drag ends (successfully dropped or cancelled).
-  final Function() onEndDrag;
-
-  /// Callback to signal the start of hover over a potential drop target.
-  /// The state manager should perform validation and update `hoveredTargetId` and `isHoverTargetValid`.
-  final Function(NoteTreeItem targetItem) onHoverTarget;
-
-  /// Callback to signal that the drag has left a potential target or the drop occurred.
-  /// The state manager should clear the hover state.
-  final Function() onLeaveTarget;
-
-  /// Callback when a dragged item is dropped onto a target item.
-  /// Assumes validation has already occurred based on hover state.
-  final Function(NoteTreeItem targetItem) onDropNote;
+  /// Service to load tree data (optional, will create a mock one if not provided)
+  final NoteTreeService treeService;
 
   const NoteTreeViewClassic({
     Key? key,
-    this.selectedItemId,
-    required this.expandedFolderIds,
-    required this.loadingFolderIds,
-    this.draggedItemId,
-    required this.isDragging,
-    this.hoveredTargetId,
-    required this.isHoverTargetValid,
-    required this.onItemSelected,
-    required this.onToggleExpand,
-    required this.onAddChildNote,
-    required this.onItemDoubleClicked,
-    required this.onDeleteNote,
-    required this.onStartDrag,
-    required this.onEndDrag,
-    required this.onHoverTarget,
-    required this.onLeaveTarget,
-    required this.onDropNote,
-    // Removed: initialItems, autoLoadInitialData, treeService, canAcceptDrop
+    this.initialItems,
+    this.onItemSelected,
+    this.onAddChildNote,
+    this.onItemDoubleClicked,
+    this.onDeleteNote,
+    this.onStartDrag,
+    this.onEndDrag,
+    this.canAcceptDrop,
+    this.onDropNote,
+    this.autoLoadInitialData = true,
+    required this.treeService,
   }) : super(key: key);
 
-  // --- Context Menu ---
+  @override
+  State<NoteTreeViewClassic> createState() => NoteTreeViewClassicState();
+}
+
+class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
+  int? _selectedItemId;
+
+  /// Items in the tree
+  late List<NoteTreeItem> _items;
+
+  /// Service for data loading
+  late final NoteTreeService _treeService;
+
+  /// Tracks which folders are currently loading their children
+  final Set<int> _loadingFolders = {};
+
+  /// Loading state for initial data
+  bool _isInitialLoading = false;
+
+  /// Cache to track which folders have children (to show expand button)
+  final Map<int, bool> _hasChildrenCache = {};
+
+  /// Current drag target being hovered (for visual feedback)
+  int? _currentDragTargetId;
+
+  /// Flag to track if a drag target is valid (for visual feedback)
+  bool _isValidTarget = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _treeService = widget.treeService;
+    _items = widget.initialItems ?? [];
+
+    if (widget.autoLoadInitialData && _items.isEmpty) {
+      _loadInitialData();
+    }
+  }
+
+  @override
+  void didUpdateWidget(NoteTreeViewClassic oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialItems != oldWidget.initialItems &&
+        widget.initialItems != null) {
+      setState(() {
+        _items = widget.initialItems!;
+      });
+    }
+  }
+
+  /// Load initial/root data
+  Future<void> _loadInitialData() async {
+    if (!mounted) return;
+    setState(() {
+      _isInitialLoading = true;
+    });
+
+    try {
+      final initialItems = await _treeService.getInitialItems();
+
+      // For each folder, assume it has children based on isFolder property
+      for (var item in initialItems.where((item) => item.isFolder)) {
+        _hasChildrenCache[item.id] = true;
+      }
+
+      // 对笔记进行排序: 文件夹优先显示，然后是普通笔记
+      final sortedItems = _sortItems(initialItems);
+
+      if (!mounted) return;
+      setState(() {
+        _items = sortedItems;
+        _isInitialLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isInitialLoading = false;
+      });
+      // In a real app, you would show an error message
+      debugPrint('Error loading initial data: $e');
+    }
+  }
+
+  /// Public method to load initial data that can be called by parent widget
+  Future<void> loadInitialData() async {
+    await _loadInitialData();
+  }
+
+  /// Load children for a specific folder
+  Future<void> _loadChildren(NoteTreeItem folder) async {
+    if (_loadingFolders.contains(folder.id) || !mounted) {
+      return; // Already loading or widget unmounted
+    }
+
+    setState(() {
+      _loadingFolders.add(folder.id);
+    });
+
+    try {
+      final children = await _treeService.getChildrenFor(folder.id);
+
+      // For each folder in the children, assume it has children
+      for (var item in children.where((item) => item.isFolder)) {
+        _hasChildrenCache[item.id] = true;
+      }
+
+      // 对子项进行排序：文件夹优先
+      final sortedChildren = _sortItems(children);
+
+      if (!mounted) return;
+      setState(() {
+        // 在当前根级别项目列表中查找该文件夹的索引位置
+        // Find item index in the current items list
+        int folderIndex = -1;
+        for (int i = 0; i < _items.length; i++) {
+          if (_items[i].id == folder.id) {
+            folderIndex = i;
+            break;
+          }
+        }
+
+        // 如果文件夹直接位于根级别(即_items数组中)
+        // If found directly in the root level
+        if (folderIndex != -1) {
+          // 使用copyWith方法创建一个新对象，设置isExpanded为true并添加排序后的children
+          // Update with new version that has the children
+          _items[folderIndex] = _items[folderIndex].copyWith(
+            isExpanded: true,
+            children: sortedChildren,
+          );
+        } else {
+          // 如果文件夹不在根级别，则在整个树中查找并更新它
+          // Otherwise update it wherever it is in the tree
+          _findAndUpdateItem(_items, folder.id, (foundItem) {
+            // 直接更新原始引用的字段
+            foundItem.isExpanded = true;
+            // 重要：直接替换children数组，使用排序后的结果
+            foundItem.children.clear();
+            foundItem.children.addAll(sortedChildren);
+
+            // For debugging
+            debugPrint(
+                '📂 Updated folder ${folder.id} with ${sortedChildren.length} children');
+          });
+        }
+        // 完成加载，从加载中文件夹集合中移除此ID
+        _loadingFolders.remove(folder.id);
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        // 如果加载失败，仍然从加载中文件夹集合中移除此ID
+        _loadingFolders.remove(folder.id);
+      });
+      // In a real app, you would show an error message
+      debugPrint('Error loading children for ${folder.id}: $e');
+    }
+  }
+
+  /// Refresh children for a specific note, ensuring it's loaded and expanded
+  Future<void> refreshChildren(int noteId) async {
+    // Find the note item
+    NoteTreeItem? item;
+    bool found = _findAndUpdateItem(_items, noteId, (foundItem) {
+      item = foundItem;
+    });
+
+    if (!found || item == null || !mounted) return;
+
+    setState(() {
+      _loadingFolders.add(noteId);
+      // Ensure the item is marked as a folder and can be expanded
+      if (!item!.isFolder) {
+        _findAndUpdateItem(_items, noteId, (foundItem) {
+          foundItem.isFolder = true;
+        });
+      }
+      _hasChildrenCache[noteId] = true;
+    });
+
+    try {
+      // Force the service to fetch fresh data by passing a cache buster parameter
+      final children = await _treeService.getChildrenFor(noteId);
+
+      if (!mounted) return;
+      setState(() {
+        _findAndUpdateItem(_items, noteId, (foundItem) {
+          foundItem.isExpanded = true;
+          // Important: Replace the entire children array
+          foundItem.children.clear();
+          foundItem.children.addAll(children);
+
+          // Update the hasChildren cache based on the latest data
+          _hasChildrenCache[noteId] = children.isNotEmpty;
+
+          // For debugging
+          debugPrint(
+              '🔄 Refreshed folder $noteId with ${children.length} children');
+        });
+        _loadingFolders.remove(noteId);
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loadingFolders.remove(noteId);
+      });
+      debugPrint('Error refreshing children for $noteId: $e');
+    }
+  }
+
+  void _toggleExpand(NoteTreeItem item) {
+    if (!item.isFolder) return;
+
+    // If folder is already expanded, just collapse it
+    if (item.isExpanded) {
+      setState(() {
+        _findAndUpdateItem(_items, item.id, (foundItem) {
+          foundItem.isExpanded = false;
+        });
+      });
+      return;
+    }
+
+    // If children are already loaded, just expand
+    if (item.children.isNotEmpty) {
+      setState(() {
+        _findAndUpdateItem(_items, item.id, (foundItem) {
+          foundItem.isExpanded = true;
+        });
+      });
+      return;
+    }
+
+    // Otherwise, load children first
+    _loadChildren(item);
+  }
+
+  void _selectItem(NoteTreeItem item) {
+    setState(() {
+      _selectedItemId = item.id;
+    });
+
+    if (widget.onItemSelected != null) {
+      widget.onItemSelected!(item);
+    }
+  }
+
+  // 处理双击事件
+  void _handleDoubleClick(NoteTreeItem item) {
+    if (widget.onItemDoubleClicked != null) {
+      widget.onItemDoubleClicked!(item);
+    }
+  }
+
   /// Show context menu for an item
   void _showContextMenu(
       BuildContext context, NoteTreeItem item, Offset position) {
@@ -119,67 +342,141 @@ class NoteTreeViewClassic extends ConsumerWidget {
         ),
       ],
     ).then((value) {
-      if (value == 'add_child') {
-        onAddChildNote(item);
-      } else if (value == 'delete_note') {
-        onDeleteNote(item);
+      if (value == 'add_child' && widget.onAddChildNote != null) {
+        widget.onAddChildNote!(item);
+      } else if (value == 'delete_note' && widget.onDeleteNote != null) {
+        widget.onDeleteNote!(item);
       }
     });
   }
 
-  // --- Build Methods ---
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(noteTreeProvider);
-    final notifier = ref.read(noteTreeProvider.notifier);
+  /// 在树结构中查找指定ID的节点并对其应用更新操作
+  ///
+  /// [items] 要搜索的节点列表
+  /// [id] 要查找的节点ID
+  /// [update] 找到节点后要应用的更新函数
+  ///
+  /// 返回一个布尔值，表示是否找到并更新了节点
+  bool _findAndUpdateItem(
+      List<NoteTreeItem> items, int id, Function(NoteTreeItem) update) {
+    for (int i = 0; i < items.length; i++) {
+      if (items[i].id == id) {
+        // 找到匹配ID的节点，应用更新函数
+        update(items[i]);
+        return true;
+      }
 
-    // Added WidgetRef
-    // Removed _isInitialLoading check, parent handles loading state
-    return Container(
-      // Removed Expanded, parent should handle layout
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: SingleChildScrollView(
-        // Removed inner Expanded, Column takes needed space
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children:
-              _buildTreeNodes(context, notifier.getRootItems(), isLast: []),
-        ),
+      // 递归搜索子节点
+      if (items[i].children.isNotEmpty) {
+        if (_findAndUpdateItem(items[i].children, id, update)) {
+          return true;
+        }
+      }
+    }
+    // 在整个树中未找到指定ID的节点
+    return false;
+  }
+
+  /// 找到一个笔记节点的父节点ID
+  /// 如果是根级别笔记，返回0
+  /// 如果找不到父节点，返回null
+  Future<int?> findParentId(int noteId) async {
+    // 首先检查是否为根级别笔记
+    bool isRootNote = false;
+    for (var rootItem in _items) {
+      if (rootItem.id == noteId) {
+        isRootNote = true;
+        break;
+      }
+    }
+
+    if (isRootNote) {
+      return 0; // 根级别笔记返回0
+    }
+
+    // 否则在树结构中搜索父节点
+    for (var rootItem in _items) {
+      int? parentId = _findParentIdInSubtree(rootItem, noteId);
+      if (parentId != null) {
+        return parentId;
+      }
+    }
+
+    // 如果在树中找不到，返回null
+    return null;
+  }
+
+  /// 在子树中递归查找节点的父ID
+  int? _findParentIdInSubtree(NoteTreeItem parent, int childId) {
+    // 检查直接子节点
+    for (var child in parent.children) {
+      if (child.id == childId) {
+        return parent.id;
+      }
+
+      // 递归检查孙子节点
+      int? foundId = _findParentIdInSubtree(child, childId);
+      if (foundId != null) {
+        return foundId;
+      }
+    }
+
+    return null;
+  }
+
+  /// 对笔记进行排序: 文件夹优先显示，然后是普通笔记
+  List<NoteTreeItem> _sortItems(List<NoteTreeItem> items) {
+    // 将项目分为两组：文件夹和普通笔记
+    final folders = items.where((item) => item.isFolder).toList();
+    final notes = items.where((item) => !item.isFolder).toList();
+
+    // 按更新时间排序每个组内的项目（可选）
+    folders.sort((a, b) => a.name.compareTo(b.name)); // 文件夹按名称字母顺序排序
+    notes.sort((a, b) => a.name.compareTo(b.name)); // 普通笔记按名称字母顺序排序
+
+    // 返回合并后的列表，文件夹在前，普通笔记在后
+    return [...folders, ...notes];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: _isInitialLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _buildTreeNodes(_items, isLast: []),
+                  ),
+                ),
+              ),
       ),
     );
   }
 
-  List<Widget> _buildNodes(
-      BuildContext context, List<NoteTreeItem> items) {
-    return items.map((item) => _)
-  }
-
-  /// Recursively builds the list of Widgets for the tree nodes.
-  List<Widget> _buildTreeNodes(
-      BuildContext context, List<NoteTreeItem> currentLevelItems,
+  List<Widget> _buildTreeNodes(List<NoteTreeItem> items,
       {required List<bool> isLast}) {
     List<Widget> widgets = [];
 
-    for (int i = 0; i < currentLevelItems.length; i++) {
-      final item = currentLevelItems[i];
-      final isLastItem = i == currentLevelItems.length - 1;
+    for (int i = 0; i < items.length; i++) {
+      final item = items[i];
+      final isLastItem = i == items.length - 1;
 
-      // Build the node for the current item
+      // For the current item
       widgets.add(_buildTreeNode(
-        context,
         item,
         isLastInLevel: isLastItem,
-        isLast: [...isLast], // Pass copies of the list
+        isLast: [...isLast],
       ));
 
-      // If the item is an expanded folder, recursively build its children
-      if (item.isFolder &&
-          expandedFolderIds.contains(item.id) &&
-          item.children.isNotEmpty) {
+      // For children
+      if (item.isFolder && item.isExpanded && item.children.isNotEmpty) {
         widgets.addAll(_buildTreeNodes(
-          context,
           item.children,
-          isLast: [...isLast, isLastItem], // Pass copies of the list
+          isLast: [...isLast, isLastItem],
         ));
       }
     }
@@ -187,318 +484,387 @@ class NoteTreeViewClassic extends ConsumerWidget {
     return widgets;
   }
 
-  /// Builds the UI for a single tree node, including lines, icon, text, and drag/drop wrappers.
-  Widget _buildTreeNode(BuildContext context, NoteTreeState state, NoteTreeItem item,
+  /// 构建单个树节点的UI
+  /// [item] 当前要构建的树节点项目
+  /// [isLast] 记录从根节点到当前节点路径上，每一级是否为该级的最后一个节点
+  /// [isLastInLevel] 当前节点是否为其所在层级的最后一个节点
+  Widget _buildTreeNode(NoteTreeItem item,
       {required List<bool> isLast, required bool isLastInLevel}) {
-    // Determine state based on passed props
-    final bool isSelected = state.selectedItem?.id == item.id;
-    final bool isLoading = loadingFolderIds.contains(item.id);
-    // A folder *can* be expanded if it's marked as a folder.
-    // The actual icon (+/-) depends on whether it *is* expanded (in expandedFolderIds).
-    final bool canExpand = item.isFolder;
-    final bool isExpanded = expandedFolderIds.contains(item.id);
+    // 判断当前节点是否被选中
+    final isSelected = _selectedItemId == item.id;
+    // 判断当前节点是否正在加载子节点
+    final isLoading = _loadingFolders.contains(item.id);
+    // 判断当前节点是否有子节点（用于显示展开/折叠按钮）
+    final hasChildren = item.isFolder && (_hasChildrenCache[item.id] ?? false);
+    // 判断当前节点是否是拖放目标
+    final isDragTarget = _currentDragTargetId == item.id;
 
-    // Determine drag target state based on props
-    final bool isCurrentDragTarget = hoveredTargetId == item.id;
-
-    // Wrap the node with Draggable and DragTarget
+    // Wrap the node with a Draggable and a DragTarget
     return _buildDragAndDropWrapper(
-      context,
       item: item,
       isLastInLevel: isLastInLevel,
       isLast: isLast,
       isSelected: isSelected,
       isLoading: isLoading,
-      canExpand: canExpand,
-      isExpanded: isExpanded,
-      isCurrentDragTarget: isCurrentDragTarget,
+      hasChildren: hasChildren,
+      isDragTarget: isDragTarget,
     );
   }
 
-  /// Builds the Draggable and DragTarget wrappers around the node content.
-  Widget _buildDragAndDropWrapper(
-    BuildContext context, {
+  /// Builds a draggable node wrapped in a drag target
+  Widget _buildDragAndDropWrapper({
     required NoteTreeItem item,
     required List<bool> isLast,
     required bool isLastInLevel,
     required bool isSelected,
     required bool isLoading,
-    required bool canExpand, // Renamed from hasChildren for clarity
-    required bool isExpanded,
-    required bool isCurrentDragTarget,
+    required bool hasChildren,
+    required bool isDragTarget,
   }) {
-    // Build the visual content of the node first
+    // The tree node content
     final Widget treeNodeContent = _buildNodeContent(
-      context,
       item: item,
       isLast: isLast,
       isLastInLevel: isLastInLevel,
       isSelected: isSelected,
       isLoading: isLoading,
-      canExpand: canExpand,
-      isExpanded: isExpanded,
+      hasChildren: hasChildren,
     );
 
     // Wrap with DragTarget to handle drops
     return DragTarget<NoteTreeItem>(
       onWillAccept: (data) {
-        // Always return true immediately to allow hover effect.
-        // Signal the state manager to start async validation.
-        if (data != null) {
-          // Prevent immediate self-drop visual glitch if needed, though validation handles logic
-          if (data.id == item.id) return false;
-          onHoverTarget(item); // Notify state manager to validate this target
+        debugPrint(
+            '🎯 onWillAccept for ${item.name} (ID: ${item.id}), data: ${data?.name ?? "null"}');
+
+        // Cannot accept drops if no data or no validation function
+        if (data == null || widget.canAcceptDrop == null) {
+          debugPrint(
+              '🎯 Rejecting drop: data is null or no validation function');
+          return false;
         }
-        return true; // Allow hover while validation runs
+
+        // Cannot drop onto self (quick rejection)
+        if (data.id == item.id) {
+          debugPrint('🎯 Rejecting drop: cannot drop onto self');
+          return false;
+        }
+
+        // Start validation process
+        debugPrint('🎯 Starting validation process');
+        _checkDropValidity(data, item);
+
+        // Initially allow the drop to start hover effect
+        // The actual validation will update the state
+        debugPrint('🎯 Initially accepting drop to start hover effect');
+        return true;
       },
       onAccept: (data) {
-        // Only call drop handler if the target was marked as valid during hover
-        if (isHoverTargetValid && hoveredTargetId == item.id) {
-          debugPrint(
-              '🎯 [View] onAccept: Dropping ${data.name} onto valid target ${item.name}');
-          onDropNote(item);
+        debugPrint(
+            '🎯 onAccept called for ${item.name} (ID: ${item.id}), data: ${data.name} (ID: ${data.id})');
+
+        // Handle the drop - call the controller's drop handler
+        if (widget.onDropNote != null) {
+          debugPrint('🎯 Calling onDropNote callback');
+          widget.onDropNote!(item);
         } else {
-          debugPrint(
-              '🎯 [View] onAccept: Drop rejected on ${item.name} (invalid or not hovered)');
+          debugPrint('❌ Error: onDropNote callback is null');
         }
-        onLeaveTarget(); // Clear hover state after drop attempt
+
+        // Reset visual feedback
+        setState(() {
+          _currentDragTargetId = null;
+          _isValidTarget = false;
+        });
       },
       onLeave: (data) {
-        // Signal the state manager to clear hover state
-        onLeaveTarget();
+        debugPrint('🎯 onLeave called for ${item.name}');
+        // Reset visual feedback when drag leaves
+        setState(() {
+          _currentDragTargetId = null;
+          _isValidTarget = false;
+        });
       },
       builder: (context, candidateData, rejectedData) {
-        // Determine visual feedback based on state managed externally
-        final bool showDropFeedback =
-            isCurrentDragTarget && candidateData.isNotEmpty;
-        final bool isValidDropTarget = showDropFeedback && isHoverTargetValid;
+        // Add visual feedback for drag target
+        final bool showDropFeedback = isDragTarget && candidateData.isNotEmpty;
 
         return Container(
           decoration: BoxDecoration(
             border: showDropFeedback
                 ? Border.all(
-                    color: isValidDropTarget
-                        ? Theme.of(context)
-                            .colorScheme
-                            .primary // Valid target color
-                        : Colors.red, // Invalid target color
+                    color: Theme.of(context).colorScheme.primary,
                     width: 1.5,
                   )
                 : null,
             borderRadius: showDropFeedback ? BorderRadius.circular(4) : null,
             color: showDropFeedback
-                ? (isValidDropTarget
-                        ? Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withOpacity(0.1) // Valid target background
-                        : Colors.red
-                            .withOpacity(0.1) // Invalid target background
-                    )
+                ? Theme.of(context).colorScheme.primary.withOpacity(0.1)
                 : Colors.transparent,
           ),
-          // Wrap with Draggable
+          // Wrap with Draggable to allow dragging the node
           child: Draggable<NoteTreeItem>(
             data: item,
-            feedback: _buildDragFeedback(
-                context, item), // Use helper for feedback widget
+            feedback: Material(
+              elevation: 6.0,
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                width: 220,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      item.icon ??
+                          (item.isFolder ? Icons.folder : Icons.description),
+                      size: 18,
+                      color:
+                          item.isFolder ? Colors.amber[700] : Colors.blue[700],
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        item.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             childWhenDragging: Opacity(
               opacity: 0.3,
               child: treeNodeContent,
             ),
             onDragStarted: () {
-              onStartDrag(item); // Notify state manager
+              debugPrint('🎯 onDragStarted for ${item.name} (ID: ${item.id})');
+              // Notify start of drag
+              if (widget.onStartDrag != null) {
+                widget.onStartDrag!(item);
+              }
             },
             onDragEnd: (details) {
-              // onEndDrag is called regardless of whether it was accepted or cancelled
-              onEndDrag(); // Notify state manager
+              debugPrint(
+                  '🎯 onDragEnd called with wasAccepted: ${details.wasAccepted}');
+              // Notify end of drag
+              if (widget.onEndDrag != null) {
+                widget.onEndDrag!();
+              }
             },
-            // onDraggableCanceled is deprecated, use onDragEnd
+            onDraggableCanceled: (_, __) {
+              debugPrint('🎯 onDraggableCanceled called');
+              // Notify end of drag when canceled
+              if (widget.onEndDrag != null) {
+                widget.onEndDrag!();
+              }
+            },
             maxSimultaneousDrags: 1,
-            child: treeNodeContent, // The actual node content
+            child: treeNodeContent,
           ),
         );
       },
     );
   }
 
-  /// Builds the widget shown while dragging.
-  Widget _buildDragFeedback(BuildContext context, NoteTreeItem item) {
-    return Material(
-      elevation: 6.0,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 12.0, vertical: 4.0), // Adjusted padding
-        // Constrain width to avoid excessive feedback size
-        constraints: const BoxConstraints(maxWidth: 250),
-        decoration: BoxDecoration(
-          color: Theme.of(context)
-              .cardColor
-              .withOpacity(0.9), // Slightly transparent
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisSize:
-              MainAxisSize.min, // Prevent row from expanding unnecessarily
-          children: [
-            Icon(
-              item.icon ?? (item.isFolder ? Icons.folder : Icons.description),
-              size: 16, // Match node icon size
-              color: item.isFolder ? Colors.amber[700] : Colors.blue[700],
-            ),
-            const SizedBox(width: 8),
-            // Flexible helps handle long names within constrained width
-            Flexible(
-              child: Text(
-                item.name,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium, // Use theme text style
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  /// Check if drop is valid and update UI accordingly
+  void _checkDropValidity(
+      NoteTreeItem draggedItem, NoteTreeItem targetItem) async {
+    debugPrint(
+        '🎯 _checkDropValidity: Checking if ${draggedItem.name} can be dropped onto ${targetItem.name}');
+
+    if (widget.canAcceptDrop != null) {
+      try {
+        // Perform async validation
+        bool isValid = await widget.canAcceptDrop!(targetItem);
+        debugPrint('🎯 _checkDropValidity result: $isValid');
+
+        // Only update if still mounted
+        if (mounted) {
+          setState(() {
+            _isValidTarget = isValid;
+            _currentDragTargetId = isValid ? targetItem.id : null;
+          });
+        }
+      } catch (e) {
+        debugPrint('❌ Error checking drop validity: $e');
+        if (mounted) {
+          setState(() {
+            _isValidTarget = false;
+            _currentDragTargetId = null;
+          });
+        }
+      }
+    } else {
+      debugPrint('❌ No canAcceptDrop callback provided');
+    }
   }
 
-  /// Builds the actual content (lines, icons, text) of a tree node.
-  Widget _buildNodeContent(
-    BuildContext context, {
+  /// Build the content of a tree node
+  Widget _buildNodeContent({
     required NoteTreeItem item,
-    required List<bool> isLast, // List of booleans indicating if ancestors are last in their level
-    required bool isLastInLevel, // If this item is the last in its level
+    required List<bool> isLast,
+    required bool isLastInLevel,
     required bool isSelected,
     required bool isLoading,
-    required bool canExpand, // If it's a folder type
-    required bool isExpanded, // If it's currently expanded
+    required bool hasChildren,
   }) {
     return GestureDetector(
+      // Handle right-click for context menu
       onSecondaryTapDown: (details) {
         _showContextMenu(context, item, details.globalPosition);
       },
       child: InkWell(
-        onTap: () => onItemSelected(item),
-        onDoubleTap: () => onItemDoubleClicked(item),
-        // Apply visual feedback for selection
+        // 点击整个节点区域时触发选中事件
+        onTap: () => _selectItem(item),
+        // 双击节点时触发双击事件
+        onDoubleTap: () => _handleDoubleClick(item),
         child: Container(
-          height: 24, // Consistent node height
+          height: 24, // 设置节点高度保持紧凑布局
+          // 选中状态时使用高亮背景色，否则透明
           color: isSelected
               ? Theme.of(context).highlightColor
               : Colors.transparent,
-          padding: const EdgeInsets.only(
-              right: 8.0), // Add some padding to the right
           child: Stack(
             children: [
-              // --- Connecting Lines ---
+              // 绘制连接线部分
               Positioned.fill(
                 child: Row(
                   children: [
-                    // Indentation lines based on depth and whether ancestors were last items
+                    // 为每一级层级绘制对应的连接线
                     ...List.generate(isLast.length, (index) {
+                      // 每一级层级的缩进宽度
                       return SizedBox(
                         width: 16,
                         child: isLast[index]
-                            ? const SizedBox() // No vertical line if ancestor was last
+                            ? const SizedBox() // 如果是该级的最后一项，则不需要绘制垂直连接线
                             : CustomPaint(
                                 size: const Size(16, 24),
                                 painter: DashedLinePainter(
-                                  isVertical: true,
-                                  dashWidth: 1,
-                                  dashSpace: 2,
-                                  strokeWidth: 0.8,
-                                  color: Colors.grey[400]!,
+                                  isVertical: true, // 垂直虚线
+                                  dashWidth: 1, // 虚线段宽度
+                                  dashSpace: 2, // 虚线间隔
+                                  strokeWidth: 0.8, // 线条粗细
+                                  color: Colors.grey[400]!, // 线条颜色
                                 ),
                               ),
                       );
                     }),
-                    // Branch line connecting to the node content
+
+                    // 绘制分支连接线（水平+垂直组合）
                     SizedBox(
                       width: 16,
                       child: CustomPaint(
                         size: const Size(16, 24),
                         painter: BranchLinePainter(
-                          isLastItem: isLastInLevel,
-                          strokeWidth: 0.8,
-                          color: Colors.grey[400]!,
-                          isDashed: true,
-                          dashWidth: 1,
-                          dashSpace: 2,
+                          isLastItem: isLastInLevel, // 是否为最后一项，决定了连接线的形状
+                          strokeWidth: 0.8, // 线条粗细
+                          color: Colors.grey[400]!, // 线条颜色
+                          isDashed: true, // 使用虚线样式
+                          dashWidth: 1, // 虚线段宽度
+                          dashSpace: 2, // 虚线间隔
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              // --- Node Content (Icon, Text) ---
+
+              // 绘制节点内容部分（文件夹/文件图标和名称）
               Row(
                 children: [
-                  // Indentation space matching the lines
+                  // 根据层级缩进的空间
                   SizedBox(width: 16.0 * isLast.length),
-                  // Branch line space
+
+                  // 分支连接线的空间
                   const SizedBox(width: 16),
-                  // Expand/Collapse button or loading indicator
-                  if (canExpand) // Only show for folders
+
+                  // 文件夹的展开/折叠按钮或加载指示器
+                  if (item.isFolder)
                     GestureDetector(
-                      onTap: isLoading ? null : () => onToggleExpand(item),
+                      // 点击展开/折叠按钮时触发对应事件，如果正在加载则禁用点击
+                      onTap: isLoading ? null : () => _toggleExpand(item),
                       child: Container(
-                        width: 16, height: 16,
-                        // Add border only if it can be expanded or is loading
-                        decoration: (canExpand || isLoading)
-                            ? BoxDecoration(
-                                border: Border.all(
-                                    color: Colors.grey[400]!, width: 0.8),
-                              )
-                            : null,
+                        width: 16,
+                        height: 16,
+                        decoration: BoxDecoration(
+                          // 如果有子节点或正在加载，则显示边框
+                          border: Border.all(
+                            color: hasChildren || isLoading
+                                ? Colors.grey[400]!
+                                : Colors.transparent,
+                            width: 0.8,
+                          ),
+                        ),
                         child: Center(
                           child: isLoading
-                              ? const SizedBox(
-                                  // Loading indicator
-                                  width: 10, height: 10,
+                              ? SizedBox(
+                                  width: 10,
+                                  height: 10,
+                                  // 加载中显示旋转进度指示器
                                   child: CircularProgressIndicator(
-                                      strokeWidth: 1.5, color: Colors.grey),
+                                    strokeWidth: 1.5,
+                                    color: Colors.grey[600],
+                                  ),
                                 )
-                              : Icon(
-                                  // Expand/collapse icon
-                                  isExpanded ? Icons.remove : Icons.add,
-                                  size: 12.0, color: Colors.grey[800],
-                                ),
+                              : hasChildren
+                                  ? Icon(
+                                      // 根据展开状态显示加号或减号图标
+                                      item.isExpanded
+                                          ? Icons.remove
+                                          : Icons.add,
+                                      size: 12.0,
+                                      color: Colors.grey[800],
+                                    )
+                                  : const SizedBox(), // 没有子节点时显示空白
                         ),
                       ),
                     )
-                  else // Non-folders get a horizontal line segment instead of button
+                  else
+                    // 非文件夹项目显示水平虚线
                     CustomPaint(
                       size: const Size(16, 24),
                       painter: DashedLinePainter(
-                        isVertical: false,
+                        isVertical: false, // 水平虚线
                         strokeWidth: 0.8,
                         color: Colors.grey[400]!,
                         dashWidth: 1,
                         dashSpace: 2,
                       ),
                     ),
+
                   const SizedBox(width: 4),
-                  // Node Icon
+
+                  // 节点图标
                   Icon(
+                    // 使用节点提供的图标，或根据节点类型选择默认图标
                     item.icon ??
-                        (canExpand
-                            ? (isExpanded ? Icons.folder_open : Icons.folder)
+                        (item.isFolder
+                            ? (item.isExpanded
+                                ? Icons.folder_open
+                                : Icons.folder)
                             : Icons.description),
                     size: 16,
-                    color: canExpand ? Colors.amber[700] : Colors.blue[700],
+                    color: item.isFolder
+                        ? Colors.amber[700]
+                        : Colors.blue[700], // 文件夹和文件使用不同颜色
                   ),
+
                   const SizedBox(width: 4),
-                  // Node Name
+
+                  // 节点名称文本
                   Expanded(
                     child: Text(
                       item.name,
                       style: TextStyle(
                         fontSize: 13,
+                        // 选中状态使用粗体显示
                         fontWeight:
                             isSelected ? FontWeight.bold : FontWeight.normal,
                       ),
-                      overflow: TextOverflow.ellipsis,
+                      overflow: TextOverflow.ellipsis, // 文本过长时显示省略号
                     ),
                   ),
                 ],
