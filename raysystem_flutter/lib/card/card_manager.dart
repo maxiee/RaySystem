@@ -4,7 +4,7 @@ import 'package:raysystem_flutter/component/widgets/mac_os_buttons.dart';
 
 // 支持 1~4 列
 const int kMinCardColumns = 1;
-const int kMaxCardColumns = 4;
+const int kMaxCardColumns = 6;
 
 // Default flex factor for adaptive cards
 const int kDefaultFlexFactor = 1;

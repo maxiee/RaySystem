@@ -137,7 +137,7 @@ class StatusBar extends StatelessWidget {
         fit: BoxFit.contain,
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: List.generate(4, (i) {
+          children: List.generate(6, (i) {
             final colNum = i + 1;
             final isActive = cardManager.columnCount == colNum;
             return Padding(
