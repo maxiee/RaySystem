@@ -61,7 +61,7 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
   int? _selectedItemId;
 
   /// Items in the tree
-  late List<NoteTreeItem> _items;
+  static late List<NoteTreeItem> _items;
 
   /// Service for data loading
   late final NoteTreeService _treeService;
@@ -73,7 +73,7 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
   bool _isInitialLoading = false;
 
   /// Cache to track which folders have children (to show expand button)
-  final Map<int, bool> _hasChildrenCache = {};
+  static final Map<int, bool> _hasChildrenCache = {};
 
   /// Current drag target being hovered (for visual feedback)
   int? _currentDragTargetId;
