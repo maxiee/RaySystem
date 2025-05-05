@@ -23,6 +23,8 @@ class NetworkListener {
     _setup();
   }
 
+  bool isScriptInjected() => _isScriptInjected;
+
   Future<void> _setup() async {
     await _loadScript();
     await _addJavaScriptChannel();

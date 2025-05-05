@@ -27,6 +27,10 @@ class _BrowserWindowState extends State<BrowserWindow> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(NavigationDelegate(
         onProgress: (progress) {
+          if (progress > 25 && !_networkListener.isScriptInjected()) {
+            debugPrint('Injecting script at progress: $progress%');
+            _networkListener.injectScript();
+          }
           // debugPrint('WebView is loading (progress: $progress%)'); // Can be noisy
         },
         onPageStarted: (url) {
@@ -36,8 +40,10 @@ class _BrowserWindowState extends State<BrowserWindow> {
         },
         onPageFinished: (url) {
           debugPrint('Page finished loading: $url');
-          // Inject the script after the page finishes loading
-          _networkListener.injectScript();
+          if (!_networkListener.isScriptInjected()) {
+            debugPrint('Injecting script on page finished (fallback)');
+            _networkListener.injectScript();
+          }
         },
         onWebResourceError: (error) {
           debugPrint('Web resource error: $error');
@@ -46,7 +52,7 @@ class _BrowserWindowState extends State<BrowserWindow> {
           debugPrint('HTTP error: $error');
         },
         onNavigationRequest: (navigationRequest) {
-          debugPrint('Navigation request: $navigationRequest');
+          debugPrint('Navigation request: ${navigationRequest.url}');
           // Reset injection status before allowing navigation
           // Note: onPageStarted might be more reliable for this. Test which works best.
           // _networkListener.resetInjectionStatus();
