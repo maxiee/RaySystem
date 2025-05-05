@@ -58,8 +58,9 @@ class _BrowserWindowState extends State<BrowserWindow> {
           // _networkListener.resetInjectionStatus();
 
           if (navigationRequest.url == 'about:blank') {
-            debugPrint('Blocking navigation to about:blank');
-            return NavigationDecision.prevent;
+            debugPrint(
+                'Allowing navigation to about:blank - this may be part of site functionality');
+            return NavigationDecision.navigate;
           }
 
           // 强制将 HTTP 请求转换为 HTTPS
