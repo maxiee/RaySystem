@@ -8,13 +8,11 @@ final browserCommands = Command(
     icon: Icons.language,
     subCommands: [
       Command(
-        command: 'browser-card',
-        title: '浏览器卡片',
-        icon: Icons.language,
+        command: 'weibo-card',
+        title: '刷微博',
+        icon: Icons.bookmark,
         callback: (context, cardManager) {
-          cardManager.addCard(
-            const BrowserCard(),
-          );
+          cardManager.addCard(const BrowserCard(), wrappedInRayCard: false);
         },
       )
     ]);
