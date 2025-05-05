@@ -83,6 +83,7 @@ class CardManager with ChangeNotifier {
     bool isContentAdaptive = true, // New: Is the content adaptive?
     int flexFactor =
         kDefaultFlexFactor, // New: Flex factor for adaptive content
+    bool wrappedInRayCard = true,
   }) {
     final targetList = _columns[_activeColumnIndex];
     final targetMap = _keyToIndexMaps[_activeColumnIndex];
@@ -113,17 +114,19 @@ class CardManager with ChangeNotifier {
     // 不再在这里创建 MacOS 按钮，而是直接使用用户提供的 leadingActions
     final card = RepaintBoundary(
       key: cardKey,
-      child: RayCard(
-        content: cardContent,
-        title: title,
-        leadingActions: leadingActions,
-        trailingActions: trailingActions,
-        footerActions: footerActions,
-        color: color,
-        padding: padding,
-        margin: margin,
-        elevation: elevation,
-      ),
+      child: wrappedInRayCard
+          ? RayCard(
+              content: cardContent,
+              title: title,
+              leadingActions: leadingActions,
+              trailingActions: trailingActions,
+              footerActions: footerActions,
+              color: color,
+              padding: padding,
+              margin: margin,
+              elevation: elevation,
+            )
+          : cardContent,
     );
     targetList.add(card);
     targetMap[cardKey] = targetList.length - 1;
