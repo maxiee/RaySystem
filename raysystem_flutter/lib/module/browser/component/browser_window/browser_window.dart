@@ -7,11 +7,13 @@ import 'package:webview_flutter/webview_flutter.dart';
 class BrowserWindow extends StatefulWidget {
   final String initialUrl;
   final void Function(String title)? onTitleChanged;
+  final String? instanceId; // 添加instanceId参数用于关联调试状态
 
   const BrowserWindow({
     super.key,
     required this.initialUrl,
     this.onTitleChanged,
+    this.instanceId,
   });
 
   @override
@@ -94,6 +96,7 @@ class _BrowserWindowState extends State<BrowserWindow> {
     // Initialize NetworkListener *after* WebViewController is created
     _networkListener = NetworkListener(
       webViewController: _webViewController,
+      instanceId: widget.instanceId, // 传递实例ID给网络监听器
       onNetworkLog: (logData) {
         // Handle the received network log data here
         // Already printed nicely within NetworkListener in debug mode

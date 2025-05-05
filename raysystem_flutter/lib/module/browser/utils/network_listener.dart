@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:webview_flutter/webview_flutter.dart';
+import '../debug/browser_debug_state.dart';
+import '../debug/browser_debug_manager.dart';
 
 /// Callback function type for handling network log messages.
 typedef NetworkLogCallback = void Function(Map<String, dynamic> logData);
@@ -15,11 +17,14 @@ class NetworkListener {
   final NetworkLogCallback? onNetworkLog;
   bool _isScriptInjected = false;
   String? _networkListenerScript;
+  String? _instanceId; // 用于关联到特定的BrowserDebugState
 
   NetworkListener({
     required WebViewController webViewController,
     this.onNetworkLog,
-  }) : _webViewController = webViewController {
+    String? instanceId,
+  })  : _webViewController = webViewController,
+        _instanceId = instanceId {
     _setup();
   }
 
@@ -62,6 +67,17 @@ class NetworkListener {
               final prettyJson = jsonEncoder.convert(logData);
               print('Network Log Received:$prettyJson');
             }
+
+            // 如果有实例ID，则将日志添加到对应的调试状态中
+            if (_instanceId != null) {
+              final debugState =
+                  BrowserDebugManager.instance.getDebugState(_instanceId!);
+              if (debugState != null) {
+                debugState.addNetworkLog(logData);
+              }
+            }
+
+            // 调用原有回调
             onNetworkLog?.call(logData);
           } catch (e) {
             debugPrint('Error decoding network log message: $e');
