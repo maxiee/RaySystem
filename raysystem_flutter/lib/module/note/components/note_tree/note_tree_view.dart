@@ -758,8 +758,15 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
         _showContextMenu(context, item, details.globalPosition);
       },
       child: InkWell(
-        // 点击整个节点区域时触发选中事件
-        onTap: () => _selectItem(item),
+        // 点击整个节点区域时触发选中和展开/收起事件
+        onTap: () {
+          // 先选中项目
+          _selectItem(item);
+          // 如果是文件夹，则切换展开/收起状态
+          if (item.isFolder && hasChildren) {
+            _toggleExpand(item);
+          }
+        },
         // 双击节点时触发双击事件
         onDoubleTap: () => _handleDoubleClick(item),
         child: Container(
