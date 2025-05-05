@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart'; // Import kDebugMode
 import 'package:flutter/material.dart';
 import 'package:raysystem_flutter/module/browser/utils/browser_utils.dart';
+import 'package:raysystem_flutter/module/browser/utils/network_listener.dart'; // Import NetworkListener
 import 'package:webview_flutter/webview_flutter.dart';
 
 class BrowserWindow extends StatefulWidget {
@@ -13,6 +15,7 @@ class BrowserWindow extends StatefulWidget {
 class _BrowserWindowState extends State<BrowserWindow> {
   late WebViewController _webViewController;
   late String _currentUrl;
+  late NetworkListener _networkListener; // Add NetworkListener instance
 
   @override
   void initState() {
@@ -24,13 +27,17 @@ class _BrowserWindowState extends State<BrowserWindow> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(NavigationDelegate(
         onProgress: (progress) {
-          debugPrint('WebView is loading (progress: $progress%)');
+          // debugPrint('WebView is loading (progress: $progress%)'); // Can be noisy
         },
         onPageStarted: (url) {
           debugPrint('Page started loading: $url');
+          _networkListener
+              .resetInjectionStatus(); // Reset injection status on new page start
         },
         onPageFinished: (url) {
           debugPrint('Page finished loading: $url');
+          // Inject the script after the page finishes loading
+          _networkListener.injectScript();
         },
         onWebResourceError: (error) {
           debugPrint('Web resource error: $error');
@@ -40,6 +47,10 @@ class _BrowserWindowState extends State<BrowserWindow> {
         },
         onNavigationRequest: (navigationRequest) {
           debugPrint('Navigation request: $navigationRequest');
+          // Reset injection status before allowing navigation
+          // Note: onPageStarted might be more reliable for this. Test which works best.
+          // _networkListener.resetInjectionStatus();
+
           if (navigationRequest.url == 'about:blank') {
             debugPrint('Blocking navigation to about:blank');
             return NavigationDecision.prevent;
@@ -60,8 +71,22 @@ class _BrowserWindowState extends State<BrowserWindow> {
       ))
       ..setUserAgent(
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15",
-      )
-      ..loadRequest(Uri.parse(widget.initialUrl));
+      );
+
+    // Initialize NetworkListener *after* WebViewController is created
+    _networkListener = NetworkListener(
+      webViewController: _webViewController,
+      onNetworkLog: (logData) {
+        // Handle the received network log data here
+        // Already printed nicely within NetworkListener in debug mode
+        if (!kDebugMode) {
+          // If not in debug mode, you might want to log differently or process the data
+          // print('Network Log: $logData');
+        }
+      },
+    );
+    // Initial load
+    _webViewController.loadRequest(Uri.parse(widget.initialUrl));
   }
 
   @override
@@ -70,12 +95,16 @@ class _BrowserWindowState extends State<BrowserWindow> {
     if (oldWidget.initialUrl != widget.initialUrl) {
       debugPrint('BrowserWindow URL changed: ${widget.initialUrl}');
       _currentUrl = widget.initialUrl;
+      // Reset injection status when URL changes externally
+      _networkListener.resetInjectionStatus();
       _webViewController.loadRequest(Uri.parse(_currentUrl));
     }
   }
 
   void _loadUrl(String url) {
     debugPrint('Loading URL: $url');
+    // Reset injection status when loading a new URL manually
+    _networkListener.resetInjectionStatus();
     _webViewController.loadRequest(Uri.parse(url));
   }
 
