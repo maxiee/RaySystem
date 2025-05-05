@@ -288,7 +288,7 @@ class NoteTreeViewClassicState extends State<NoteTreeViewClassic> {
           foundItem.isExpanded = true;
         });
       });
-      return;
+      // return;
     }
 
     // Otherwise, load children first
