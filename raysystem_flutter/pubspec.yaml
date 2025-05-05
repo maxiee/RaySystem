@@ -46,6 +46,7 @@ dependencies:
   openapi:
     path: ./api
   highlight: ^0.7.0
+  flutter_highlight: ^0.7.0
   window_manager: ^0.4.3
   infinite_scroll_pagination: ^5.0.0
   webview_flutter: ^4.11.0

@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:raysystem_flutter/component/card/ray_card.dart';
 import 'browser_debug_manager.dart';
 import 'browser_debug_state.dart';
+import 'dart:convert'; // Import dart:convert for jsonDecode
+import 'package:flutter_highlight/flutter_highlight.dart'; // Import flutter_highlight
+import 'package:flutter_highlight/themes/github.dart'; // Choose a theme (e.g., github)
 
 /// 一个标签页定义
 class DevToolsTab {
@@ -349,6 +352,18 @@ class NetworkRequestsTab extends StatelessWidget {
   void _showNetworkRequestDetails(
       BuildContext context, NetworkLogEntry logEntry) {
     final logData = logEntry.data;
+    // Define the highlighter and theme
+    final highlighter = HighlightView(
+      // The original code to be highlighted
+      '',
+      language: 'json',
+      theme: githubTheme, // Apply the chosen theme
+      padding: const EdgeInsets.all(8.0),
+      textStyle: const TextStyle(
+        fontFamily: 'monospace', // Use a monospace font for code
+        fontSize: 12,
+      ),
+    );
 
     showDialog(
       context: context,
@@ -370,12 +385,16 @@ class NetworkRequestsTab extends StatelessWidget {
                       Tab(text: '响应'),
                     ],
                     labelColor: Colors.blue,
+                    unselectedLabelColor:
+                        Colors.grey, // Added for better contrast
+                    indicatorColor: Colors.blue, // Added for clarity
                   ),
                   Expanded(
                     child: TabBarView(
                       children: [
                         // 概览
                         SingleChildScrollView(
+                          padding: const EdgeInsets.all(8.0), // Added padding
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -393,36 +412,30 @@ class NetworkRequestsTab extends StatelessWidget {
                         ),
                         // 请求头
                         SingleChildScrollView(
+                          padding: const EdgeInsets.all(8.0), // Added padding
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              if (logData['requestHeaders'] != null)
+                              if (logData['requestHeaders'] != null &&
+                                  logData['requestHeaders'] is Map)
                                 for (var entry in (logData['requestHeaders']
                                         as Map<String, dynamic>)
                                     .entries)
                                   _buildDetailRow(
                                       entry.key, entry.value.toString()),
-                              if (logData['requestHeaders'] == null)
+                              if (logData['requestHeaders'] == null ||
+                                  logData['requestHeaders'] is! Map ||
+                                  (logData['requestHeaders'] as Map).isEmpty)
                                 const Text('无请求头信息'),
                             ],
                           ),
                         ),
                         // 请求体
-                        SingleChildScrollView(
-                          child: Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                                logData['requestBody']?.toString() ?? '无请求体'),
-                          ),
-                        ),
+                        _buildBodyView(logData['requestBody']?.toString(),
+                            '无请求体', highlighter),
                         // 响应
-                        SingleChildScrollView(
-                          child: Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                                logData['responseBody']?.toString() ?? '无响应体'),
-                          ),
-                        ),
+                        _buildBodyView(logData['responseBody']?.toString(),
+                            '无响应体', highlighter),
                       ],
                     ),
                   ),
@@ -462,5 +475,44 @@ class NetworkRequestsTab extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Helper function to build Request/Response Body View
+  Widget _buildBodyView(
+      String? body, String emptyMessage, HighlightView highlighter) {
+    if (body == null || body.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(8.0),
+        alignment: Alignment.centerLeft,
+        child: Text(emptyMessage),
+      );
+    }
+
+    try {
+      // Try to decode and re-encode with indentation
+      final dynamic decodedJson = jsonDecode(body);
+      const encoder = JsonEncoder.withIndent('  ');
+      final String prettyPrintedJson = encoder.convert(decodedJson);
+
+      // Return highlighted JSON
+      return SingleChildScrollView(
+        child: HighlightView(
+          prettyPrintedJson,
+          language: 'json',
+          theme: highlighter.theme, // Use theme from passed highlighter
+          padding: highlighter.padding,
+          textStyle: highlighter.textStyle,
+        ),
+      );
+    } catch (e) {
+      // If it's not JSON, display as plain text
+      return SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(8.0),
+          alignment: Alignment.centerLeft,
+          child: Text(body),
+        ),
+      );
+    }
   }
 }
