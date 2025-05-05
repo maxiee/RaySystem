@@ -6,7 +6,13 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 class BrowserWindow extends StatefulWidget {
   final String initialUrl;
-  const BrowserWindow({super.key, required this.initialUrl});
+  final void Function(String title)? onTitleChanged;
+
+  const BrowserWindow({
+    super.key,
+    required this.initialUrl,
+    this.onTitleChanged,
+  });
 
   @override
   State<BrowserWindow> createState() => _BrowserWindowState();
@@ -15,7 +21,8 @@ class BrowserWindow extends StatefulWidget {
 class _BrowserWindowState extends State<BrowserWindow> {
   late WebViewController _webViewController;
   late String _currentUrl;
-  late NetworkListener _networkListener; // Add NetworkListener instance
+  late NetworkListener _networkListener;
+  String _pageTitle = '';
 
   @override
   void initState() {
@@ -31,12 +38,14 @@ class _BrowserWindowState extends State<BrowserWindow> {
             debugPrint('Injecting script at progress: $progress%');
             _networkListener.injectScript();
           }
-          // debugPrint('WebView is loading (progress: $progress%)'); // Can be noisy
+          // 在页面加载过程中获取标题
+          if (progress > 50) {
+            _updatePageTitle();
+          }
         },
         onPageStarted: (url) {
           debugPrint('Page started loading: $url');
-          _networkListener
-              .resetInjectionStatus(); // Reset injection status on new page start
+          _networkListener.resetInjectionStatus();
         },
         onPageFinished: (url) {
           debugPrint('Page finished loading: $url');
@@ -44,6 +53,8 @@ class _BrowserWindowState extends State<BrowserWindow> {
             debugPrint('Injecting script on page finished (fallback)');
             _networkListener.injectScript();
           }
+          // 页面加载完成后获取标题
+          _updatePageTitle();
         },
         onWebResourceError: (error) {
           debugPrint('Web resource error: $error');
@@ -105,6 +116,7 @@ class _BrowserWindowState extends State<BrowserWindow> {
       // Reset injection status when URL changes externally
       _networkListener.resetInjectionStatus();
       _webViewController.loadRequest(Uri.parse(_currentUrl));
+      // URL变化后，等待页面加载并更新标题
     }
   }
 
@@ -113,6 +125,26 @@ class _BrowserWindowState extends State<BrowserWindow> {
     // Reset injection status when loading a new URL manually
     _networkListener.resetInjectionStatus();
     _webViewController.loadRequest(Uri.parse(url));
+    // loadRequest后，navigationDelegate会处理页面加载事件，
+    // 在onPageFinished中会自动调用_updatePageTitle()
+  }
+
+  // 获取并更新页面标题的方法
+  Future<void> _updatePageTitle() async {
+    try {
+      final title = await _webViewController.getTitle() ?? '';
+      if (title != _pageTitle) {
+        setState(() {
+          _pageTitle = title;
+        });
+        // 通知父部件标题已更改
+        if (widget.onTitleChanged != null) {
+          widget.onTitleChanged!(title);
+        }
+      }
+    } catch (e) {
+      debugPrint('Error getting page title: $e');
+    }
   }
 
   @override

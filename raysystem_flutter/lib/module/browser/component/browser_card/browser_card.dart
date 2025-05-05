@@ -10,8 +10,22 @@ class BrowserCard extends StatefulWidget {
 }
 
 class _BrowserCardState extends State<BrowserCard> {
+  String _pageTitle = '';
+
+  void _onTitleChanged(String title) {
+    setState(() {
+      _pageTitle = title;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return RayCard(content: BrowserWindow(initialUrl: 'https://weibo.com'));
+    return RayCard(
+      title: _pageTitle.isNotEmpty ? Text(_pageTitle) : const Text('浏览器'),
+      content: BrowserWindow(
+        initialUrl: 'https://weibo.com',
+        onTitleChanged: _onTitleChanged,
+      ),
+    );
   }
 }
