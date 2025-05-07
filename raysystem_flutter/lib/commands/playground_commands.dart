@@ -6,6 +6,8 @@ import 'package:raysystem_flutter/commands/command.dart';
 import 'package:raysystem_flutter/form/form_field.dart';
 import 'package:raysystem_flutter/form/form_manager.dart';
 import 'package:appflowy_editor/appflowy_editor.dart';
+import 'package:dio/dio.dart'; // 新增 dio 导入
+import 'package:raysystem_flutter/component/card/ray_card.dart'; // 新增 RayCard 导入
 
 final playgroundCommands = Command(
   command: 'playground-app',
@@ -126,6 +128,51 @@ final playgroundCommands = Command(
           ),
         );
       },
-    ),    
+    ),
+    Command(
+      command: 'debug-weibo-image',
+      title: '调试微博图片',
+      icon: Icons.image,
+      callback: (context, cardManager) async {
+        const imageUrl =
+            'https://wx1.sinaimg.cn/mw690/87860e4bgy1i17cvs1w1aj20of0swdjc.jpg'; // 请替换为实际的微博图片 URL
+        final dio = Dio();
+        try {
+          final response = await dio.get(
+            imageUrl,
+            options: Options(
+              responseType: ResponseType.bytes, // 获取原始字节数据
+              headers: {
+                'Referer': 'https://weibo.com',
+                'User-Agent':
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
+                'sec-fetch-mode': 'no-cors',
+                'sec-fetch-site': 'cross-site',
+              },
+            ),
+          );
+
+          if (response.statusCode == 200 && response.data != null) {
+            cardManager.addCard(
+              RayCard(
+                title: const Text('微博图片'),
+                content: Image.memory(response.data),
+              ),
+              wrappedInRayCard: false, // RayCard 内部已经处理了包裹
+            );
+          } else {
+            cardManager.addCard(Container(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('图片加载失败: ${response.statusCode}'),
+            ));
+          }
+        } catch (e) {
+          cardManager.addCard(Container(
+            padding: const EdgeInsets.all(8.0),
+            child: Text('图片加载异常: $e'),
+          ));
+        }
+      },
+    ),
   ],
 );
