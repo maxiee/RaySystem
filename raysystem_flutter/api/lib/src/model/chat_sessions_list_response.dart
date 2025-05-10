@@ -13,10 +13,12 @@ part 'chat_sessions_list_response.g.dart';
 /// Schema for listing multiple chat sessions.
 ///
 /// Properties:
-/// * [total] 
-/// * [items] 
+/// * [total]
+/// * [items]
 @BuiltValue()
-abstract class ChatSessionsListResponse implements Built<ChatSessionsListResponse, ChatSessionsListResponseBuilder> {
+abstract class ChatSessionsListResponse
+    implements
+        Built<ChatSessionsListResponse, ChatSessionsListResponseBuilder> {
   @BuiltValueField(wireName: r'total')
   int get total;
 
@@ -25,18 +27,25 @@ abstract class ChatSessionsListResponse implements Built<ChatSessionsListRespons
 
   ChatSessionsListResponse._();
 
-  factory ChatSessionsListResponse([void updates(ChatSessionsListResponseBuilder b)]) = _$ChatSessionsListResponse;
+  factory ChatSessionsListResponse(
+          [void updates(ChatSessionsListResponseBuilder b)]) =
+      _$ChatSessionsListResponse;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(ChatSessionsListResponseBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<ChatSessionsListResponse> get serializer => _$ChatSessionsListResponseSerializer();
+  static Serializer<ChatSessionsListResponse> get serializer =>
+      _$ChatSessionsListResponseSerializer();
 }
 
-class _$ChatSessionsListResponseSerializer implements PrimitiveSerializer<ChatSessionsListResponse> {
+class _$ChatSessionsListResponseSerializer
+    implements PrimitiveSerializer<ChatSessionsListResponse> {
   @override
-  final Iterable<Type> types = const [ChatSessionsListResponse, _$ChatSessionsListResponse];
+  final Iterable<Type> types = const [
+    ChatSessionsListResponse,
+    _$ChatSessionsListResponse
+  ];
 
   @override
   final String wireName = r'ChatSessionsListResponse';
@@ -64,7 +73,9 @@ class _$ChatSessionsListResponseSerializer implements PrimitiveSerializer<ChatSe
     ChatSessionsListResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -89,7 +100,8 @@ class _$ChatSessionsListResponseSerializer implements PrimitiveSerializer<ChatSe
         case r'items':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(ChatSessionResponse)]),
+            specifiedType:
+                const FullType(BuiltList, [FullType(ChatSessionResponse)]),
           ) as BuiltList<ChatSessionResponse>;
           result.items.replace(valueDes);
           break;
@@ -121,4 +133,3 @@ class _$ChatSessionsListResponseSerializer implements PrimitiveSerializer<ChatSe
     return result.build();
   }
 }
-

@@ -11,15 +11,15 @@ part 'disk_metrics.g.dart';
 /// DiskMetrics
 ///
 /// Properties:
-/// * [device] 
-/// * [mountPoint] 
-/// * [volumeName] 
-/// * [totalGb] 
-/// * [usedGb] 
-/// * [freeGb] 
-/// * [usagePercent] 
-/// * [readSpeedMb] 
-/// * [writeSpeedMb] 
+/// * [device]
+/// * [mountPoint]
+/// * [volumeName]
+/// * [totalGb]
+/// * [usedGb]
+/// * [freeGb]
+/// * [usagePercent]
+/// * [readSpeedMb]
+/// * [writeSpeedMb]
 @BuiltValue()
 abstract class DiskMetrics implements Built<DiskMetrics, DiskMetricsBuilder> {
   @BuiltValueField(wireName: r'device')
@@ -125,7 +125,9 @@ class _$DiskMetricsSerializer implements PrimitiveSerializer<DiskMetrics> {
     DiskMetrics object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -231,4 +233,3 @@ class _$DiskMetricsSerializer implements PrimitiveSerializer<DiskMetrics> {
     return result.build();
   }
 }
-

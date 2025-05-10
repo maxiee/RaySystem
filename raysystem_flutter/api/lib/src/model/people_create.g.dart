@@ -1,0 +1,115 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'people_create.dart';
+
+// **************************************************************************
+// BuiltValueGenerator
+// **************************************************************************
+
+class _$PeopleCreate extends PeopleCreate {
+  @override
+  final String? description;
+  @override
+  final String? avatar;
+  @override
+  final String? birthDate;
+
+  factory _$PeopleCreate([void Function(PeopleCreateBuilder)? updates]) =>
+      (new PeopleCreateBuilder()..update(updates))._build();
+
+  _$PeopleCreate._({this.description, this.avatar, this.birthDate}) : super._();
+
+  @override
+  PeopleCreate rebuild(void Function(PeopleCreateBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  PeopleCreateBuilder toBuilder() => new PeopleCreateBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is PeopleCreate &&
+        description == other.description &&
+        avatar == other.avatar &&
+        birthDate == other.birthDate;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, description.hashCode);
+    _$hash = $jc(_$hash, avatar.hashCode);
+    _$hash = $jc(_$hash, birthDate.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'PeopleCreate')
+          ..add('description', description)
+          ..add('avatar', avatar)
+          ..add('birthDate', birthDate))
+        .toString();
+  }
+}
+
+class PeopleCreateBuilder
+    implements Builder<PeopleCreate, PeopleCreateBuilder> {
+  _$PeopleCreate? _$v;
+
+  String? _description;
+  String? get description => _$this._description;
+  set description(String? description) => _$this._description = description;
+
+  String? _avatar;
+  String? get avatar => _$this._avatar;
+  set avatar(String? avatar) => _$this._avatar = avatar;
+
+  String? _birthDate;
+  String? get birthDate => _$this._birthDate;
+  set birthDate(String? birthDate) => _$this._birthDate = birthDate;
+
+  PeopleCreateBuilder() {
+    PeopleCreate._defaults(this);
+  }
+
+  PeopleCreateBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _description = $v.description;
+      _avatar = $v.avatar;
+      _birthDate = $v.birthDate;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(PeopleCreate other) {
+    ArgumentError.checkNotNull(other, 'other');
+    _$v = other as _$PeopleCreate;
+  }
+
+  @override
+  void update(void Function(PeopleCreateBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  PeopleCreate build() => _build();
+
+  _$PeopleCreate _build() {
+    final _$result = _$v ??
+        new _$PeopleCreate._(
+          description: description,
+          avatar: avatar,
+          birthDate: birthDate,
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+// ignore_for_file: deprecated_member_use_from_same_package,type=lint

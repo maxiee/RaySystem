@@ -13,10 +13,11 @@ part 'note_tree_response.g.dart';
 /// NoteTreeResponse
 ///
 /// Properties:
-/// * [total] 
-/// * [items] 
+/// * [total]
+/// * [items]
 @BuiltValue()
-abstract class NoteTreeResponse implements Built<NoteTreeResponse, NoteTreeResponseBuilder> {
+abstract class NoteTreeResponse
+    implements Built<NoteTreeResponse, NoteTreeResponseBuilder> {
   @BuiltValueField(wireName: r'total')
   int get total;
 
@@ -25,16 +26,19 @@ abstract class NoteTreeResponse implements Built<NoteTreeResponse, NoteTreeRespo
 
   NoteTreeResponse._();
 
-  factory NoteTreeResponse([void updates(NoteTreeResponseBuilder b)]) = _$NoteTreeResponse;
+  factory NoteTreeResponse([void updates(NoteTreeResponseBuilder b)]) =
+      _$NoteTreeResponse;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(NoteTreeResponseBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<NoteTreeResponse> get serializer => _$NoteTreeResponseSerializer();
+  static Serializer<NoteTreeResponse> get serializer =>
+      _$NoteTreeResponseSerializer();
 }
 
-class _$NoteTreeResponseSerializer implements PrimitiveSerializer<NoteTreeResponse> {
+class _$NoteTreeResponseSerializer
+    implements PrimitiveSerializer<NoteTreeResponse> {
   @override
   final Iterable<Type> types = const [NoteTreeResponse, _$NoteTreeResponse];
 
@@ -64,7 +68,9 @@ class _$NoteTreeResponseSerializer implements PrimitiveSerializer<NoteTreeRespon
     NoteTreeResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -121,4 +127,3 @@ class _$NoteTreeResponseSerializer implements PrimitiveSerializer<NoteTreeRespon
     return result.build();
   }
 }
-

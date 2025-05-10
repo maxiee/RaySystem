@@ -32,6 +32,11 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..add(NoteTreeResponse.serializer)
       ..add(NoteUpdate.serializer)
       ..add(NotesListResponse.serializer)
+      ..add(PeopleCreate.serializer)
+      ..add(PeopleNameCreate.serializer)
+      ..add(PeopleNameResponse.serializer)
+      ..add(PeopleResponse.serializer)
+      ..add(PeopleUpdate.serializer)
       ..add(ResponseGetMetricsSystemMetricsGet.serializer)
       ..add(ScheduledTaskResponse.serializer)
       ..add(Site.serializer)
@@ -68,6 +73,9 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(NoteTitleResponse)]),
           () => new ListBuilder<NoteTitleResponse>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(PeopleNameResponse)]),
+          () => new ListBuilder<PeopleNameResponse>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(ValidationError)]),
           () => new ListBuilder<ValidationError>())

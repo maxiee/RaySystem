@@ -13,11 +13,12 @@ part 'validation_error.g.dart';
 /// ValidationError
 ///
 /// Properties:
-/// * [loc] 
-/// * [msg] 
-/// * [type] 
+/// * [loc]
+/// * [msg]
+/// * [type]
 @BuiltValue()
-abstract class ValidationError implements Built<ValidationError, ValidationErrorBuilder> {
+abstract class ValidationError
+    implements Built<ValidationError, ValidationErrorBuilder> {
   @BuiltValueField(wireName: r'loc')
   BuiltList<ValidationErrorLocInner> get loc;
 
@@ -29,16 +30,19 @@ abstract class ValidationError implements Built<ValidationError, ValidationError
 
   ValidationError._();
 
-  factory ValidationError([void updates(ValidationErrorBuilder b)]) = _$ValidationError;
+  factory ValidationError([void updates(ValidationErrorBuilder b)]) =
+      _$ValidationError;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(ValidationErrorBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<ValidationError> get serializer => _$ValidationErrorSerializer();
+  static Serializer<ValidationError> get serializer =>
+      _$ValidationErrorSerializer();
 }
 
-class _$ValidationErrorSerializer implements PrimitiveSerializer<ValidationError> {
+class _$ValidationErrorSerializer
+    implements PrimitiveSerializer<ValidationError> {
   @override
   final Iterable<Type> types = const [ValidationError, _$ValidationError];
 
@@ -53,7 +57,8 @@ class _$ValidationErrorSerializer implements PrimitiveSerializer<ValidationError
     yield r'loc';
     yield serializers.serialize(
       object.loc,
-      specifiedType: const FullType(BuiltList, [FullType(ValidationErrorLocInner)]),
+      specifiedType:
+          const FullType(BuiltList, [FullType(ValidationErrorLocInner)]),
     );
     yield r'msg';
     yield serializers.serialize(
@@ -73,7 +78,9 @@ class _$ValidationErrorSerializer implements PrimitiveSerializer<ValidationError
     ValidationError object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -91,7 +98,8 @@ class _$ValidationErrorSerializer implements PrimitiveSerializer<ValidationError
         case r'loc':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(ValidationErrorLocInner)]),
+            specifiedType:
+                const FullType(BuiltList, [FullType(ValidationErrorLocInner)]),
           ) as BuiltList<ValidationErrorLocInner>;
           result.loc.replace(valueDes);
           break;
@@ -137,4 +145,3 @@ class _$ValidationErrorSerializer implements PrimitiveSerializer<ValidationError
     return result.build();
   }
 }
-

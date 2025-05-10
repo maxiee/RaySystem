@@ -11,13 +11,14 @@ part 'note_title_response.g.dart';
 /// NoteTitleResponse
 ///
 /// Properties:
-/// * [title] 
-/// * [isPrimary] 
-/// * [id] 
-/// * [noteId] 
-/// * [createdAt] 
+/// * [title]
+/// * [isPrimary]
+/// * [id]
+/// * [noteId]
+/// * [createdAt]
 @BuiltValue()
-abstract class NoteTitleResponse implements Built<NoteTitleResponse, NoteTitleResponseBuilder> {
+abstract class NoteTitleResponse
+    implements Built<NoteTitleResponse, NoteTitleResponseBuilder> {
   @BuiltValueField(wireName: r'title')
   String get title;
 
@@ -35,17 +36,19 @@ abstract class NoteTitleResponse implements Built<NoteTitleResponse, NoteTitleRe
 
   NoteTitleResponse._();
 
-  factory NoteTitleResponse([void updates(NoteTitleResponseBuilder b)]) = _$NoteTitleResponse;
+  factory NoteTitleResponse([void updates(NoteTitleResponseBuilder b)]) =
+      _$NoteTitleResponse;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(NoteTitleResponseBuilder b) => b
-      ..isPrimary = false;
+  static void _defaults(NoteTitleResponseBuilder b) => b..isPrimary = false;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<NoteTitleResponse> get serializer => _$NoteTitleResponseSerializer();
+  static Serializer<NoteTitleResponse> get serializer =>
+      _$NoteTitleResponseSerializer();
 }
 
-class _$NoteTitleResponseSerializer implements PrimitiveSerializer<NoteTitleResponse> {
+class _$NoteTitleResponseSerializer
+    implements PrimitiveSerializer<NoteTitleResponse> {
   @override
   final Iterable<Type> types = const [NoteTitleResponse, _$NoteTitleResponse];
 
@@ -92,7 +95,9 @@ class _$NoteTitleResponseSerializer implements PrimitiveSerializer<NoteTitleResp
     NoteTitleResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -170,4 +175,3 @@ class _$NoteTitleResponseSerializer implements PrimitiveSerializer<NoteTitleResp
     return result.build();
   }
 }
-

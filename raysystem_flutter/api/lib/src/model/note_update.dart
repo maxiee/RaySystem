@@ -11,8 +11,8 @@ part 'note_update.g.dart';
 /// NoteUpdate
 ///
 /// Properties:
-/// * [contentAppflowy] 
-/// * [parentId] 
+/// * [contentAppflowy]
+/// * [parentId]
 @BuiltValue()
 abstract class NoteUpdate implements Built<NoteUpdate, NoteUpdateBuilder> {
   @BuiltValueField(wireName: r'content_appflowy')
@@ -64,7 +64,9 @@ class _$NoteUpdateSerializer implements PrimitiveSerializer<NoteUpdate> {
     NoteUpdate object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -122,4 +124,3 @@ class _$NoteUpdateSerializer implements PrimitiveSerializer<NoteUpdate> {
     return result.build();
   }
 }
-

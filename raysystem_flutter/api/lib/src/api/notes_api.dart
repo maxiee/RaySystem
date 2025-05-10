@@ -18,7 +18,6 @@ import 'package:openapi/src/model/note_update.dart';
 import 'package:openapi/src/model/notes_list_response.dart';
 
 class NotesApi {
-
   final Dio _dio;
 
   final Serializers _serializers;
@@ -29,7 +28,7 @@ class NotesApi {
   /// Create a new note with title and AppFlowy editor content
   ///
   /// Parameters:
-  /// * [noteCreate] 
+  /// * [noteCreate]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -39,7 +38,7 @@ class NotesApi {
   ///
   /// Returns a [Future] containing a [Response] with a [NoteResponse] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<NoteResponse>> createNoteNotesPost({ 
+  Future<Response<NoteResponse>> createNoteNotesPost({
     required NoteCreate noteCreate,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -67,10 +66,9 @@ class NotesApi {
     try {
       const _type = FullType(NoteCreate);
       _bodyData = _serializers.serialize(noteCreate, specifiedType: _type);
-
-    } catch(error, stackTrace) {
+    } catch (error, stackTrace) {
       throw DioException(
-         requestOptions: _options.compose(
+        requestOptions: _options.compose(
           _dio.options,
           _path,
         ),
@@ -93,11 +91,12 @@ class NotesApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(NoteResponse),
-      ) as NoteResponse;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(NoteResponse),
+            ) as NoteResponse;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -124,7 +123,7 @@ class NotesApi {
   /// Delete a note by ID
   ///
   /// Parameters:
-  /// * [noteId] 
+  /// * [noteId]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -134,7 +133,7 @@ class NotesApi {
   ///
   /// Returns a [Future] containing a [Response] with a [bool] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<bool>> deleteNoteNotesNoteIdDelete({ 
+  Future<Response<bool>> deleteNoteNotesNoteIdDelete({
     required int noteId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -143,7 +142,10 @@ class NotesApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/notes/{note_id}'.replaceAll('{' r'note_id' '}', encodeQueryParameter(_serializers, noteId, const FullType(int)).toString());
+    final _path = r'/notes/{note_id}'.replaceAll(
+        '{' r'note_id' '}',
+        encodeQueryParameter(_serializers, noteId, const FullType(int))
+            .toString());
     final _options = Options(
       method: r'DELETE',
       headers: <String, dynamic>{
@@ -169,7 +171,6 @@ class NotesApi {
     try {
       final rawResponse = _response.data;
       _responseData = rawResponse == null ? null : rawResponse as bool;
-
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -208,7 +209,7 @@ class NotesApi {
   ///
   /// Returns a [Future] containing a [Response] with a [NoteTreeResponse] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<NoteTreeResponse>> getChildNotesNotesTreeChildrenGet({ 
+  Future<Response<NoteTreeResponse>> getChildNotesNotesTreeChildrenGet({
     int? parentId,
     int? limit = 50,
     int? offset = 0,
@@ -233,9 +234,14 @@ class NotesApi {
     );
 
     final _queryParameters = <String, dynamic>{
-      r'parent_id': encodeQueryParameter(_serializers, parentId, const FullType(int)),
-      if (limit != null) r'limit': encodeQueryParameter(_serializers, limit, const FullType(int)),
-      if (offset != null) r'offset': encodeQueryParameter(_serializers, offset, const FullType(int)),
+      r'parent_id':
+          encodeQueryParameter(_serializers, parentId, const FullType(int)),
+      if (limit != null)
+        r'limit':
+            encodeQueryParameter(_serializers, limit, const FullType(int)),
+      if (offset != null)
+        r'offset':
+            encodeQueryParameter(_serializers, offset, const FullType(int)),
     };
 
     final _response = await _dio.request<Object>(
@@ -251,11 +257,12 @@ class NotesApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(NoteTreeResponse),
-      ) as NoteTreeResponse;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(NoteTreeResponse),
+            ) as NoteTreeResponse;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -282,7 +289,7 @@ class NotesApi {
   /// Get a specific note by ID
   ///
   /// Parameters:
-  /// * [noteId] 
+  /// * [noteId]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -292,7 +299,7 @@ class NotesApi {
   ///
   /// Returns a [Future] containing a [Response] with a [NoteResponse] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<NoteResponse>> getNoteNotesNoteIdGet({ 
+  Future<Response<NoteResponse>> getNoteNotesNoteIdGet({
     required int noteId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -301,7 +308,10 @@ class NotesApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/notes/{note_id}'.replaceAll('{' r'note_id' '}', encodeQueryParameter(_serializers, noteId, const FullType(int)).toString());
+    final _path = r'/notes/{note_id}'.replaceAll(
+        '{' r'note_id' '}',
+        encodeQueryParameter(_serializers, noteId, const FullType(int))
+            .toString());
     final _options = Options(
       method: r'GET',
       headers: <String, dynamic>{
@@ -326,11 +336,12 @@ class NotesApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(NoteResponse),
-      ) as NoteResponse;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(NoteResponse),
+            ) as NoteResponse;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -357,7 +368,7 @@ class NotesApi {
   /// Get the path from root to the specified note (breadcrumbs)
   ///
   /// Parameters:
-  /// * [noteId] 
+  /// * [noteId]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -367,7 +378,7 @@ class NotesApi {
   ///
   /// Returns a [Future] containing a [Response] with a [BuiltList<NoteResponse>] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<BuiltList<NoteResponse>>> getNotePathNotesNoteIdPathGet({ 
+  Future<Response<BuiltList<NoteResponse>>> getNotePathNotesNoteIdPathGet({
     required int noteId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -376,7 +387,10 @@ class NotesApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/notes/{note_id}/path'.replaceAll('{' r'note_id' '}', encodeQueryParameter(_serializers, noteId, const FullType(int)).toString());
+    final _path = r'/notes/{note_id}/path'.replaceAll(
+        '{' r'note_id' '}',
+        encodeQueryParameter(_serializers, noteId, const FullType(int))
+            .toString());
     final _options = Options(
       method: r'GET',
       headers: <String, dynamic>{
@@ -401,11 +415,13 @@ class NotesApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(BuiltList, [FullType(NoteResponse)]),
-      ) as BuiltList<NoteResponse>;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType:
+                  const FullType(BuiltList, [FullType(NoteResponse)]),
+            ) as BuiltList<NoteResponse>;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -443,7 +459,7 @@ class NotesApi {
   ///
   /// Returns a [Future] containing a [Response] with a [NotesListResponse] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<NotesListResponse>> listRecentNotesNotesGet({ 
+  Future<Response<NotesListResponse>> listRecentNotesNotesGet({
     int? limit = 20,
     int? offset = 0,
     CancelToken? cancelToken,
@@ -467,8 +483,12 @@ class NotesApi {
     );
 
     final _queryParameters = <String, dynamic>{
-      if (limit != null) r'limit': encodeQueryParameter(_serializers, limit, const FullType(int)),
-      if (offset != null) r'offset': encodeQueryParameter(_serializers, offset, const FullType(int)),
+      if (limit != null)
+        r'limit':
+            encodeQueryParameter(_serializers, limit, const FullType(int)),
+      if (offset != null)
+        r'offset':
+            encodeQueryParameter(_serializers, offset, const FullType(int)),
     };
 
     final _response = await _dio.request<Object>(
@@ -484,11 +504,12 @@ class NotesApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(NotesListResponse),
-      ) as NotesListResponse;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(NotesListResponse),
+            ) as NotesListResponse;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -515,7 +536,7 @@ class NotesApi {
   /// Move a note to a new parent. If new_parent_id is None, the note becomes a root note.
   ///
   /// Parameters:
-  /// * [noteId] 
+  /// * [noteId]
   /// * [newParentId] - New parent ID, None for root level
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
@@ -526,7 +547,7 @@ class NotesApi {
   ///
   /// Returns a [Future] containing a [Response] with a [NoteResponse] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<NoteResponse>> moveNoteNotesNoteIdMovePost({ 
+  Future<Response<NoteResponse>> moveNoteNotesNoteIdMovePost({
     required int noteId,
     int? newParentId,
     CancelToken? cancelToken,
@@ -536,7 +557,10 @@ class NotesApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/notes/{note_id}/move'.replaceAll('{' r'note_id' '}', encodeQueryParameter(_serializers, noteId, const FullType(int)).toString());
+    final _path = r'/notes/{note_id}/move'.replaceAll(
+        '{' r'note_id' '}',
+        encodeQueryParameter(_serializers, noteId, const FullType(int))
+            .toString());
     final _options = Options(
       method: r'POST',
       headers: <String, dynamic>{
@@ -550,7 +574,8 @@ class NotesApi {
     );
 
     final _queryParameters = <String, dynamic>{
-      r'new_parent_id': encodeQueryParameter(_serializers, newParentId, const FullType(int)),
+      r'new_parent_id':
+          encodeQueryParameter(_serializers, newParentId, const FullType(int)),
     };
 
     final _response = await _dio.request<Object>(
@@ -566,11 +591,12 @@ class NotesApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(NoteResponse),
-      ) as NoteResponse;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(NoteResponse),
+            ) as NoteResponse;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -609,7 +635,7 @@ class NotesApi {
   ///
   /// Returns a [Future] containing a [Response] with a [NotesListResponse] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<NotesListResponse>> searchNotesNotesSearchGet({ 
+  Future<Response<NotesListResponse>> searchNotesNotesSearchGet({
     required String q,
     int? limit = 20,
     int? offset = 0,
@@ -635,8 +661,12 @@ class NotesApi {
 
     final _queryParameters = <String, dynamic>{
       r'q': encodeQueryParameter(_serializers, q, const FullType(String)),
-      if (limit != null) r'limit': encodeQueryParameter(_serializers, limit, const FullType(int)),
-      if (offset != null) r'offset': encodeQueryParameter(_serializers, offset, const FullType(int)),
+      if (limit != null)
+        r'limit':
+            encodeQueryParameter(_serializers, limit, const FullType(int)),
+      if (offset != null)
+        r'offset':
+            encodeQueryParameter(_serializers, offset, const FullType(int)),
     };
 
     final _response = await _dio.request<Object>(
@@ -652,11 +682,12 @@ class NotesApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(NotesListResponse),
-      ) as NotesListResponse;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(NotesListResponse),
+            ) as NotesListResponse;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -683,8 +714,8 @@ class NotesApi {
   /// Update an existing note
   ///
   /// Parameters:
-  /// * [noteId] 
-  /// * [noteUpdate] 
+  /// * [noteId]
+  /// * [noteUpdate]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -694,7 +725,7 @@ class NotesApi {
   ///
   /// Returns a [Future] containing a [Response] with a [NoteResponse] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<NoteResponse>> updateNoteNotesNoteIdPut({ 
+  Future<Response<NoteResponse>> updateNoteNotesNoteIdPut({
     required int noteId,
     required NoteUpdate noteUpdate,
     CancelToken? cancelToken,
@@ -704,7 +735,10 @@ class NotesApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/notes/{note_id}'.replaceAll('{' r'note_id' '}', encodeQueryParameter(_serializers, noteId, const FullType(int)).toString());
+    final _path = r'/notes/{note_id}'.replaceAll(
+        '{' r'note_id' '}',
+        encodeQueryParameter(_serializers, noteId, const FullType(int))
+            .toString());
     final _options = Options(
       method: r'PUT',
       headers: <String, dynamic>{
@@ -723,10 +757,9 @@ class NotesApi {
     try {
       const _type = FullType(NoteUpdate);
       _bodyData = _serializers.serialize(noteUpdate, specifiedType: _type);
-
-    } catch(error, stackTrace) {
+    } catch (error, stackTrace) {
       throw DioException(
-         requestOptions: _options.compose(
+        requestOptions: _options.compose(
           _dio.options,
           _path,
         ),
@@ -749,11 +782,12 @@ class NotesApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(NoteResponse),
-      ) as NoteResponse;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(NoteResponse),
+            ) as NoteResponse;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -775,5 +809,4 @@ class NotesApi {
       extra: _response.extra,
     );
   }
-
 }

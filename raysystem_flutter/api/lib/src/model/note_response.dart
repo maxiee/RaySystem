@@ -13,15 +13,16 @@ part 'note_response.g.dart';
 /// NoteResponse
 ///
 /// Properties:
-/// * [contentAppflowy] 
-/// * [parentId] 
-/// * [id] 
-/// * [noteTitles] 
-/// * [hasChildren] 
-/// * [createdAt] 
-/// * [updatedAt] 
+/// * [contentAppflowy]
+/// * [parentId]
+/// * [id]
+/// * [noteTitles]
+/// * [hasChildren]
+/// * [createdAt]
+/// * [updatedAt]
 @BuiltValue()
-abstract class NoteResponse implements Built<NoteResponse, NoteResponseBuilder> {
+abstract class NoteResponse
+    implements Built<NoteResponse, NoteResponseBuilder> {
   @BuiltValueField(wireName: r'content_appflowy')
   String get contentAppflowy;
 
@@ -111,7 +112,9 @@ class _$NoteResponseSerializer implements PrimitiveSerializer<NoteResponse> {
     NoteResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -151,7 +154,8 @@ class _$NoteResponseSerializer implements PrimitiveSerializer<NoteResponse> {
         case r'note_titles':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(NoteTitleResponse)]),
+            specifiedType:
+                const FullType(BuiltList, [FullType(NoteTitleResponse)]),
           ) as BuiltList<NoteTitleResponse>;
           result.noteTitles.replace(valueDes);
           break;
@@ -204,4 +208,3 @@ class _$NoteResponseSerializer implements PrimitiveSerializer<NoteResponse> {
     return result.build();
   }
 }
-

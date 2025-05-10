@@ -15,7 +15,8 @@ part 'chat_completion_response.g.dart';
 /// * [message] - The generated chat message from the assistant.
 /// * [modelUsed] - The name of the model used for this completion.
 @BuiltValue()
-abstract class ChatCompletionResponse implements Built<ChatCompletionResponse, ChatCompletionResponseBuilder> {
+abstract class ChatCompletionResponse
+    implements Built<ChatCompletionResponse, ChatCompletionResponseBuilder> {
   /// The generated chat message from the assistant.
   @BuiltValueField(wireName: r'message')
   ChatMessageOutput get message;
@@ -26,18 +27,25 @@ abstract class ChatCompletionResponse implements Built<ChatCompletionResponse, C
 
   ChatCompletionResponse._();
 
-  factory ChatCompletionResponse([void updates(ChatCompletionResponseBuilder b)]) = _$ChatCompletionResponse;
+  factory ChatCompletionResponse(
+          [void updates(ChatCompletionResponseBuilder b)]) =
+      _$ChatCompletionResponse;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(ChatCompletionResponseBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<ChatCompletionResponse> get serializer => _$ChatCompletionResponseSerializer();
+  static Serializer<ChatCompletionResponse> get serializer =>
+      _$ChatCompletionResponseSerializer();
 }
 
-class _$ChatCompletionResponseSerializer implements PrimitiveSerializer<ChatCompletionResponse> {
+class _$ChatCompletionResponseSerializer
+    implements PrimitiveSerializer<ChatCompletionResponse> {
   @override
-  final Iterable<Type> types = const [ChatCompletionResponse, _$ChatCompletionResponse];
+  final Iterable<Type> types = const [
+    ChatCompletionResponse,
+    _$ChatCompletionResponse
+  ];
 
   @override
   final String wireName = r'ChatCompletionResponse';
@@ -65,7 +73,9 @@ class _$ChatCompletionResponseSerializer implements PrimitiveSerializer<ChatComp
     ChatCompletionResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -122,4 +132,3 @@ class _$ChatCompletionResponseSerializer implements PrimitiveSerializer<ChatComp
     return result.build();
   }
 }
-

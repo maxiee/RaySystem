@@ -13,9 +13,9 @@ part 'note_create.g.dart';
 /// NoteCreate
 ///
 /// Properties:
-/// * [contentAppflowy] 
-/// * [parentId] 
-/// * [titles] 
+/// * [contentAppflowy]
+/// * [parentId]
+/// * [titles]
 @BuiltValue()
 abstract class NoteCreate implements Built<NoteCreate, NoteCreateBuilder> {
   @BuiltValueField(wireName: r'content_appflowy')
@@ -32,8 +32,7 @@ abstract class NoteCreate implements Built<NoteCreate, NoteCreateBuilder> {
   factory NoteCreate([void updates(NoteCreateBuilder b)]) = _$NoteCreate;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(NoteCreateBuilder b) => b
-      ..titles = ListBuilder();
+  static void _defaults(NoteCreateBuilder b) => b..titles = ListBuilder();
 
   @BuiltValueSerializer(custom: true)
   static Serializer<NoteCreate> get serializer => _$NoteCreateSerializer();
@@ -78,7 +77,9 @@ class _$NoteCreateSerializer implements PrimitiveSerializer<NoteCreate> {
     NoteCreate object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -111,7 +112,8 @@ class _$NoteCreateSerializer implements PrimitiveSerializer<NoteCreate> {
         case r'titles':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(NoteTitleCreate)]),
+            specifiedType:
+                const FullType(BuiltList, [FullType(NoteTitleCreate)]),
           ) as BuiltList<NoteTitleCreate>;
           result.titles.replace(valueDes);
           break;
@@ -143,4 +145,3 @@ class _$NoteCreateSerializer implements PrimitiveSerializer<NoteCreate> {
     return result.build();
   }
 }
-

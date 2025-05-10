@@ -11,17 +11,18 @@ part 'memory_metrics.g.dart';
 /// MemoryMetrics
 ///
 /// Properties:
-/// * [totalGb] 
-/// * [usedGb] 
-/// * [availableGb] 
-/// * [cachedGb] 
-/// * [percent] 
-/// * [swapTotalGb] 
-/// * [swapUsedGb] 
-/// * [swapFreeGb] 
-/// * [swapPercent] 
+/// * [totalGb]
+/// * [usedGb]
+/// * [availableGb]
+/// * [cachedGb]
+/// * [percent]
+/// * [swapTotalGb]
+/// * [swapUsedGb]
+/// * [swapFreeGb]
+/// * [swapPercent]
 @BuiltValue()
-abstract class MemoryMetrics implements Built<MemoryMetrics, MemoryMetricsBuilder> {
+abstract class MemoryMetrics
+    implements Built<MemoryMetrics, MemoryMetricsBuilder> {
   @BuiltValueField(wireName: r'total_gb')
   num get totalGb;
 
@@ -51,13 +52,15 @@ abstract class MemoryMetrics implements Built<MemoryMetrics, MemoryMetricsBuilde
 
   MemoryMetrics._();
 
-  factory MemoryMetrics([void updates(MemoryMetricsBuilder b)]) = _$MemoryMetrics;
+  factory MemoryMetrics([void updates(MemoryMetricsBuilder b)]) =
+      _$MemoryMetrics;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(MemoryMetricsBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<MemoryMetrics> get serializer => _$MemoryMetricsSerializer();
+  static Serializer<MemoryMetrics> get serializer =>
+      _$MemoryMetricsSerializer();
 }
 
 class _$MemoryMetricsSerializer implements PrimitiveSerializer<MemoryMetrics> {
@@ -125,7 +128,9 @@ class _$MemoryMetricsSerializer implements PrimitiveSerializer<MemoryMetrics> {
     MemoryMetrics object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -231,4 +236,3 @@ class _$MemoryMetricsSerializer implements PrimitiveSerializer<MemoryMetrics> {
     return result.build();
   }
 }
-

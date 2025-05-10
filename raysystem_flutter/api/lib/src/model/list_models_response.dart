@@ -16,7 +16,8 @@ part 'list_models_response.g.dart';
 /// * [models] - List of available models
 /// * [defaultModel] - The name of the default model
 @BuiltValue()
-abstract class ListModelsResponse implements Built<ListModelsResponse, ListModelsResponseBuilder> {
+abstract class ListModelsResponse
+    implements Built<ListModelsResponse, ListModelsResponseBuilder> {
   /// List of available models
   @BuiltValueField(wireName: r'models')
   BuiltList<ModelInfo> get models;
@@ -27,16 +28,19 @@ abstract class ListModelsResponse implements Built<ListModelsResponse, ListModel
 
   ListModelsResponse._();
 
-  factory ListModelsResponse([void updates(ListModelsResponseBuilder b)]) = _$ListModelsResponse;
+  factory ListModelsResponse([void updates(ListModelsResponseBuilder b)]) =
+      _$ListModelsResponse;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(ListModelsResponseBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<ListModelsResponse> get serializer => _$ListModelsResponseSerializer();
+  static Serializer<ListModelsResponse> get serializer =>
+      _$ListModelsResponseSerializer();
 }
 
-class _$ListModelsResponseSerializer implements PrimitiveSerializer<ListModelsResponse> {
+class _$ListModelsResponseSerializer
+    implements PrimitiveSerializer<ListModelsResponse> {
   @override
   final Iterable<Type> types = const [ListModelsResponse, _$ListModelsResponse];
 
@@ -66,7 +70,9 @@ class _$ListModelsResponseSerializer implements PrimitiveSerializer<ListModelsRe
     ListModelsResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -123,4 +129,3 @@ class _$ListModelsResponseSerializer implements PrimitiveSerializer<ListModelsRe
     return result.build();
   }
 }
-

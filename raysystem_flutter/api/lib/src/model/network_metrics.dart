@@ -11,10 +11,11 @@ part 'network_metrics.g.dart';
 /// NetworkMetrics
 ///
 /// Properties:
-/// * [uploadSpeedMb] 
-/// * [downloadSpeedMb] 
+/// * [uploadSpeedMb]
+/// * [downloadSpeedMb]
 @BuiltValue()
-abstract class NetworkMetrics implements Built<NetworkMetrics, NetworkMetricsBuilder> {
+abstract class NetworkMetrics
+    implements Built<NetworkMetrics, NetworkMetricsBuilder> {
   @BuiltValueField(wireName: r'upload_speed_mb')
   num get uploadSpeedMb;
 
@@ -23,16 +24,19 @@ abstract class NetworkMetrics implements Built<NetworkMetrics, NetworkMetricsBui
 
   NetworkMetrics._();
 
-  factory NetworkMetrics([void updates(NetworkMetricsBuilder b)]) = _$NetworkMetrics;
+  factory NetworkMetrics([void updates(NetworkMetricsBuilder b)]) =
+      _$NetworkMetrics;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(NetworkMetricsBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<NetworkMetrics> get serializer => _$NetworkMetricsSerializer();
+  static Serializer<NetworkMetrics> get serializer =>
+      _$NetworkMetricsSerializer();
 }
 
-class _$NetworkMetricsSerializer implements PrimitiveSerializer<NetworkMetrics> {
+class _$NetworkMetricsSerializer
+    implements PrimitiveSerializer<NetworkMetrics> {
   @override
   final Iterable<Type> types = const [NetworkMetrics, _$NetworkMetrics];
 
@@ -62,7 +66,9 @@ class _$NetworkMetricsSerializer implements PrimitiveSerializer<NetworkMetrics> 
     NetworkMetrics object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -119,4 +125,3 @@ class _$NetworkMetricsSerializer implements PrimitiveSerializer<NetworkMetrics> 
     return result.build();
   }
 }
-

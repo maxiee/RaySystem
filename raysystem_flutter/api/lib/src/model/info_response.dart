@@ -11,21 +11,22 @@ part 'info_response.g.dart';
 /// InfoResponse
 ///
 /// Properties:
-/// * [id] 
-/// * [title] 
-/// * [url] 
-/// * [published] 
-/// * [createdAt] 
-/// * [description] 
-/// * [image] 
-/// * [isNew] 
-/// * [isMark] 
-/// * [siteId] 
-/// * [channelId] 
-/// * [subchannelId] 
-/// * [storageHtml] 
+/// * [id]
+/// * [title]
+/// * [url]
+/// * [published]
+/// * [createdAt]
+/// * [description]
+/// * [image]
+/// * [isNew]
+/// * [isMark]
+/// * [siteId]
+/// * [channelId]
+/// * [subchannelId]
+/// * [storageHtml]
 @BuiltValue()
-abstract class InfoResponse implements Built<InfoResponse, InfoResponseBuilder> {
+abstract class InfoResponse
+    implements Built<InfoResponse, InfoResponseBuilder> {
   @BuiltValueField(wireName: r'id')
   int get id;
 
@@ -173,7 +174,9 @@ class _$InfoResponseSerializer implements PrimitiveSerializer<InfoResponse> {
     InfoResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -313,4 +316,3 @@ class _$InfoResponseSerializer implements PrimitiveSerializer<InfoResponse> {
     return result.build();
   }
 }
-

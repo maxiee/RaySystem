@@ -11,11 +11,12 @@ part 'chat_session_update.g.dart';
 /// Schema for updating an existing chat session.
 ///
 /// Properties:
-/// * [title] 
-/// * [modelName] 
-/// * [contentJson] 
+/// * [title]
+/// * [modelName]
+/// * [contentJson]
 @BuiltValue()
-abstract class ChatSessionUpdate implements Built<ChatSessionUpdate, ChatSessionUpdateBuilder> {
+abstract class ChatSessionUpdate
+    implements Built<ChatSessionUpdate, ChatSessionUpdateBuilder> {
   @BuiltValueField(wireName: r'title')
   String? get title;
 
@@ -27,16 +28,19 @@ abstract class ChatSessionUpdate implements Built<ChatSessionUpdate, ChatSession
 
   ChatSessionUpdate._();
 
-  factory ChatSessionUpdate([void updates(ChatSessionUpdateBuilder b)]) = _$ChatSessionUpdate;
+  factory ChatSessionUpdate([void updates(ChatSessionUpdateBuilder b)]) =
+      _$ChatSessionUpdate;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(ChatSessionUpdateBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<ChatSessionUpdate> get serializer => _$ChatSessionUpdateSerializer();
+  static Serializer<ChatSessionUpdate> get serializer =>
+      _$ChatSessionUpdateSerializer();
 }
 
-class _$ChatSessionUpdateSerializer implements PrimitiveSerializer<ChatSessionUpdate> {
+class _$ChatSessionUpdateSerializer
+    implements PrimitiveSerializer<ChatSessionUpdate> {
   @override
   final Iterable<Type> types = const [ChatSessionUpdate, _$ChatSessionUpdate];
 
@@ -77,7 +81,9 @@ class _$ChatSessionUpdateSerializer implements PrimitiveSerializer<ChatSessionUp
     ChatSessionUpdate object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -144,4 +150,3 @@ class _$ChatSessionUpdateSerializer implements PrimitiveSerializer<ChatSessionUp
     return result.build();
   }
 }
-

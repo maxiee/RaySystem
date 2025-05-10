@@ -18,7 +18,6 @@ import 'package:openapi/src/model/people_response.dart';
 import 'package:openapi/src/model/people_update.dart';
 
 class PeopleApi {
-
   final Dio _dio;
 
   final Serializers _serializers;
@@ -26,11 +25,11 @@ class PeopleApi {
   const PeopleApi(this._dio, this._serializers);
 
   /// Create People Name
-  /// 
+  ///
   ///
   /// Parameters:
-  /// * [peopleId] 
-  /// * [peopleNameCreate] 
+  /// * [peopleId]
+  /// * [peopleNameCreate]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -40,7 +39,7 @@ class PeopleApi {
   ///
   /// Returns a [Future] containing a [Response] with a [PeopleNameResponse] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<PeopleNameResponse>> createPeopleNamePeoplePeopleIdNamesPost({ 
+  Future<Response<PeopleNameResponse>> createPeopleNamePeoplePeopleIdNamesPost({
     required int peopleId,
     required PeopleNameCreate peopleNameCreate,
     CancelToken? cancelToken,
@@ -50,7 +49,10 @@ class PeopleApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/people/{people_id}/names'.replaceAll('{' r'people_id' '}', encodeQueryParameter(_serializers, peopleId, const FullType(int)).toString());
+    final _path = r'/people/{people_id}/names'.replaceAll(
+        '{' r'people_id' '}',
+        encodeQueryParameter(_serializers, peopleId, const FullType(int))
+            .toString());
     final _options = Options(
       method: r'POST',
       headers: <String, dynamic>{
@@ -68,11 +70,11 @@ class PeopleApi {
 
     try {
       const _type = FullType(PeopleNameCreate);
-      _bodyData = _serializers.serialize(peopleNameCreate, specifiedType: _type);
-
-    } catch(error, stackTrace) {
+      _bodyData =
+          _serializers.serialize(peopleNameCreate, specifiedType: _type);
+    } catch (error, stackTrace) {
       throw DioException(
-         requestOptions: _options.compose(
+        requestOptions: _options.compose(
           _dio.options,
           _path,
         ),
@@ -95,11 +97,12 @@ class PeopleApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(PeopleNameResponse),
-      ) as PeopleNameResponse;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(PeopleNameResponse),
+            ) as PeopleNameResponse;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -123,10 +126,10 @@ class PeopleApi {
   }
 
   /// Create People
-  /// 
+  ///
   ///
   /// Parameters:
-  /// * [peopleCreate] 
+  /// * [peopleCreate]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -136,7 +139,7 @@ class PeopleApi {
   ///
   /// Returns a [Future] containing a [Response] with a [PeopleResponse] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<PeopleResponse>> createPeoplePeoplePost({ 
+  Future<Response<PeopleResponse>> createPeoplePeoplePost({
     required PeopleCreate peopleCreate,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -164,10 +167,9 @@ class PeopleApi {
     try {
       const _type = FullType(PeopleCreate);
       _bodyData = _serializers.serialize(peopleCreate, specifiedType: _type);
-
-    } catch(error, stackTrace) {
+    } catch (error, stackTrace) {
       throw DioException(
-         requestOptions: _options.compose(
+        requestOptions: _options.compose(
           _dio.options,
           _path,
         ),
@@ -190,11 +192,12 @@ class PeopleApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(PeopleResponse),
-      ) as PeopleResponse;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(PeopleResponse),
+            ) as PeopleResponse;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -218,10 +221,10 @@ class PeopleApi {
   }
 
   /// Delete People Name
-  /// 
+  ///
   ///
   /// Parameters:
-  /// * [nameId] 
+  /// * [nameId]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -231,7 +234,7 @@ class PeopleApi {
   ///
   /// Returns a [Future] containing a [Response] with a [bool] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<bool>> deletePeopleNamePeopleNamesNameIdDelete({ 
+  Future<Response<bool>> deletePeopleNamePeopleNamesNameIdDelete({
     required int nameId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -240,7 +243,10 @@ class PeopleApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/people/names/{name_id}'.replaceAll('{' r'name_id' '}', encodeQueryParameter(_serializers, nameId, const FullType(int)).toString());
+    final _path = r'/people/names/{name_id}'.replaceAll(
+        '{' r'name_id' '}',
+        encodeQueryParameter(_serializers, nameId, const FullType(int))
+            .toString());
     final _options = Options(
       method: r'DELETE',
       headers: <String, dynamic>{
@@ -266,7 +272,6 @@ class PeopleApi {
     try {
       final rawResponse = _response.data;
       _responseData = rawResponse == null ? null : rawResponse as bool;
-
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -290,10 +295,10 @@ class PeopleApi {
   }
 
   /// Delete People
-  /// 
+  ///
   ///
   /// Parameters:
-  /// * [peopleId] 
+  /// * [peopleId]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -303,7 +308,7 @@ class PeopleApi {
   ///
   /// Returns a [Future] containing a [Response] with a [bool] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<bool>> deletePeoplePeoplePeopleIdDelete({ 
+  Future<Response<bool>> deletePeoplePeoplePeopleIdDelete({
     required int peopleId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -312,7 +317,10 @@ class PeopleApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/people/{people_id}'.replaceAll('{' r'people_id' '}', encodeQueryParameter(_serializers, peopleId, const FullType(int)).toString());
+    final _path = r'/people/{people_id}'.replaceAll(
+        '{' r'people_id' '}',
+        encodeQueryParameter(_serializers, peopleId, const FullType(int))
+            .toString());
     final _options = Options(
       method: r'DELETE',
       headers: <String, dynamic>{
@@ -338,7 +346,6 @@ class PeopleApi {
     try {
       final rawResponse = _response.data;
       _responseData = rawResponse == null ? null : rawResponse as bool;
-
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -362,10 +369,10 @@ class PeopleApi {
   }
 
   /// Get People Names
-  /// 
+  ///
   ///
   /// Parameters:
-  /// * [peopleId] 
+  /// * [peopleId]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -375,7 +382,8 @@ class PeopleApi {
   ///
   /// Returns a [Future] containing a [Response] with a [BuiltList<PeopleNameResponse>] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<BuiltList<PeopleNameResponse>>> getPeopleNamesPeoplePeopleIdNamesGet({ 
+  Future<Response<BuiltList<PeopleNameResponse>>>
+      getPeopleNamesPeoplePeopleIdNamesGet({
     required int peopleId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -384,7 +392,10 @@ class PeopleApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/people/{people_id}/names'.replaceAll('{' r'people_id' '}', encodeQueryParameter(_serializers, peopleId, const FullType(int)).toString());
+    final _path = r'/people/{people_id}/names'.replaceAll(
+        '{' r'people_id' '}',
+        encodeQueryParameter(_serializers, peopleId, const FullType(int))
+            .toString());
     final _options = Options(
       method: r'GET',
       headers: <String, dynamic>{
@@ -409,11 +420,13 @@ class PeopleApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(BuiltList, [FullType(PeopleNameResponse)]),
-      ) as BuiltList<PeopleNameResponse>;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType:
+                  const FullType(BuiltList, [FullType(PeopleNameResponse)]),
+            ) as BuiltList<PeopleNameResponse>;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -437,10 +450,10 @@ class PeopleApi {
   }
 
   /// Get People
-  /// 
+  ///
   ///
   /// Parameters:
-  /// * [peopleId] 
+  /// * [peopleId]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -450,7 +463,7 @@ class PeopleApi {
   ///
   /// Returns a [Future] containing a [Response] with a [PeopleResponse] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<PeopleResponse>> getPeoplePeoplePeopleIdGet({ 
+  Future<Response<PeopleResponse>> getPeoplePeoplePeopleIdGet({
     required int peopleId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -459,7 +472,10 @@ class PeopleApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/people/{people_id}'.replaceAll('{' r'people_id' '}', encodeQueryParameter(_serializers, peopleId, const FullType(int)).toString());
+    final _path = r'/people/{people_id}'.replaceAll(
+        '{' r'people_id' '}',
+        encodeQueryParameter(_serializers, peopleId, const FullType(int))
+            .toString());
     final _options = Options(
       method: r'GET',
       headers: <String, dynamic>{
@@ -484,11 +500,12 @@ class PeopleApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(PeopleResponse),
-      ) as PeopleResponse;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(PeopleResponse),
+            ) as PeopleResponse;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -512,11 +529,11 @@ class PeopleApi {
   }
 
   /// Update People Name
-  /// 
+  ///
   ///
   /// Parameters:
-  /// * [nameId] 
-  /// * [peopleNameCreate] 
+  /// * [nameId]
+  /// * [peopleNameCreate]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -526,7 +543,7 @@ class PeopleApi {
   ///
   /// Returns a [Future] containing a [Response] with a [PeopleNameResponse] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<PeopleNameResponse>> updatePeopleNamePeopleNamesNameIdPut({ 
+  Future<Response<PeopleNameResponse>> updatePeopleNamePeopleNamesNameIdPut({
     required int nameId,
     required PeopleNameCreate peopleNameCreate,
     CancelToken? cancelToken,
@@ -536,7 +553,10 @@ class PeopleApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/people/names/{name_id}'.replaceAll('{' r'name_id' '}', encodeQueryParameter(_serializers, nameId, const FullType(int)).toString());
+    final _path = r'/people/names/{name_id}'.replaceAll(
+        '{' r'name_id' '}',
+        encodeQueryParameter(_serializers, nameId, const FullType(int))
+            .toString());
     final _options = Options(
       method: r'PUT',
       headers: <String, dynamic>{
@@ -554,11 +574,11 @@ class PeopleApi {
 
     try {
       const _type = FullType(PeopleNameCreate);
-      _bodyData = _serializers.serialize(peopleNameCreate, specifiedType: _type);
-
-    } catch(error, stackTrace) {
+      _bodyData =
+          _serializers.serialize(peopleNameCreate, specifiedType: _type);
+    } catch (error, stackTrace) {
       throw DioException(
-         requestOptions: _options.compose(
+        requestOptions: _options.compose(
           _dio.options,
           _path,
         ),
@@ -581,11 +601,12 @@ class PeopleApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(PeopleNameResponse),
-      ) as PeopleNameResponse;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(PeopleNameResponse),
+            ) as PeopleNameResponse;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -609,11 +630,11 @@ class PeopleApi {
   }
 
   /// Update People
-  /// 
+  ///
   ///
   /// Parameters:
-  /// * [peopleId] 
-  /// * [peopleUpdate] 
+  /// * [peopleId]
+  /// * [peopleUpdate]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -623,7 +644,7 @@ class PeopleApi {
   ///
   /// Returns a [Future] containing a [Response] with a [PeopleResponse] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<PeopleResponse>> updatePeoplePeoplePeopleIdPut({ 
+  Future<Response<PeopleResponse>> updatePeoplePeoplePeopleIdPut({
     required int peopleId,
     required PeopleUpdate peopleUpdate,
     CancelToken? cancelToken,
@@ -633,7 +654,10 @@ class PeopleApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/people/{people_id}'.replaceAll('{' r'people_id' '}', encodeQueryParameter(_serializers, peopleId, const FullType(int)).toString());
+    final _path = r'/people/{people_id}'.replaceAll(
+        '{' r'people_id' '}',
+        encodeQueryParameter(_serializers, peopleId, const FullType(int))
+            .toString());
     final _options = Options(
       method: r'PUT',
       headers: <String, dynamic>{
@@ -652,10 +676,9 @@ class PeopleApi {
     try {
       const _type = FullType(PeopleUpdate);
       _bodyData = _serializers.serialize(peopleUpdate, specifiedType: _type);
-
-    } catch(error, stackTrace) {
+    } catch (error, stackTrace) {
       throw DioException(
-         requestOptions: _options.compose(
+        requestOptions: _options.compose(
           _dio.options,
           _path,
         ),
@@ -678,11 +701,12 @@ class PeopleApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(PeopleResponse),
-      ) as PeopleResponse;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(PeopleResponse),
+            ) as PeopleResponse;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -704,5 +728,4 @@ class PeopleApi {
       extra: _response.extra,
     );
   }
-
 }

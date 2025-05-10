@@ -16,7 +16,6 @@ import 'package:openapi/src/model/chat_sessions_list_response.dart';
 import 'package:openapi/src/model/http_validation_error.dart';
 
 class ChatSessionsApi {
-
   final Dio _dio;
 
   final Serializers _serializers;
@@ -27,7 +26,7 @@ class ChatSessionsApi {
   /// Create a new chat session with the specified title, model name, and content
   ///
   /// Parameters:
-  /// * [chatSessionCreate] 
+  /// * [chatSessionCreate]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -37,7 +36,7 @@ class ChatSessionsApi {
   ///
   /// Returns a [Future] containing a [Response] with a [ChatSessionResponse] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<ChatSessionResponse>> createChatSessionLlmChatSessionsPost({ 
+  Future<Response<ChatSessionResponse>> createChatSessionLlmChatSessionsPost({
     required ChatSessionCreate chatSessionCreate,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -64,11 +63,11 @@ class ChatSessionsApi {
 
     try {
       const _type = FullType(ChatSessionCreate);
-      _bodyData = _serializers.serialize(chatSessionCreate, specifiedType: _type);
-
-    } catch(error, stackTrace) {
+      _bodyData =
+          _serializers.serialize(chatSessionCreate, specifiedType: _type);
+    } catch (error, stackTrace) {
       throw DioException(
-         requestOptions: _options.compose(
+        requestOptions: _options.compose(
           _dio.options,
           _path,
         ),
@@ -91,11 +90,12 @@ class ChatSessionsApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(ChatSessionResponse),
-      ) as ChatSessionResponse;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(ChatSessionResponse),
+            ) as ChatSessionResponse;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -122,7 +122,7 @@ class ChatSessionsApi {
   /// Delete a chat session by ID
   ///
   /// Parameters:
-  /// * [sessionId] 
+  /// * [sessionId]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -132,7 +132,7 @@ class ChatSessionsApi {
   ///
   /// Returns a [Future] containing a [Response] with a [bool] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<bool>> deleteChatSessionLlmChatSessionsSessionIdDelete({ 
+  Future<Response<bool>> deleteChatSessionLlmChatSessionsSessionIdDelete({
     required int sessionId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -141,7 +141,10 @@ class ChatSessionsApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/llm/chat-sessions/{session_id}'.replaceAll('{' r'session_id' '}', encodeQueryParameter(_serializers, sessionId, const FullType(int)).toString());
+    final _path = r'/llm/chat-sessions/{session_id}'.replaceAll(
+        '{' r'session_id' '}',
+        encodeQueryParameter(_serializers, sessionId, const FullType(int))
+            .toString());
     final _options = Options(
       method: r'DELETE',
       headers: <String, dynamic>{
@@ -167,7 +170,6 @@ class ChatSessionsApi {
     try {
       final rawResponse = _response.data;
       _responseData = rawResponse == null ? null : rawResponse as bool;
-
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -194,7 +196,7 @@ class ChatSessionsApi {
   /// Get a specific chat session by ID
   ///
   /// Parameters:
-  /// * [sessionId] 
+  /// * [sessionId]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -204,7 +206,8 @@ class ChatSessionsApi {
   ///
   /// Returns a [Future] containing a [Response] with a [ChatSessionResponse] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<ChatSessionResponse>> getChatSessionLlmChatSessionsSessionIdGet({ 
+  Future<Response<ChatSessionResponse>>
+      getChatSessionLlmChatSessionsSessionIdGet({
     required int sessionId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -213,7 +216,10 @@ class ChatSessionsApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/llm/chat-sessions/{session_id}'.replaceAll('{' r'session_id' '}', encodeQueryParameter(_serializers, sessionId, const FullType(int)).toString());
+    final _path = r'/llm/chat-sessions/{session_id}'.replaceAll(
+        '{' r'session_id' '}',
+        encodeQueryParameter(_serializers, sessionId, const FullType(int))
+            .toString());
     final _options = Options(
       method: r'GET',
       headers: <String, dynamic>{
@@ -238,11 +244,12 @@ class ChatSessionsApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(ChatSessionResponse),
-      ) as ChatSessionResponse;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(ChatSessionResponse),
+            ) as ChatSessionResponse;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -280,7 +287,8 @@ class ChatSessionsApi {
   ///
   /// Returns a [Future] containing a [Response] with a [ChatSessionsListResponse] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<ChatSessionsListResponse>> listChatSessionsLlmChatSessionsGet({ 
+  Future<Response<ChatSessionsListResponse>>
+      listChatSessionsLlmChatSessionsGet({
     int? limit = 20,
     int? offset = 0,
     CancelToken? cancelToken,
@@ -304,8 +312,12 @@ class ChatSessionsApi {
     );
 
     final _queryParameters = <String, dynamic>{
-      if (limit != null) r'limit': encodeQueryParameter(_serializers, limit, const FullType(int)),
-      if (offset != null) r'offset': encodeQueryParameter(_serializers, offset, const FullType(int)),
+      if (limit != null)
+        r'limit':
+            encodeQueryParameter(_serializers, limit, const FullType(int)),
+      if (offset != null)
+        r'offset':
+            encodeQueryParameter(_serializers, offset, const FullType(int)),
     };
 
     final _response = await _dio.request<Object>(
@@ -321,11 +333,12 @@ class ChatSessionsApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(ChatSessionsListResponse),
-      ) as ChatSessionsListResponse;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(ChatSessionsListResponse),
+            ) as ChatSessionsListResponse;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -352,8 +365,8 @@ class ChatSessionsApi {
   /// Update an existing chat session
   ///
   /// Parameters:
-  /// * [sessionId] 
-  /// * [chatSessionUpdate] 
+  /// * [sessionId]
+  /// * [chatSessionUpdate]
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -363,7 +376,8 @@ class ChatSessionsApi {
   ///
   /// Returns a [Future] containing a [Response] with a [ChatSessionResponse] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<ChatSessionResponse>> updateChatSessionLlmChatSessionsSessionIdPut({ 
+  Future<Response<ChatSessionResponse>>
+      updateChatSessionLlmChatSessionsSessionIdPut({
     required int sessionId,
     required ChatSessionUpdate chatSessionUpdate,
     CancelToken? cancelToken,
@@ -373,7 +387,10 @@ class ChatSessionsApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/llm/chat-sessions/{session_id}'.replaceAll('{' r'session_id' '}', encodeQueryParameter(_serializers, sessionId, const FullType(int)).toString());
+    final _path = r'/llm/chat-sessions/{session_id}'.replaceAll(
+        '{' r'session_id' '}',
+        encodeQueryParameter(_serializers, sessionId, const FullType(int))
+            .toString());
     final _options = Options(
       method: r'PUT',
       headers: <String, dynamic>{
@@ -391,11 +408,11 @@ class ChatSessionsApi {
 
     try {
       const _type = FullType(ChatSessionUpdate);
-      _bodyData = _serializers.serialize(chatSessionUpdate, specifiedType: _type);
-
-    } catch(error, stackTrace) {
+      _bodyData =
+          _serializers.serialize(chatSessionUpdate, specifiedType: _type);
+    } catch (error, stackTrace) {
       throw DioException(
-         requestOptions: _options.compose(
+        requestOptions: _options.compose(
           _dio.options,
           _path,
         ),
@@ -418,11 +435,12 @@ class ChatSessionsApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null ? null : _serializers.deserialize(
-        rawResponse,
-        specifiedType: const FullType(ChatSessionResponse),
-      ) as ChatSessionResponse;
-
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(ChatSessionResponse),
+            ) as ChatSessionResponse;
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -444,5 +462,4 @@ class ChatSessionsApi {
       extra: _response.extra,
     );
   }
-
 }

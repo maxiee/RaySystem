@@ -13,10 +13,11 @@ part 'notes_list_response.g.dart';
 /// NotesListResponse
 ///
 /// Properties:
-/// * [total] 
-/// * [items] 
+/// * [total]
+/// * [items]
 @BuiltValue()
-abstract class NotesListResponse implements Built<NotesListResponse, NotesListResponseBuilder> {
+abstract class NotesListResponse
+    implements Built<NotesListResponse, NotesListResponseBuilder> {
   @BuiltValueField(wireName: r'total')
   int get total;
 
@@ -25,16 +26,19 @@ abstract class NotesListResponse implements Built<NotesListResponse, NotesListRe
 
   NotesListResponse._();
 
-  factory NotesListResponse([void updates(NotesListResponseBuilder b)]) = _$NotesListResponse;
+  factory NotesListResponse([void updates(NotesListResponseBuilder b)]) =
+      _$NotesListResponse;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(NotesListResponseBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<NotesListResponse> get serializer => _$NotesListResponseSerializer();
+  static Serializer<NotesListResponse> get serializer =>
+      _$NotesListResponseSerializer();
 }
 
-class _$NotesListResponseSerializer implements PrimitiveSerializer<NotesListResponse> {
+class _$NotesListResponseSerializer
+    implements PrimitiveSerializer<NotesListResponse> {
   @override
   final Iterable<Type> types = const [NotesListResponse, _$NotesListResponse];
 
@@ -64,7 +68,9 @@ class _$NotesListResponseSerializer implements PrimitiveSerializer<NotesListResp
     NotesListResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -121,4 +127,3 @@ class _$NotesListResponseSerializer implements PrimitiveSerializer<NotesListResp
     return result.build();
   }
 }
-

@@ -13,13 +13,14 @@ part 'people_response.g.dart';
 /// PeopleResponse
 ///
 /// Properties:
-/// * [description] 
-/// * [avatar] 
-/// * [birthDate] 
-/// * [id] 
-/// * [names] 
+/// * [description]
+/// * [avatar]
+/// * [birthDate]
+/// * [id]
+/// * [names]
 @BuiltValue()
-abstract class PeopleResponse implements Built<PeopleResponse, PeopleResponseBuilder> {
+abstract class PeopleResponse
+    implements Built<PeopleResponse, PeopleResponseBuilder> {
   @BuiltValueField(wireName: r'description')
   String? get description;
 
@@ -37,17 +38,19 @@ abstract class PeopleResponse implements Built<PeopleResponse, PeopleResponseBui
 
   PeopleResponse._();
 
-  factory PeopleResponse([void updates(PeopleResponseBuilder b)]) = _$PeopleResponse;
+  factory PeopleResponse([void updates(PeopleResponseBuilder b)]) =
+      _$PeopleResponse;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(PeopleResponseBuilder b) => b
-      ..names = ListBuilder();
+  static void _defaults(PeopleResponseBuilder b) => b..names = ListBuilder();
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<PeopleResponse> get serializer => _$PeopleResponseSerializer();
+  static Serializer<PeopleResponse> get serializer =>
+      _$PeopleResponseSerializer();
 }
 
-class _$PeopleResponseSerializer implements PrimitiveSerializer<PeopleResponse> {
+class _$PeopleResponseSerializer
+    implements PrimitiveSerializer<PeopleResponse> {
   @override
   final Iterable<Type> types = const [PeopleResponse, _$PeopleResponse];
 
@@ -89,7 +92,8 @@ class _$PeopleResponseSerializer implements PrimitiveSerializer<PeopleResponse> 
       yield r'names';
       yield serializers.serialize(
         object.names,
-        specifiedType: const FullType(BuiltList, [FullType(PeopleNameResponse)]),
+        specifiedType:
+            const FullType(BuiltList, [FullType(PeopleNameResponse)]),
       );
     }
   }
@@ -100,7 +104,9 @@ class _$PeopleResponseSerializer implements PrimitiveSerializer<PeopleResponse> 
     PeopleResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -149,7 +155,8 @@ class _$PeopleResponseSerializer implements PrimitiveSerializer<PeopleResponse> 
         case r'names':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(PeopleNameResponse)]),
+            specifiedType:
+                const FullType(BuiltList, [FullType(PeopleNameResponse)]),
           ) as BuiltList<PeopleNameResponse>;
           result.names.replace(valueDes);
           break;
@@ -181,4 +188,3 @@ class _$PeopleResponseSerializer implements PrimitiveSerializer<PeopleResponse> 
     return result.build();
   }
 }
-

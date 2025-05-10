@@ -10,23 +10,26 @@ import 'package:built_value/serializer.dart';
 part 'task_schedule_type.g.dart';
 
 class TaskScheduleType extends EnumClass {
-
   /// 任务调度类型
   @BuiltValueEnumConst(wireName: r'INTERVAL')
   static const TaskScheduleType INTERVAL = _$INTERVAL;
+
   /// 任务调度类型
   @BuiltValueEnumConst(wireName: r'CRON')
   static const TaskScheduleType CRON = _$CRON;
+
   /// 任务调度类型
   @BuiltValueEnumConst(wireName: r'EVENT')
   static const TaskScheduleType EVENT = _$EVENT;
+
   /// 任务调度类型
   @BuiltValueEnumConst(wireName: r'MANUAL')
   static const TaskScheduleType MANUAL = _$MANUAL;
 
-  static Serializer<TaskScheduleType> get serializer => _$taskScheduleTypeSerializer;
+  static Serializer<TaskScheduleType> get serializer =>
+      _$taskScheduleTypeSerializer;
 
-  const TaskScheduleType._(String name): super(name);
+  const TaskScheduleType._(String name) : super(name);
 
   static BuiltSet<TaskScheduleType> get values => _$values;
   static TaskScheduleType valueOf(String name) => _$valueOf(name);
@@ -39,4 +42,3 @@ class TaskScheduleType extends EnumClass {
 ///
 /// Trigger mixin generation by writing a line like this one next to your enum.
 abstract class TaskScheduleTypeMixin = Object with _$TaskScheduleTypeMixin;
-

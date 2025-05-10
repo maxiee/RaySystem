@@ -11,14 +11,15 @@ part 'chat_session_response.g.dart';
 /// Schema for chat session responses.
 ///
 /// Properties:
-/// * [title] 
-/// * [modelName] 
-/// * [contentJson] 
-/// * [id] 
-/// * [createdAt] 
-/// * [updatedAt] 
+/// * [title]
+/// * [modelName]
+/// * [contentJson]
+/// * [id]
+/// * [createdAt]
+/// * [updatedAt]
 @BuiltValue()
-abstract class ChatSessionResponse implements Built<ChatSessionResponse, ChatSessionResponseBuilder> {
+abstract class ChatSessionResponse
+    implements Built<ChatSessionResponse, ChatSessionResponseBuilder> {
   @BuiltValueField(wireName: r'title')
   String get title;
 
@@ -39,18 +40,24 @@ abstract class ChatSessionResponse implements Built<ChatSessionResponse, ChatSes
 
   ChatSessionResponse._();
 
-  factory ChatSessionResponse([void updates(ChatSessionResponseBuilder b)]) = _$ChatSessionResponse;
+  factory ChatSessionResponse([void updates(ChatSessionResponseBuilder b)]) =
+      _$ChatSessionResponse;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(ChatSessionResponseBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<ChatSessionResponse> get serializer => _$ChatSessionResponseSerializer();
+  static Serializer<ChatSessionResponse> get serializer =>
+      _$ChatSessionResponseSerializer();
 }
 
-class _$ChatSessionResponseSerializer implements PrimitiveSerializer<ChatSessionResponse> {
+class _$ChatSessionResponseSerializer
+    implements PrimitiveSerializer<ChatSessionResponse> {
   @override
-  final Iterable<Type> types = const [ChatSessionResponse, _$ChatSessionResponse];
+  final Iterable<Type> types = const [
+    ChatSessionResponse,
+    _$ChatSessionResponse
+  ];
 
   @override
   final String wireName = r'ChatSessionResponse';
@@ -100,7 +107,9 @@ class _$ChatSessionResponseSerializer implements PrimitiveSerializer<ChatSession
     ChatSessionResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -186,4 +195,3 @@ class _$ChatSessionResponseSerializer implements PrimitiveSerializer<ChatSession
     return result.build();
   }
 }
-

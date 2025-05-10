@@ -11,11 +11,12 @@ part 'people_update.g.dart';
 /// PeopleUpdate
 ///
 /// Properties:
-/// * [description] 
-/// * [avatar] 
-/// * [birthDate] 
+/// * [description]
+/// * [avatar]
+/// * [birthDate]
 @BuiltValue()
-abstract class PeopleUpdate implements Built<PeopleUpdate, PeopleUpdateBuilder> {
+abstract class PeopleUpdate
+    implements Built<PeopleUpdate, PeopleUpdateBuilder> {
   @BuiltValueField(wireName: r'description')
   String? get description;
 
@@ -77,7 +78,9 @@ class _$PeopleUpdateSerializer implements PrimitiveSerializer<PeopleUpdate> {
     PeopleUpdate object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -144,4 +147,3 @@ class _$PeopleUpdateSerializer implements PrimitiveSerializer<PeopleUpdate> {
     return result.build();
   }
 }
-

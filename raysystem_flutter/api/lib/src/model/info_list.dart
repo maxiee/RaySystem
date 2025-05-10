@@ -13,9 +13,9 @@ part 'info_list.g.dart';
 /// InfoList
 ///
 /// Properties:
-/// * [items] 
-/// * [total] 
-/// * [hasMore] 
+/// * [items]
+/// * [total]
+/// * [hasMore]
 @BuiltValue()
 abstract class InfoList implements Built<InfoList, InfoListBuilder> {
   @BuiltValueField(wireName: r'items')
@@ -73,7 +73,9 @@ class _$InfoListSerializer implements PrimitiveSerializer<InfoList> {
     InfoList object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
+    return _serializeProperties(serializers, object,
+            specifiedType: specifiedType)
+        .toList();
   }
 
   void _deserializeProperties(
@@ -137,4 +139,3 @@ class _$InfoListSerializer implements PrimitiveSerializer<InfoList> {
     return result.build();
   }
 }
-
