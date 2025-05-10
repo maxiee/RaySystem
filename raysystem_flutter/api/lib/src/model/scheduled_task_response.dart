@@ -13,19 +13,18 @@ part 'scheduled_task_response.g.dart';
 /// ScheduledTaskResponse
 ///
 /// Properties:
-/// * [id]
-/// * [taskType]
-/// * [scheduleType]
-/// * [interval]
-/// * [cronExpression]
-/// * [eventType]
-/// * [nextRun]
-/// * [tag]
-/// * [parameters]
-/// * [enabled]
+/// * [id] 
+/// * [taskType] 
+/// * [scheduleType] 
+/// * [interval] 
+/// * [cronExpression] 
+/// * [eventType] 
+/// * [nextRun] 
+/// * [tag] 
+/// * [parameters] 
+/// * [enabled] 
 @BuiltValue()
-abstract class ScheduledTaskResponse
-    implements Built<ScheduledTaskResponse, ScheduledTaskResponseBuilder> {
+abstract class ScheduledTaskResponse implements Built<ScheduledTaskResponse, ScheduledTaskResponseBuilder> {
   @BuiltValueField(wireName: r'id')
   String get id;
 
@@ -59,24 +58,18 @@ abstract class ScheduledTaskResponse
 
   ScheduledTaskResponse._();
 
-  factory ScheduledTaskResponse(
-      [void updates(ScheduledTaskResponseBuilder b)]) = _$ScheduledTaskResponse;
+  factory ScheduledTaskResponse([void updates(ScheduledTaskResponseBuilder b)]) = _$ScheduledTaskResponse;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(ScheduledTaskResponseBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<ScheduledTaskResponse> get serializer =>
-      _$ScheduledTaskResponseSerializer();
+  static Serializer<ScheduledTaskResponse> get serializer => _$ScheduledTaskResponseSerializer();
 }
 
-class _$ScheduledTaskResponseSerializer
-    implements PrimitiveSerializer<ScheduledTaskResponse> {
+class _$ScheduledTaskResponseSerializer implements PrimitiveSerializer<ScheduledTaskResponse> {
   @override
-  final Iterable<Type> types = const [
-    ScheduledTaskResponse,
-    _$ScheduledTaskResponse
-  ];
+  final Iterable<Type> types = const [ScheduledTaskResponse, _$ScheduledTaskResponse];
 
   @override
   final String wireName = r'ScheduledTaskResponse';
@@ -148,9 +141,7 @@ class _$ScheduledTaskResponseSerializer
     ScheduledTaskResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
   }
 
   void _deserializeProperties(
@@ -265,3 +256,4 @@ class _$ScheduledTaskResponseSerializer
     return result.build();
   }
 }
+

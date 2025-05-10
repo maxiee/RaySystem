@@ -17,39 +17,29 @@ part 'response_get_metrics_system_metrics_get.g.dart';
 /// ResponseGetMetricsSystemMetricsGet
 ///
 /// Properties:
-/// * [cpuPercent]
-/// * [memory]
-/// * [disks]
-/// * [network]
+/// * [cpuPercent] 
+/// * [memory] 
+/// * [disks] 
+/// * [network] 
 @BuiltValue()
-abstract class ResponseGetMetricsSystemMetricsGet
-    implements
-        Built<ResponseGetMetricsSystemMetricsGet,
-            ResponseGetMetricsSystemMetricsGetBuilder> {
+abstract class ResponseGetMetricsSystemMetricsGet implements Built<ResponseGetMetricsSystemMetricsGet, ResponseGetMetricsSystemMetricsGetBuilder> {
   /// Any Of [BuiltMap<String, String>], [SystemMetrics]
   AnyOf get anyOf;
 
   ResponseGetMetricsSystemMetricsGet._();
 
-  factory ResponseGetMetricsSystemMetricsGet(
-          [void updates(ResponseGetMetricsSystemMetricsGetBuilder b)]) =
-      _$ResponseGetMetricsSystemMetricsGet;
+  factory ResponseGetMetricsSystemMetricsGet([void updates(ResponseGetMetricsSystemMetricsGetBuilder b)]) = _$ResponseGetMetricsSystemMetricsGet;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(ResponseGetMetricsSystemMetricsGetBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<ResponseGetMetricsSystemMetricsGet> get serializer =>
-      _$ResponseGetMetricsSystemMetricsGetSerializer();
+  static Serializer<ResponseGetMetricsSystemMetricsGet> get serializer => _$ResponseGetMetricsSystemMetricsGetSerializer();
 }
 
-class _$ResponseGetMetricsSystemMetricsGetSerializer
-    implements PrimitiveSerializer<ResponseGetMetricsSystemMetricsGet> {
+class _$ResponseGetMetricsSystemMetricsGetSerializer implements PrimitiveSerializer<ResponseGetMetricsSystemMetricsGet> {
   @override
-  final Iterable<Type> types = const [
-    ResponseGetMetricsSystemMetricsGet,
-    _$ResponseGetMetricsSystemMetricsGet
-  ];
+  final Iterable<Type> types = const [ResponseGetMetricsSystemMetricsGet, _$ResponseGetMetricsSystemMetricsGet];
 
   @override
   final String wireName = r'ResponseGetMetricsSystemMetricsGet';
@@ -58,7 +48,8 @@ class _$ResponseGetMetricsSystemMetricsGetSerializer
     Serializers serializers,
     ResponseGetMetricsSystemMetricsGet object, {
     FullType specifiedType = FullType.unspecified,
-  }) sync* {}
+  }) sync* {
+  }
 
   @override
   Object serialize(
@@ -67,9 +58,7 @@ class _$ResponseGetMetricsSystemMetricsGetSerializer
     FullType specifiedType = FullType.unspecified,
   }) {
     final anyOf = object.anyOf;
-    return serializers.serialize(anyOf,
-        specifiedType: FullType(
-            AnyOf, anyOf.valueTypes.map((type) => FullType(type)).toList()))!;
+    return serializers.serialize(anyOf, specifiedType: FullType(AnyOf, anyOf.valueTypes.map((type) => FullType(type)).toList()))!;
   }
 
   @override
@@ -80,13 +69,10 @@ class _$ResponseGetMetricsSystemMetricsGetSerializer
   }) {
     final result = ResponseGetMetricsSystemMetricsGetBuilder();
     Object? anyOfDataSrc;
-    final targetType = const FullType(AnyOf, [
-      FullType(SystemMetrics),
-      FullType(BuiltMap, [FullType(String), FullType(String)]),
-    ]);
+    final targetType = const FullType(AnyOf, [FullType(SystemMetrics), FullType(BuiltMap, [FullType(String), FullType(String)]), ]);
     anyOfDataSrc = serialized;
-    result.anyOf = serializers.deserialize(anyOfDataSrc,
-        specifiedType: targetType) as AnyOf;
+    result.anyOf = serializers.deserialize(anyOfDataSrc, specifiedType: targetType) as AnyOf;
     return result.build();
   }
 }
+

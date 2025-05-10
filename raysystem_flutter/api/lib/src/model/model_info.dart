@@ -13,7 +13,7 @@ part 'model_info.g.dart';
 /// Properties:
 /// * [name] - The name of the model, used as identifier when requesting completions
 /// * [displayName] - User-friendly display name for the model
-/// * [description]
+/// * [description] 
 @BuiltValue()
 abstract class ModelInfo implements Built<ModelInfo, ModelInfoBuilder> {
   /// The name of the model, used as identifier when requesting completions
@@ -75,9 +75,7 @@ class _$ModelInfoSerializer implements PrimitiveSerializer<ModelInfo> {
     ModelInfo object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
   }
 
   void _deserializeProperties(
@@ -142,3 +140,4 @@ class _$ModelInfoSerializer implements PrimitiveSerializer<ModelInfo> {
     return result.build();
   }
 }
+

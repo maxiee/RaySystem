@@ -6,66 +6,66 @@
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'chat_session_update.g.dart';
+part 'people_update.g.dart';
 
-/// Schema for updating an existing chat session.
+/// PeopleUpdate
 ///
 /// Properties:
-/// * [title] 
-/// * [modelName] 
-/// * [contentJson] 
+/// * [description] 
+/// * [avatar] 
+/// * [birthDate] 
 @BuiltValue()
-abstract class ChatSessionUpdate implements Built<ChatSessionUpdate, ChatSessionUpdateBuilder> {
-  @BuiltValueField(wireName: r'title')
-  String? get title;
+abstract class PeopleUpdate implements Built<PeopleUpdate, PeopleUpdateBuilder> {
+  @BuiltValueField(wireName: r'description')
+  String? get description;
 
-  @BuiltValueField(wireName: r'model_name')
-  String? get modelName;
+  @BuiltValueField(wireName: r'avatar')
+  String? get avatar;
 
-  @BuiltValueField(wireName: r'content_json')
-  String? get contentJson;
+  @BuiltValueField(wireName: r'birth_date')
+  String? get birthDate;
 
-  ChatSessionUpdate._();
+  PeopleUpdate._();
 
-  factory ChatSessionUpdate([void updates(ChatSessionUpdateBuilder b)]) = _$ChatSessionUpdate;
+  factory PeopleUpdate([void updates(PeopleUpdateBuilder b)]) = _$PeopleUpdate;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(ChatSessionUpdateBuilder b) => b;
+  static void _defaults(PeopleUpdateBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<ChatSessionUpdate> get serializer => _$ChatSessionUpdateSerializer();
+  static Serializer<PeopleUpdate> get serializer => _$PeopleUpdateSerializer();
 }
 
-class _$ChatSessionUpdateSerializer implements PrimitiveSerializer<ChatSessionUpdate> {
+class _$PeopleUpdateSerializer implements PrimitiveSerializer<PeopleUpdate> {
   @override
-  final Iterable<Type> types = const [ChatSessionUpdate, _$ChatSessionUpdate];
+  final Iterable<Type> types = const [PeopleUpdate, _$PeopleUpdate];
 
   @override
-  final String wireName = r'ChatSessionUpdate';
+  final String wireName = r'PeopleUpdate';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    ChatSessionUpdate object, {
+    PeopleUpdate object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    if (object.title != null) {
-      yield r'title';
+    if (object.description != null) {
+      yield r'description';
       yield serializers.serialize(
-        object.title,
+        object.description,
         specifiedType: const FullType.nullable(String),
       );
     }
-    if (object.modelName != null) {
-      yield r'model_name';
+    if (object.avatar != null) {
+      yield r'avatar';
       yield serializers.serialize(
-        object.modelName,
+        object.avatar,
         specifiedType: const FullType.nullable(String),
       );
     }
-    if (object.contentJson != null) {
-      yield r'content_json';
+    if (object.birthDate != null) {
+      yield r'birth_date';
       yield serializers.serialize(
-        object.contentJson,
+        object.birthDate,
         specifiedType: const FullType.nullable(String),
       );
     }
@@ -74,7 +74,7 @@ class _$ChatSessionUpdateSerializer implements PrimitiveSerializer<ChatSessionUp
   @override
   Object serialize(
     Serializers serializers,
-    ChatSessionUpdate object, {
+    PeopleUpdate object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
@@ -85,36 +85,36 @@ class _$ChatSessionUpdateSerializer implements PrimitiveSerializer<ChatSessionUp
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required ChatSessionUpdateBuilder result,
+    required PeopleUpdateBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'title':
+        case r'description':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType.nullable(String),
           ) as String?;
           if (valueDes == null) continue;
-          result.title = valueDes;
+          result.description = valueDes;
           break;
-        case r'model_name':
+        case r'avatar':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType.nullable(String),
           ) as String?;
           if (valueDes == null) continue;
-          result.modelName = valueDes;
+          result.avatar = valueDes;
           break;
-        case r'content_json':
+        case r'birth_date':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType.nullable(String),
           ) as String?;
           if (valueDes == null) continue;
-          result.contentJson = valueDes;
+          result.birthDate = valueDes;
           break;
         default:
           unhandled.add(key);
@@ -125,12 +125,12 @@ class _$ChatSessionUpdateSerializer implements PrimitiveSerializer<ChatSessionUp
   }
 
   @override
-  ChatSessionUpdate deserialize(
+  PeopleUpdate deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = ChatSessionUpdateBuilder();
+    final result = PeopleUpdateBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

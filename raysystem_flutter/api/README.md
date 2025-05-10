@@ -102,6 +102,14 @@ Class | Method | HTTP request | Description
 [*NotesApi*](doc/NotesApi.md) | [**moveNoteNotesNoteIdMovePost**](doc/NotesApi.md#movenotenotesnoteidmovepost) | **POST** /notes/{note_id}/move | Move Note
 [*NotesApi*](doc/NotesApi.md) | [**searchNotesNotesSearchGet**](doc/NotesApi.md#searchnotesnotessearchget) | **GET** /notes/search | Search Notes
 [*NotesApi*](doc/NotesApi.md) | [**updateNoteNotesNoteIdPut**](doc/NotesApi.md#updatenotenotesnoteidput) | **PUT** /notes/{note_id} | Update Note
+[*PeopleApi*](doc/PeopleApi.md) | [**createPeopleNamePeoplePeopleIdNamesPost**](doc/PeopleApi.md#createpeoplenamepeoplepeopleidnamespost) | **POST** /people/{people_id}/names | Create People Name
+[*PeopleApi*](doc/PeopleApi.md) | [**createPeoplePeoplePost**](doc/PeopleApi.md#createpeoplepeoplepost) | **POST** /people/ | Create People
+[*PeopleApi*](doc/PeopleApi.md) | [**deletePeopleNamePeopleNamesNameIdDelete**](doc/PeopleApi.md#deletepeoplenamepeoplenamesnameiddelete) | **DELETE** /people/names/{name_id} | Delete People Name
+[*PeopleApi*](doc/PeopleApi.md) | [**deletePeoplePeoplePeopleIdDelete**](doc/PeopleApi.md#deletepeoplepeoplepeopleiddelete) | **DELETE** /people/{people_id} | Delete People
+[*PeopleApi*](doc/PeopleApi.md) | [**getPeopleNamesPeoplePeopleIdNamesGet**](doc/PeopleApi.md#getpeoplenamespeoplepeopleidnamesget) | **GET** /people/{people_id}/names | Get People Names
+[*PeopleApi*](doc/PeopleApi.md) | [**getPeoplePeoplePeopleIdGet**](doc/PeopleApi.md#getpeoplepeoplepeopleidget) | **GET** /people/{people_id} | Get People
+[*PeopleApi*](doc/PeopleApi.md) | [**updatePeopleNamePeopleNamesNameIdPut**](doc/PeopleApi.md#updatepeoplenamepeoplenamesnameidput) | **PUT** /people/names/{name_id} | Update People Name
+[*PeopleApi*](doc/PeopleApi.md) | [**updatePeoplePeoplePeopleIdPut**](doc/PeopleApi.md#updatepeoplepeoplepeopleidput) | **PUT** /people/{people_id} | Update People
 
 
 ## Documentation For Models
@@ -131,6 +139,11 @@ Class | Method | HTTP request | Description
  - [NoteTreeResponse](doc/NoteTreeResponse.md)
  - [NoteUpdate](doc/NoteUpdate.md)
  - [NotesListResponse](doc/NotesListResponse.md)
+ - [PeopleCreate](doc/PeopleCreate.md)
+ - [PeopleNameCreate](doc/PeopleNameCreate.md)
+ - [PeopleNameResponse](doc/PeopleNameResponse.md)
+ - [PeopleResponse](doc/PeopleResponse.md)
+ - [PeopleUpdate](doc/PeopleUpdate.md)
  - [ResponseGetMetricsSystemMetricsGet](doc/ResponseGetMetricsSystemMetricsGet.md)
  - [ScheduledTaskResponse](doc/ScheduledTaskResponse.md)
  - [Site](doc/Site.md)

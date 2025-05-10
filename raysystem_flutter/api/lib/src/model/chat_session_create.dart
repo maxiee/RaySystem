@@ -11,12 +11,11 @@ part 'chat_session_create.g.dart';
 /// Schema for creating a new chat session.
 ///
 /// Properties:
-/// * [title]
-/// * [modelName]
-/// * [contentJson]
+/// * [title] 
+/// * [modelName] 
+/// * [contentJson] 
 @BuiltValue()
-abstract class ChatSessionCreate
-    implements Built<ChatSessionCreate, ChatSessionCreateBuilder> {
+abstract class ChatSessionCreate implements Built<ChatSessionCreate, ChatSessionCreateBuilder> {
   @BuiltValueField(wireName: r'title')
   String get title;
 
@@ -28,19 +27,16 @@ abstract class ChatSessionCreate
 
   ChatSessionCreate._();
 
-  factory ChatSessionCreate([void updates(ChatSessionCreateBuilder b)]) =
-      _$ChatSessionCreate;
+  factory ChatSessionCreate([void updates(ChatSessionCreateBuilder b)]) = _$ChatSessionCreate;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(ChatSessionCreateBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<ChatSessionCreate> get serializer =>
-      _$ChatSessionCreateSerializer();
+  static Serializer<ChatSessionCreate> get serializer => _$ChatSessionCreateSerializer();
 }
 
-class _$ChatSessionCreateSerializer
-    implements PrimitiveSerializer<ChatSessionCreate> {
+class _$ChatSessionCreateSerializer implements PrimitiveSerializer<ChatSessionCreate> {
   @override
   final Iterable<Type> types = const [ChatSessionCreate, _$ChatSessionCreate];
 
@@ -77,9 +73,7 @@ class _$ChatSessionCreateSerializer
     ChatSessionCreate object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
   }
 
   void _deserializeProperties(
@@ -144,3 +138,4 @@ class _$ChatSessionCreateSerializer
     return result.build();
   }
 }
+

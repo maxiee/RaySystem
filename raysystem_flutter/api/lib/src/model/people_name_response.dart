@@ -3,65 +3,72 @@
 //
 
 // ignore_for_file: unused_element
-import 'package:built_collection/built_collection.dart';
-import 'package:openapi/src/model/note_response.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
-part 'notes_list_response.g.dart';
+part 'people_name_response.g.dart';
 
-/// NotesListResponse
+/// PeopleNameResponse
 ///
 /// Properties:
-/// * [total] 
-/// * [items] 
+/// * [name] 
+/// * [id] 
+/// * [peopleId] 
 @BuiltValue()
-abstract class NotesListResponse implements Built<NotesListResponse, NotesListResponseBuilder> {
-  @BuiltValueField(wireName: r'total')
-  int get total;
+abstract class PeopleNameResponse implements Built<PeopleNameResponse, PeopleNameResponseBuilder> {
+  @BuiltValueField(wireName: r'name')
+  String get name;
 
-  @BuiltValueField(wireName: r'items')
-  BuiltList<NoteResponse> get items;
+  @BuiltValueField(wireName: r'id')
+  int get id;
 
-  NotesListResponse._();
+  @BuiltValueField(wireName: r'people_id')
+  int get peopleId;
 
-  factory NotesListResponse([void updates(NotesListResponseBuilder b)]) = _$NotesListResponse;
+  PeopleNameResponse._();
+
+  factory PeopleNameResponse([void updates(PeopleNameResponseBuilder b)]) = _$PeopleNameResponse;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(NotesListResponseBuilder b) => b;
+  static void _defaults(PeopleNameResponseBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<NotesListResponse> get serializer => _$NotesListResponseSerializer();
+  static Serializer<PeopleNameResponse> get serializer => _$PeopleNameResponseSerializer();
 }
 
-class _$NotesListResponseSerializer implements PrimitiveSerializer<NotesListResponse> {
+class _$PeopleNameResponseSerializer implements PrimitiveSerializer<PeopleNameResponse> {
   @override
-  final Iterable<Type> types = const [NotesListResponse, _$NotesListResponse];
+  final Iterable<Type> types = const [PeopleNameResponse, _$PeopleNameResponse];
 
   @override
-  final String wireName = r'NotesListResponse';
+  final String wireName = r'PeopleNameResponse';
 
   Iterable<Object?> _serializeProperties(
     Serializers serializers,
-    NotesListResponse object, {
+    PeopleNameResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'total';
+    yield r'name';
     yield serializers.serialize(
-      object.total,
+      object.name,
+      specifiedType: const FullType(String),
+    );
+    yield r'id';
+    yield serializers.serialize(
+      object.id,
       specifiedType: const FullType(int),
     );
-    yield r'items';
+    yield r'people_id';
     yield serializers.serialize(
-      object.items,
-      specifiedType: const FullType(BuiltList, [FullType(NoteResponse)]),
+      object.peopleId,
+      specifiedType: const FullType(int),
     );
   }
 
   @override
   Object serialize(
     Serializers serializers,
-    NotesListResponse object, {
+    PeopleNameResponse object, {
     FullType specifiedType = FullType.unspecified,
   }) {
     return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
@@ -72,26 +79,33 @@ class _$NotesListResponseSerializer implements PrimitiveSerializer<NotesListResp
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
     required List<Object?> serializedList,
-    required NotesListResponseBuilder result,
+    required PeopleNameResponseBuilder result,
     required List<Object?> unhandled,
   }) {
     for (var i = 0; i < serializedList.length; i += 2) {
       final key = serializedList[i] as String;
       final value = serializedList[i + 1];
       switch (key) {
-        case r'total':
+        case r'name':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(String),
+          ) as String;
+          result.name = valueDes;
+          break;
+        case r'id':
           final valueDes = serializers.deserialize(
             value,
             specifiedType: const FullType(int),
           ) as int;
-          result.total = valueDes;
+          result.id = valueDes;
           break;
-        case r'items':
+        case r'people_id':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(BuiltList, [FullType(NoteResponse)]),
-          ) as BuiltList<NoteResponse>;
-          result.items.replace(valueDes);
+            specifiedType: const FullType(int),
+          ) as int;
+          result.peopleId = valueDes;
           break;
         default:
           unhandled.add(key);
@@ -102,12 +116,12 @@ class _$NotesListResponseSerializer implements PrimitiveSerializer<NotesListResp
   }
 
   @override
-  NotesListResponse deserialize(
+  PeopleNameResponse deserialize(
     Serializers serializers,
     Object serialized, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    final result = NotesListResponseBuilder();
+    final result = PeopleNameResponseBuilder();
     final serializedList = (serialized as Iterable<Object?>).toList();
     final unhandled = <Object?>[];
     _deserializeProperties(

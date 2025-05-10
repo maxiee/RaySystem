@@ -11,9 +11,9 @@ part 'info_stats.g.dart';
 /// InfoStats
 ///
 /// Properties:
-/// * [totalCount]
-/// * [unreadCount]
-/// * [markedCount]
+/// * [totalCount] 
+/// * [unreadCount] 
+/// * [markedCount] 
 @BuiltValue()
 abstract class InfoStats implements Built<InfoStats, InfoStatsBuilder> {
   @BuiltValueField(wireName: r'total_count')
@@ -71,9 +71,7 @@ class _$InfoStatsSerializer implements PrimitiveSerializer<InfoStats> {
     InfoStats object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
   }
 
   void _deserializeProperties(
@@ -137,3 +135,4 @@ class _$InfoStatsSerializer implements PrimitiveSerializer<InfoStats> {
     return result.build();
   }
 }
+

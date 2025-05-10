@@ -14,8 +14,7 @@ part 'chat_message_output.g.dart';
 /// * [role] - Role of the message sender (usually 'assistant')
 /// * [content] - Content of the generated message
 @BuiltValue()
-abstract class ChatMessageOutput
-    implements Built<ChatMessageOutput, ChatMessageOutputBuilder> {
+abstract class ChatMessageOutput implements Built<ChatMessageOutput, ChatMessageOutputBuilder> {
   /// Role of the message sender (usually 'assistant')
   @BuiltValueField(wireName: r'role')
   String get role;
@@ -26,19 +25,16 @@ abstract class ChatMessageOutput
 
   ChatMessageOutput._();
 
-  factory ChatMessageOutput([void updates(ChatMessageOutputBuilder b)]) =
-      _$ChatMessageOutput;
+  factory ChatMessageOutput([void updates(ChatMessageOutputBuilder b)]) = _$ChatMessageOutput;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(ChatMessageOutputBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<ChatMessageOutput> get serializer =>
-      _$ChatMessageOutputSerializer();
+  static Serializer<ChatMessageOutput> get serializer => _$ChatMessageOutputSerializer();
 }
 
-class _$ChatMessageOutputSerializer
-    implements PrimitiveSerializer<ChatMessageOutput> {
+class _$ChatMessageOutputSerializer implements PrimitiveSerializer<ChatMessageOutput> {
   @override
   final Iterable<Type> types = const [ChatMessageOutput, _$ChatMessageOutput];
 
@@ -68,9 +64,7 @@ class _$ChatMessageOutputSerializer
     ChatMessageOutput object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
   }
 
   void _deserializeProperties(
@@ -127,3 +121,4 @@ class _$ChatMessageOutputSerializer
     return result.build();
   }
 }
+

@@ -15,6 +15,7 @@ export 'package:openapi/src/api/default_api.dart';
 export 'package:openapi/src/api/llm_api.dart';
 export 'package:openapi/src/api/note_titles_api.dart';
 export 'package:openapi/src/api/notes_api.dart';
+export 'package:openapi/src/api/people_api.dart';
 
 export 'package:openapi/src/model/chat_completion_request.dart';
 export 'package:openapi/src/model/chat_completion_response.dart';
@@ -41,6 +42,11 @@ export 'package:openapi/src/model/note_title_update.dart';
 export 'package:openapi/src/model/note_tree_response.dart';
 export 'package:openapi/src/model/note_update.dart';
 export 'package:openapi/src/model/notes_list_response.dart';
+export 'package:openapi/src/model/people_create.dart';
+export 'package:openapi/src/model/people_name_create.dart';
+export 'package:openapi/src/model/people_name_response.dart';
+export 'package:openapi/src/model/people_response.dart';
+export 'package:openapi/src/model/people_update.dart';
 export 'package:openapi/src/model/response_get_metrics_system_metrics_get.dart';
 export 'package:openapi/src/model/scheduled_task_response.dart';
 export 'package:openapi/src/model/site.dart';
@@ -49,3 +55,4 @@ export 'package:openapi/src/model/system_metrics.dart';
 export 'package:openapi/src/model/task_schedule_type.dart';
 export 'package:openapi/src/model/validation_error.dart';
 export 'package:openapi/src/model/validation_error_loc_inner.dart';
+

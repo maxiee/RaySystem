@@ -39,6 +39,11 @@ import 'package:openapi/src/model/note_title_update.dart';
 import 'package:openapi/src/model/note_tree_response.dart';
 import 'package:openapi/src/model/note_update.dart';
 import 'package:openapi/src/model/notes_list_response.dart';
+import 'package:openapi/src/model/people_create.dart';
+import 'package:openapi/src/model/people_name_create.dart';
+import 'package:openapi/src/model/people_name_response.dart';
+import 'package:openapi/src/model/people_response.dart';
+import 'package:openapi/src/model/people_update.dart';
 import 'package:openapi/src/model/response_get_metrics_system_metrics_get.dart';
 import 'package:openapi/src/model/scheduled_task_response.dart';
 import 'package:openapi/src/model/site.dart';
@@ -76,6 +81,11 @@ part 'serializers.g.dart';
   NoteTreeResponse,
   NoteUpdate,
   NotesListResponse,
+  PeopleCreate,
+  PeopleNameCreate,
+  PeopleNameResponse,
+  PeopleResponse,
+  PeopleUpdate,
   ResponseGetMetricsSystemMetricsGet,
   ScheduledTaskResponse,
   Site,
@@ -93,6 +103,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(NoteResponse)]),
         () => ListBuilder<NoteResponse>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(PeopleNameResponse)]),
+        () => ListBuilder<PeopleNameResponse>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(Site)]),

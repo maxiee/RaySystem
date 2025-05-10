@@ -11,11 +11,11 @@ part 'site_create.g.dart';
 /// SiteCreate
 ///
 /// Properties:
-/// * [name]
-/// * [description]
-/// * [host]
-/// * [favicon]
-/// * [rss]
+/// * [name] 
+/// * [description] 
+/// * [host] 
+/// * [favicon] 
+/// * [rss] 
 @BuiltValue()
 abstract class SiteCreate implements Built<SiteCreate, SiteCreateBuilder> {
   @BuiltValueField(wireName: r'name')
@@ -95,9 +95,7 @@ class _$SiteCreateSerializer implements PrimitiveSerializer<SiteCreate> {
     SiteCreate object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
   }
 
   void _deserializeProperties(
@@ -178,3 +176,4 @@ class _$SiteCreateSerializer implements PrimitiveSerializer<SiteCreate> {
     return result.build();
   }
 }
+

@@ -15,13 +15,12 @@ part 'system_metrics.g.dart';
 /// SystemMetrics
 ///
 /// Properties:
-/// * [cpuPercent]
-/// * [memory]
-/// * [disks]
-/// * [network]
+/// * [cpuPercent] 
+/// * [memory] 
+/// * [disks] 
+/// * [network] 
 @BuiltValue()
-abstract class SystemMetrics
-    implements Built<SystemMetrics, SystemMetricsBuilder> {
+abstract class SystemMetrics implements Built<SystemMetrics, SystemMetricsBuilder> {
   @BuiltValueField(wireName: r'cpu_percent')
   num get cpuPercent;
 
@@ -36,15 +35,13 @@ abstract class SystemMetrics
 
   SystemMetrics._();
 
-  factory SystemMetrics([void updates(SystemMetricsBuilder b)]) =
-      _$SystemMetrics;
+  factory SystemMetrics([void updates(SystemMetricsBuilder b)]) = _$SystemMetrics;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(SystemMetricsBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<SystemMetrics> get serializer =>
-      _$SystemMetricsSerializer();
+  static Serializer<SystemMetrics> get serializer => _$SystemMetricsSerializer();
 }
 
 class _$SystemMetricsSerializer implements PrimitiveSerializer<SystemMetrics> {
@@ -87,9 +84,7 @@ class _$SystemMetricsSerializer implements PrimitiveSerializer<SystemMetrics> {
     SystemMetrics object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
   }
 
   void _deserializeProperties(
@@ -160,3 +155,4 @@ class _$SystemMetricsSerializer implements PrimitiveSerializer<SystemMetrics> {
     return result.build();
   }
 }
+

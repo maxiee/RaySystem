@@ -14,10 +14,9 @@ part 'chat_completion_request.g.dart';
 ///
 /// Properties:
 /// * [messages] - A list of messages comprising the conversation history.
-/// * [modelName]
+/// * [modelName] 
 @BuiltValue()
-abstract class ChatCompletionRequest
-    implements Built<ChatCompletionRequest, ChatCompletionRequestBuilder> {
+abstract class ChatCompletionRequest implements Built<ChatCompletionRequest, ChatCompletionRequestBuilder> {
   /// A list of messages comprising the conversation history.
   @BuiltValueField(wireName: r'messages')
   BuiltList<ChatMessageInput> get messages;
@@ -27,24 +26,18 @@ abstract class ChatCompletionRequest
 
   ChatCompletionRequest._();
 
-  factory ChatCompletionRequest(
-      [void updates(ChatCompletionRequestBuilder b)]) = _$ChatCompletionRequest;
+  factory ChatCompletionRequest([void updates(ChatCompletionRequestBuilder b)]) = _$ChatCompletionRequest;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(ChatCompletionRequestBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<ChatCompletionRequest> get serializer =>
-      _$ChatCompletionRequestSerializer();
+  static Serializer<ChatCompletionRequest> get serializer => _$ChatCompletionRequestSerializer();
 }
 
-class _$ChatCompletionRequestSerializer
-    implements PrimitiveSerializer<ChatCompletionRequest> {
+class _$ChatCompletionRequestSerializer implements PrimitiveSerializer<ChatCompletionRequest> {
   @override
-  final Iterable<Type> types = const [
-    ChatCompletionRequest,
-    _$ChatCompletionRequest
-  ];
+  final Iterable<Type> types = const [ChatCompletionRequest, _$ChatCompletionRequest];
 
   @override
   final String wireName = r'ChatCompletionRequest';
@@ -74,9 +67,7 @@ class _$ChatCompletionRequestSerializer
     ChatCompletionRequest object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
   }
 
   void _deserializeProperties(
@@ -94,8 +85,7 @@ class _$ChatCompletionRequestSerializer
         case r'messages':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType:
-                const FullType(BuiltList, [FullType(ChatMessageInput)]),
+            specifiedType: const FullType(BuiltList, [FullType(ChatMessageInput)]),
           ) as BuiltList<ChatMessageInput>;
           result.messages.replace(valueDes);
           break;
@@ -135,3 +125,4 @@ class _$ChatCompletionRequestSerializer
     return result.build();
   }
 }
+

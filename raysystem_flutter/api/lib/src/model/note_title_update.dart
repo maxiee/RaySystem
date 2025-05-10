@@ -11,11 +11,10 @@ part 'note_title_update.g.dart';
 /// NoteTitleUpdate
 ///
 /// Properties:
-/// * [title]
-/// * [isPrimary]
+/// * [title] 
+/// * [isPrimary] 
 @BuiltValue()
-abstract class NoteTitleUpdate
-    implements Built<NoteTitleUpdate, NoteTitleUpdateBuilder> {
+abstract class NoteTitleUpdate implements Built<NoteTitleUpdate, NoteTitleUpdateBuilder> {
   @BuiltValueField(wireName: r'title')
   String get title;
 
@@ -24,19 +23,17 @@ abstract class NoteTitleUpdate
 
   NoteTitleUpdate._();
 
-  factory NoteTitleUpdate([void updates(NoteTitleUpdateBuilder b)]) =
-      _$NoteTitleUpdate;
+  factory NoteTitleUpdate([void updates(NoteTitleUpdateBuilder b)]) = _$NoteTitleUpdate;
 
   @BuiltValueHook(initializeBuilder: true)
-  static void _defaults(NoteTitleUpdateBuilder b) => b..isPrimary = false;
+  static void _defaults(NoteTitleUpdateBuilder b) => b
+      ..isPrimary = false;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<NoteTitleUpdate> get serializer =>
-      _$NoteTitleUpdateSerializer();
+  static Serializer<NoteTitleUpdate> get serializer => _$NoteTitleUpdateSerializer();
 }
 
-class _$NoteTitleUpdateSerializer
-    implements PrimitiveSerializer<NoteTitleUpdate> {
+class _$NoteTitleUpdateSerializer implements PrimitiveSerializer<NoteTitleUpdate> {
   @override
   final Iterable<Type> types = const [NoteTitleUpdate, _$NoteTitleUpdate];
 
@@ -68,9 +65,7 @@ class _$NoteTitleUpdateSerializer
     NoteTitleUpdate object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
   }
 
   void _deserializeProperties(
@@ -127,3 +122,4 @@ class _$NoteTitleUpdateSerializer
     return result.build();
   }
 }
+

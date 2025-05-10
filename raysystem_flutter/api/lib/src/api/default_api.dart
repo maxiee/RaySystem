@@ -20,6 +20,7 @@ import 'package:openapi/src/model/site.dart';
 import 'package:openapi/src/model/site_create.dart';
 
 class DefaultApi {
+
   final Dio _dio;
 
   final Serializers _serializers;
@@ -27,10 +28,10 @@ class DefaultApi {
   const DefaultApi(this._dio, this._serializers);
 
   /// Create Site
-  ///
+  /// 
   ///
   /// Parameters:
-  /// * [siteCreate]
+  /// * [siteCreate] 
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -40,7 +41,7 @@ class DefaultApi {
   ///
   /// Returns a [Future] containing a [Response] with a [Site] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<Site>> createSiteSitesPost({
+  Future<Response<Site>> createSiteSitesPost({ 
     required SiteCreate siteCreate,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -68,9 +69,10 @@ class DefaultApi {
     try {
       const _type = FullType(SiteCreate);
       _bodyData = _serializers.serialize(siteCreate, specifiedType: _type);
-    } catch (error, stackTrace) {
+
+    } catch(error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
+         requestOptions: _options.compose(
           _dio.options,
           _path,
         ),
@@ -93,12 +95,11 @@ class DefaultApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(Site),
-            ) as Site;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(Site),
+      ) as Site;
+
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -122,10 +123,10 @@ class DefaultApi {
   }
 
   /// Delete Site
-  ///
+  /// 
   ///
   /// Parameters:
-  /// * [siteId]
+  /// * [siteId] 
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -135,7 +136,7 @@ class DefaultApi {
   ///
   /// Returns a [Future] containing a [Response] with a [JsonObject] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<JsonObject>> deleteSiteSitesSiteIdDelete({
+  Future<Response<JsonObject>> deleteSiteSitesSiteIdDelete({ 
     required int siteId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -144,10 +145,7 @@ class DefaultApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/sites/{site_id}'.replaceAll(
-        '{' r'site_id' '}',
-        encodeQueryParameter(_serializers, siteId, const FullType(int))
-            .toString());
+    final _path = r'/sites/{site_id}'.replaceAll('{' r'site_id' '}', encodeQueryParameter(_serializers, siteId, const FullType(int)).toString());
     final _options = Options(
       method: r'DELETE',
       headers: <String, dynamic>{
@@ -172,12 +170,11 @@ class DefaultApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(JsonObject),
-            ) as JsonObject;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(JsonObject),
+      ) as JsonObject;
+
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -213,7 +210,7 @@ class DefaultApi {
   ///
   /// Returns a [Future] containing a [Response] with a [InfoStats] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<InfoStats>> getInfoStatsInfosStatsGet({
+  Future<Response<InfoStats>> getInfoStatsInfosStatsGet({ 
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -246,12 +243,11 @@ class DefaultApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(InfoStats),
-            ) as InfoStats;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(InfoStats),
+      ) as InfoStats;
+
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -289,7 +285,7 @@ class DefaultApi {
   ///
   /// Returns a [Future] containing a [Response] with a [InfoList] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<InfoList>> getInfosInfosGet({
+  Future<Response<InfoList>> getInfosInfosGet({ 
     DateTime? createdBefore,
     int? limit = 20,
     CancelToken? cancelToken,
@@ -313,11 +309,8 @@ class DefaultApi {
     );
 
     final _queryParameters = <String, dynamic>{
-      r'created_before': encodeQueryParameter(
-          _serializers, createdBefore, const FullType(DateTime)),
-      if (limit != null)
-        r'limit':
-            encodeQueryParameter(_serializers, limit, const FullType(int)),
+      r'created_before': encodeQueryParameter(_serializers, createdBefore, const FullType(DateTime)),
+      if (limit != null) r'limit': encodeQueryParameter(_serializers, limit, const FullType(int)),
     };
 
     final _response = await _dio.request<Object>(
@@ -333,12 +326,11 @@ class DefaultApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(InfoList),
-            ) as InfoList;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(InfoList),
+      ) as InfoList;
+
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -374,8 +366,7 @@ class DefaultApi {
   ///
   /// Returns a [Future] containing a [Response] with a [ResponseGetMetricsSystemMetricsGet] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<ResponseGetMetricsSystemMetricsGet>>
-      getMetricsSystemMetricsGet({
+  Future<Response<ResponseGetMetricsSystemMetricsGet>> getMetricsSystemMetricsGet({ 
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -408,12 +399,11 @@ class DefaultApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(ResponseGetMetricsSystemMetricsGet),
-            ) as ResponseGetMetricsSystemMetricsGet;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(ResponseGetMetricsSystemMetricsGet),
+      ) as ResponseGetMetricsSystemMetricsGet;
+
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -449,8 +439,7 @@ class DefaultApi {
   ///
   /// Returns a [Future] containing a [Response] with a [BuiltList<ScheduledTaskResponse>] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<BuiltList<ScheduledTaskResponse>>>
-      getScheduledTasksSchedulerTasksGet({
+  Future<Response<BuiltList<ScheduledTaskResponse>>> getScheduledTasksSchedulerTasksGet({ 
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -483,13 +472,11 @@ class DefaultApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType:
-                  const FullType(BuiltList, [FullType(ScheduledTaskResponse)]),
-            ) as BuiltList<ScheduledTaskResponse>;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(BuiltList, [FullType(ScheduledTaskResponse)]),
+      ) as BuiltList<ScheduledTaskResponse>;
+
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -513,7 +500,7 @@ class DefaultApi {
   }
 
   /// Heelo World
-  ///
+  /// 
   ///
   /// Parameters:
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
@@ -525,7 +512,7 @@ class DefaultApi {
   ///
   /// Returns a [Future] containing a [Response] with a [JsonObject] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<JsonObject>> heeloWorldHelloGet({
+  Future<Response<JsonObject>> heeloWorldHelloGet({ 
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -558,12 +545,11 @@ class DefaultApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(JsonObject),
-            ) as JsonObject;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(JsonObject),
+      ) as JsonObject;
+
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -587,10 +573,10 @@ class DefaultApi {
   }
 
   /// Read Site
-  ///
+  /// 
   ///
   /// Parameters:
-  /// * [siteId]
+  /// * [siteId] 
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -600,7 +586,7 @@ class DefaultApi {
   ///
   /// Returns a [Future] containing a [Response] with a [Site] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<Site>> readSiteSitesSiteIdGet({
+  Future<Response<Site>> readSiteSitesSiteIdGet({ 
     required int siteId,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -609,10 +595,7 @@ class DefaultApi {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final _path = r'/sites/{site_id}'.replaceAll(
-        '{' r'site_id' '}',
-        encodeQueryParameter(_serializers, siteId, const FullType(int))
-            .toString());
+    final _path = r'/sites/{site_id}'.replaceAll('{' r'site_id' '}', encodeQueryParameter(_serializers, siteId, const FullType(int)).toString());
     final _options = Options(
       method: r'GET',
       headers: <String, dynamic>{
@@ -637,12 +620,11 @@ class DefaultApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(Site),
-            ) as Site;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(Site),
+      ) as Site;
+
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -666,11 +648,11 @@ class DefaultApi {
   }
 
   /// Read Sites
-  ///
+  /// 
   ///
   /// Parameters:
-  /// * [skip]
-  /// * [limit]
+  /// * [skip] 
+  /// * [limit] 
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -680,7 +662,7 @@ class DefaultApi {
   ///
   /// Returns a [Future] containing a [Response] with a [BuiltList<Site>] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<BuiltList<Site>>> readSitesSitesGet({
+  Future<Response<BuiltList<Site>>> readSitesSitesGet({ 
     int? skip = 0,
     int? limit = 100,
     CancelToken? cancelToken,
@@ -704,11 +686,8 @@ class DefaultApi {
     );
 
     final _queryParameters = <String, dynamic>{
-      if (skip != null)
-        r'skip': encodeQueryParameter(_serializers, skip, const FullType(int)),
-      if (limit != null)
-        r'limit':
-            encodeQueryParameter(_serializers, limit, const FullType(int)),
+      if (skip != null) r'skip': encodeQueryParameter(_serializers, skip, const FullType(int)),
+      if (limit != null) r'limit': encodeQueryParameter(_serializers, limit, const FullType(int)),
     };
 
     final _response = await _dio.request<Object>(
@@ -724,12 +703,11 @@ class DefaultApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(BuiltList, [FullType(Site)]),
-            ) as BuiltList<Site>;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(BuiltList, [FullType(Site)]),
+      ) as BuiltList<Site>;
+
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -756,7 +734,7 @@ class DefaultApi {
   /// 接收图片文件并进行 OCR 文字识别  :param file: 上传的图片文件 :return: 识别出的文字内容
   ///
   /// Parameters:
-  /// * [file]
+  /// * [file] 
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -766,7 +744,7 @@ class DefaultApi {
   ///
   /// Returns a [Future] containing a [Response] with a [JsonObject] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<JsonObject>> recognizeTextOcrRecognizePost({
+  Future<Response<JsonObject>> recognizeTextOcrRecognizePost({ 
     required MultipartFile file,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
@@ -795,9 +773,10 @@ class DefaultApi {
       _bodyData = FormData.fromMap(<String, dynamic>{
         r'file': file,
       });
-    } catch (error, stackTrace) {
+
+    } catch(error, stackTrace) {
       throw DioException(
-        requestOptions: _options.compose(
+         requestOptions: _options.compose(
           _dio.options,
           _path,
         ),
@@ -820,12 +799,11 @@ class DefaultApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(JsonObject),
-            ) as JsonObject;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(JsonObject),
+      ) as JsonObject;
+
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -849,7 +827,7 @@ class DefaultApi {
   }
 
   /// Root
-  ///
+  /// 
   ///
   /// Parameters:
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
@@ -861,7 +839,7 @@ class DefaultApi {
   ///
   /// Returns a [Future] containing a [Response] with a [JsonObject] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<JsonObject>> rootGet({
+  Future<Response<JsonObject>> rootGet({ 
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -894,12 +872,11 @@ class DefaultApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(JsonObject),
-            ) as JsonObject;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(JsonObject),
+      ) as JsonObject;
+
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -921,4 +898,5 @@ class DefaultApi {
       extra: _response.extra,
     );
   }
+
 }

@@ -31,6 +31,12 @@ doc/NoteTreeResponse.md
 doc/NoteUpdate.md
 doc/NotesApi.md
 doc/NotesListResponse.md
+doc/PeopleApi.md
+doc/PeopleCreate.md
+doc/PeopleNameCreate.md
+doc/PeopleNameResponse.md
+doc/PeopleResponse.md
+doc/PeopleUpdate.md
 doc/ResponseGetMetricsSystemMetricsGet.md
 doc/ScheduledTaskResponse.md
 doc/Site.md
@@ -46,6 +52,7 @@ lib/src/api/default_api.dart
 lib/src/api/llm_api.dart
 lib/src/api/note_titles_api.dart
 lib/src/api/notes_api.dart
+lib/src/api/people_api.dart
 lib/src/api_util.dart
 lib/src/auth/api_key_auth.dart
 lib/src/auth/auth.dart
@@ -79,6 +86,11 @@ lib/src/model/note_title_update.dart
 lib/src/model/note_tree_response.dart
 lib/src/model/note_update.dart
 lib/src/model/notes_list_response.dart
+lib/src/model/people_create.dart
+lib/src/model/people_name_create.dart
+lib/src/model/people_name_response.dart
+lib/src/model/people_response.dart
+lib/src/model/people_update.dart
 lib/src/model/response_get_metrics_system_metrics_get.dart
 lib/src/model/scheduled_task_response.dart
 lib/src/model/site.dart
@@ -89,3 +101,9 @@ lib/src/model/validation_error.dart
 lib/src/model/validation_error_loc_inner.dart
 lib/src/serializers.dart
 pubspec.yaml
+test/people_api_test.dart
+test/people_create_test.dart
+test/people_name_create_test.dart
+test/people_name_response_test.dart
+test/people_response_test.dart
+test/people_update_test.dart
