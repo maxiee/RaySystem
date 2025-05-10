@@ -28,7 +28,10 @@ async def get_people(people_id: int, session: AsyncSession = Depends(get_db_sess
     people = await PeopleManager.get_people(people_id, session)
     if not people:
         raise HTTPException(status_code=404, detail="People not found")
-    return people
+
+    # Ensure names are included in the response
+    names = [name.name for name in people.names] if people.names else []
+    return PeopleResponse(**people.__dict__, names=names)
 
 
 @router.put("/{people_id}", response_model=PeopleResponse)

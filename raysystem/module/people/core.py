@@ -1,6 +1,7 @@
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.orm import joinedload
 from module.people.model import People, PeopleName
 from module.people.schemas import PeopleCreate, PeopleUpdate
 
@@ -16,7 +17,11 @@ class PeopleManager:
 
     @staticmethod
     async def get_people(people_id: int, session: AsyncSession) -> Optional[People]:
-        result = await session.execute(select(People).where(People.id == people_id))
+        result = await session.execute(
+            select(People)
+            .options(joinedload(People.names))
+            .where(People.id == people_id)
+        )
         return result.scalar_one_or_none()
 
     @staticmethod
