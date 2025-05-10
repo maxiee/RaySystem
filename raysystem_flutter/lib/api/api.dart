@@ -71,6 +71,11 @@ final llmApi = generatedAPI.Openapi(
   dio: createConfiguredDio(longTimeout: true),
 ).getLLMApi();
 
+final peopleApi = generatedAPI.Openapi(
+  basePathOverride: getBaseUrl(),
+  dio: createConfiguredDio(),
+).getPeopleApi();
+
 /// SSE event types returned by the server
 enum SSEEventType {
   start,
