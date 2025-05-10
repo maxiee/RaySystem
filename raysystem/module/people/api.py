@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 from typing import List
 from module.db.db import get_db_session
 from module.people.core import PeopleManager
@@ -11,7 +12,7 @@ from module.people.schemas import (
     PeopleNameCreate,
     PeopleNameResponse,
 )
-from module.people.model import PeopleName
+from module.people.model import People, PeopleName
 
 router = APIRouter(prefix="/people", tags=["people"])
 
@@ -107,3 +108,36 @@ async def update_people_name(
     await session.commit()
     await session.refresh(name)
     return name
+
+
+@router.get("/search", response_model=List[PeopleResponse])
+async def search_people(
+    name: str, session: AsyncSession = Depends(get_db_session)
+):
+    # Step 1: Perform a case-insensitive search in PeopleName table
+    result = await session.execute(
+        select(PeopleName).where(PeopleName.name.ilike(f"%{name}%"))
+    )
+    people_name_results = result.scalars().all()
+
+    # Step 2: Extract unique People IDs from the search results
+    people_ids = {name.people_id for name in people_name_results}
+
+    if not people_ids:
+        return []
+
+    # Step 3: Query People table with joinedload for names
+    result = await session.execute(
+        select(People)
+        .options(joinedload(People.names))
+        .where(People.id.in_(people_ids))
+    )
+    people_results = result.scalars().all()
+
+    # Step 4: Construct the response
+    response = []
+    for person in people_results:
+        names = [name.name for name in person.names] if person.names else []
+        response.append(PeopleResponse(**person.__dict__, names=names))
+
+    return response
