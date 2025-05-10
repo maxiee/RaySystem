@@ -101,9 +101,3 @@ lib/src/model/validation_error.dart
 lib/src/model/validation_error_loc_inner.dart
 lib/src/serializers.dart
 pubspec.yaml
-test/people_api_test.dart
-test/people_create_test.dart
-test/people_name_create_test.dart
-test/people_name_response_test.dart
-test/people_response_test.dart
-test/people_update_test.dart

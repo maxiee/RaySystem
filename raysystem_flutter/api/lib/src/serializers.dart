@@ -113,6 +113,10 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<Site>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(PeopleResponse)]),
+        () => ListBuilder<PeopleResponse>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(ScheduledTaskResponse)]),
         () => ListBuilder<ScheduledTaskResponse>(),
       )

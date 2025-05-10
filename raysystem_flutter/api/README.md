@@ -108,6 +108,7 @@ Class | Method | HTTP request | Description
 [*PeopleApi*](doc/PeopleApi.md) | [**deletePeoplePeoplePeopleIdDelete**](doc/PeopleApi.md#deletepeoplepeoplepeopleiddelete) | **DELETE** /people/{people_id} | Delete People
 [*PeopleApi*](doc/PeopleApi.md) | [**getPeopleNamesPeoplePeopleIdNamesGet**](doc/PeopleApi.md#getpeoplenamespeoplepeopleidnamesget) | **GET** /people/{people_id}/names | Get People Names
 [*PeopleApi*](doc/PeopleApi.md) | [**getPeoplePeoplePeopleIdGet**](doc/PeopleApi.md#getpeoplepeoplepeopleidget) | **GET** /people/{people_id} | Get People
+[*PeopleApi*](doc/PeopleApi.md) | [**searchPeoplePeopleSearchGet**](doc/PeopleApi.md#searchpeoplepeoplesearchget) | **GET** /people/search | Search People
 [*PeopleApi*](doc/PeopleApi.md) | [**updatePeopleNamePeopleNamesNameIdPut**](doc/PeopleApi.md#updatepeoplenamepeoplenamesnameidput) | **PUT** /people/names/{name_id} | Update People Name
 [*PeopleApi*](doc/PeopleApi.md) | [**updatePeoplePeoplePeopleIdPut**](doc/PeopleApi.md#updatepeoplepeoplepeopleidput) | **PUT** /people/{people_id} | Update People
 

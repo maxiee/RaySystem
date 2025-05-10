@@ -1,4 +1,4 @@
-// Openapi Generator last run: : 2025-05-01T23:45:41.501321
+// Openapi Generator last run: : 2025-05-10T16:09:42.869715
 import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
@@ -11,7 +11,7 @@ import 'package:openapi/openapi.dart' as generatedAPI;
     inputSpec: RemoteSpec(path: 'http://127.0.0.1:8000/openapi.json'),
     generatorName: Generator.dio,
     outputDirectory: 'api',
-    forceAlwaysRun: false,
+    forceAlwaysRun: true,
     skipIfSpecIsUnchanged: true)
 class API {}
 

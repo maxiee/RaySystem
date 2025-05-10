@@ -15,6 +15,7 @@ Method | HTTP request | Description
 [**deletePeoplePeoplePeopleIdDelete**](PeopleApi.md#deletepeoplepeoplepeopleiddelete) | **DELETE** /people/{people_id} | Delete People
 [**getPeopleNamesPeoplePeopleIdNamesGet**](PeopleApi.md#getpeoplenamespeoplepeopleidnamesget) | **GET** /people/{people_id}/names | Get People Names
 [**getPeoplePeoplePeopleIdGet**](PeopleApi.md#getpeoplepeoplepeopleidget) | **GET** /people/{people_id} | Get People
+[**searchPeoplePeopleSearchGet**](PeopleApi.md#searchpeoplepeoplesearchget) | **GET** /people/search | Search People
 [**updatePeopleNamePeopleNamesNameIdPut**](PeopleApi.md#updatepeoplenamepeoplenamesnameidput) | **PUT** /people/names/{name_id} | Update People Name
 [**updatePeoplePeoplePeopleIdPut**](PeopleApi.md#updatepeoplepeoplepeopleidput) | **PUT** /people/{people_id} | Update People
 
@@ -255,6 +256,47 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**PeopleResponse**](PeopleResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **searchPeoplePeopleSearchGet**
+> BuiltList<PeopleResponse> searchPeoplePeopleSearchGet(name)
+
+Search People
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+
+final api = Openapi().getPeopleApi();
+final String name = name_example; // String | 
+
+try {
+    final response = api.searchPeoplePeopleSearchGet(name);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling PeopleApi->searchPeoplePeopleSearchGet: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **name** | **String**|  | 
+
+### Return type
+
+[**BuiltList&lt;PeopleResponse&gt;**](PeopleResponse.md)
 
 ### Authorization
 
