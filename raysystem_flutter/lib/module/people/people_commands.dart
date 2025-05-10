@@ -13,9 +13,7 @@ final peopleCommands = Command(
         icon: Icons.search,
         callback: (context, cardManager) {
           // 添加人物列表卡片
-          cardManager.addCard(
-            SearchPeopleCard(),
-          );
+          cardManager.addCard(SearchPeopleCard(), wrappedInRayCard: false);
         },
       ),
     ]);

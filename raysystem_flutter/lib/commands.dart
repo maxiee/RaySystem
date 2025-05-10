@@ -9,10 +9,12 @@ import 'package:raysystem_flutter/commands/info_commands.dart';
 import 'package:raysystem_flutter/commands/scheduler_commands.dart';
 import 'package:raysystem_flutter/commands/llm_commands.dart';
 import 'package:raysystem_flutter/module/browser/browser_commands.dart';
+import 'package:raysystem_flutter/module/people/people_commands.dart';
 
 final List<Command> rootCommands = [
   browserCommands,
   noteCommands,
+  peopleCommands,
   llmCommands,
   textCommands,
   todoCommands,
