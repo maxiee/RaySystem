@@ -24,6 +24,37 @@ async def create_people(
     return await PeopleManager.create_people(people_data, session)
 
 
+@router.get("/search", response_model=List[PeopleResponse])
+async def search_people(name: str, session: AsyncSession = Depends(get_db_session)):
+    # Step 1: Perform a case-insensitive search in PeopleName table
+    result = await session.execute(
+        select(PeopleName).where(PeopleName.name.ilike(f"%{name}%"))
+    )
+    people_name_results = result.scalars().all()
+
+    # Step 2: Extract unique People IDs from the search results
+    people_ids = {name.people_id for name in people_name_results}
+
+    if not people_ids:
+        return []
+
+    # Step 3: Query People table with joinedload for names
+    result = await session.execute(
+        select(People)
+        .options(joinedload(People.names))
+        .where(People.id.in_(people_ids))
+    )
+    people_results = result.scalars().all()
+
+    # Step 4: Construct the response
+    response = []
+    for person in people_results:
+        names = [name.name for name in person.names] if person.names else []
+        response.append(PeopleResponse(**person.__dict__, names=names))
+
+    return response
+
+
 @router.get("/{people_id}", response_model=PeopleResponse)
 async def get_people(people_id: int, session: AsyncSession = Depends(get_db_session)):
     people = await PeopleManager.get_people(people_id, session)
@@ -108,36 +139,3 @@ async def update_people_name(
     await session.commit()
     await session.refresh(name)
     return name
-
-
-@router.get("/search", response_model=List[PeopleResponse])
-async def search_people(
-    name: str, session: AsyncSession = Depends(get_db_session)
-):
-    # Step 1: Perform a case-insensitive search in PeopleName table
-    result = await session.execute(
-        select(PeopleName).where(PeopleName.name.ilike(f"%{name}%"))
-    )
-    people_name_results = result.scalars().all()
-
-    # Step 2: Extract unique People IDs from the search results
-    people_ids = {name.people_id for name in people_name_results}
-
-    if not people_ids:
-        return []
-
-    # Step 3: Query People table with joinedload for names
-    result = await session.execute(
-        select(People)
-        .options(joinedload(People.names))
-        .where(People.id.in_(people_ids))
-    )
-    people_results = result.scalars().all()
-
-    # Step 4: Construct the response
-    response = []
-    for person in people_results:
-        names = [name.name for name in person.names] if person.names else []
-        response.append(PeopleResponse(**person.__dict__, names=names))
-
-    return response
