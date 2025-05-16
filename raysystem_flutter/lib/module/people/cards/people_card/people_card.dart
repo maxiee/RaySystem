@@ -36,19 +36,12 @@ class PeopleCard extends StatelessWidget {
           return RayCard(
             title: Text(peopleId != null ? '编辑人物信息' : '新建人物'),
             trailingActions: [
-              if (viewModel.isEditMode)
-                IconButton(
-                  icon: Icon(
-                      viewModel.isSaving ? Icons.hourglass_empty : Icons.check),
-                  onPressed: viewModel.isSaving ? null : viewModel.savePeople,
-                  tooltip: '保存',
-                )
-              else
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () => viewModel.setEditMode(true),
-                  tooltip: '编辑',
-                ),
+              IconButton(
+                icon: Icon(
+                    viewModel.isSaving ? Icons.hourglass_empty : Icons.check),
+                onPressed: viewModel.isSaving ? null : viewModel.savePeople,
+                tooltip: '保存',
+              )
             ],
             content: _buildCardContent(context, viewModel),
           );
@@ -173,14 +166,8 @@ class PeopleCard extends StatelessWidget {
   // 构建人名 Tag 组件
   Widget _buildPeopleNamesTags(
       BuildContext context, PeopleCardViewModel viewModel) {
-    // 新建人物时只有加号
-    if (viewModel.peopleId == null && !viewModel.isEditMode) {
-      // If not in edit mode and new, show nothing or placeholder
-      return const Text("保存后可添加姓名",
-          style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey));
-    }
-    if (viewModel.peopleId == null && viewModel.isEditMode) {
-      // If in edit mode and new, show add tag
+    // 新建人物时只显示添加按钮
+    if (viewModel.peopleId == null) {
       return Row(
         children: [
           _buildAddNameTag(context, viewModel),
@@ -191,11 +178,11 @@ class PeopleCard extends StatelessWidget {
     if (viewModel.peopleNames.isEmpty) {
       return Row(
         children: [
-          _buildAddNameTag(context,
-              viewModel), // Show add tag even if list is empty but person exists
+          _buildAddNameTag(context, viewModel),
         ],
       );
     }
+
     List<Widget> tags = [];
     for (int i = 0; i < viewModel.peopleNames.length; i++) {
       final name = viewModel.peopleNames[i];
@@ -207,10 +194,10 @@ class PeopleCard extends StatelessWidget {
         ));
       }
     }
-    // 加号 (Only if in edit mode)
-    if (viewModel.isEditMode) {
-      tags.add(_buildAddNameTag(context, viewModel));
-    }
+
+    // 添加标签按钮
+    tags.add(_buildAddNameTag(context, viewModel));
+
     return Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,
       children: tags,
@@ -222,16 +209,11 @@ class PeopleCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
       child: GestureDetector(
-        onTap: viewModel.isEditMode
-            ? () => _showEditNameDialog(context, viewModel, name)
-            : null,
+        onTap: () => _showEditNameDialog(context, viewModel, name),
         child: Chip(
           label: Text(name.name),
-          deleteIcon:
-              viewModel.isEditMode ? const Icon(Icons.close, size: 16) : null,
-          onDeleted: viewModel.isEditMode
-              ? () => _confirmDeleteName(context, viewModel, name)
-              : null,
+          deleteIcon: const Icon(Icons.close, size: 16),
+          onDeleted: () => _confirmDeleteName(context, viewModel, name),
         ),
       ),
     );
@@ -243,11 +225,10 @@ class PeopleCard extends StatelessWidget {
       child: ActionChip(
         avatar: const Icon(Icons.add, size: 16),
         label: const Text('添加'),
-        onPressed: viewModel.isEditMode
-            ? () => (viewModel.peopleData?.id ?? viewModel.peopleId) == null
+        onPressed: () =>
+            (viewModel.peopleData?.id ?? viewModel.peopleId) == null
                 ? _showSaveFirstDialog(context, viewModel)
-                : _showAddNameDialog(context, viewModel)
-            : null,
+                : _showAddNameDialog(context, viewModel),
       ),
     );
   }
@@ -282,7 +263,7 @@ class PeopleCard extends StatelessWidget {
     }
   }
 
-  // 构建统一的表单和视图内容 (Replaces the old _buildEditForm content)
+  // 构建统一的表单内容
   Widget _buildEditForm(BuildContext context, PeopleCardViewModel viewModel) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -302,64 +283,47 @@ class PeopleCard extends StatelessWidget {
               const Text('头像URL',
                   style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              viewModel.isEditMode
-                  ? TextFormField(
-                      controller: viewModel.avatarController,
-                      decoration: const InputDecoration(
-                        hintText: '输入图像的URL地址',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.image),
-                      ),
-                    )
-                  : Text(viewModel.avatarController.text.isNotEmpty
-                      ? viewModel.avatarController.text
-                      : '未设置'),
+              TextFormField(
+                controller: viewModel.avatarController,
+                decoration: const InputDecoration(
+                  hintText: '输入图像的URL地址',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.image),
+                ),
+              ),
               const SizedBox(height: 16),
 
               // 出生日期
               const Text('出生日期', style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              viewModel.isEditMode
-                  ? GestureDetector(
-                      onTap: () => _selectDate(context, viewModel),
-                      child: AbsorbPointer(
-                        child: TextFormField(
-                          controller: viewModel.birthDateController,
-                          readOnly: true,
-                          decoration: const InputDecoration(
-                            hintText: 'YYYY-MM-DD',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.calendar_today),
-                          ),
-                        ),
-                      ),
-                    )
-                  : Text(viewModel.birthDateController.text.isNotEmpty
-                      ? viewModel.birthDateController.text
-                      : '未设置'),
+              GestureDetector(
+                onTap: () => _selectDate(context, viewModel),
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    controller: viewModel.birthDateController,
+                    readOnly: true,
+                    decoration: const InputDecoration(
+                      hintText: 'YYYY-MM-DD',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.calendar_today),
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 16),
 
               // 描述
               const Text('描述', style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              viewModel.isEditMode
-                  ? TextFormField(
-                      controller: viewModel.descriptionController,
-                      maxLines: 5,
-                      decoration: const InputDecoration(
-                        hintText: '输入人物的描述信息',
-                        alignLabelWithHint: true,
-                        border: OutlineInputBorder(),
-                      ),
-                    )
-                  : Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text(
-                          viewModel.descriptionController.text.isNotEmpty
-                              ? viewModel.descriptionController.text
-                              : '暂无描述'),
-                    ),
+              TextFormField(
+                controller: viewModel.descriptionController,
+                maxLines: 5,
+                decoration: const InputDecoration(
+                  hintText: '输入人物的描述信息',
+                  alignLabelWithHint: true,
+                  border: OutlineInputBorder(),
+                ),
+              ),
               const SizedBox(height: 16),
 
               // 预览头像
@@ -398,9 +362,8 @@ class PeopleCard extends StatelessWidget {
                 },
               ),
 
-              // ID (Display only if not in edit mode and ID exists)
-              if (!viewModel.isEditMode &&
-                  viewModel.peopleData?.id != null) ...[
+              // ID (仅显示已有的ID)
+              if (viewModel.peopleData?.id != null) ...[
                 const Text('ID', style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Text(viewModel.peopleData!.id.toString()),

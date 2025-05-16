@@ -13,7 +13,6 @@ class PeopleCardViewModel extends ChangeNotifier {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   bool _isSaving = false;
-  bool _isEditMode = false;
 
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController avatarController = TextEditingController();
@@ -26,7 +25,6 @@ class PeopleCardViewModel extends ChangeNotifier {
   // Getters
   bool get isLoading => _isLoading;
   bool get isSaving => _isSaving;
-  bool get isEditMode => _isEditMode;
   openapi.PeopleResponse? get peopleData => _peopleData;
   List<openapi.PeopleNameResponse> get peopleNames => _peopleNames;
   String? successMessage;
@@ -37,7 +35,6 @@ class PeopleCardViewModel extends ChangeNotifier {
       loadPeopleData();
       loadPeopleNames();
     } else {
-      _isEditMode = true;
       _peopleNames = [];
       notifyListeners();
     }
@@ -49,11 +46,6 @@ class PeopleCardViewModel extends ChangeNotifier {
     avatarController.dispose();
     birthDateController.dispose();
     super.dispose();
-  }
-
-  void setEditMode(bool editMode) {
-    _isEditMode = editMode;
-    notifyListeners();
   }
 
   Future<void> loadPeopleData() async {
@@ -143,7 +135,6 @@ class PeopleCardViewModel extends ChangeNotifier {
         successMessage = '人物信息更新成功';
       }
       _isSaving = false;
-      _isEditMode = false;
       notifyListeners();
 
       // 如果有回调，调用它
