@@ -22,9 +22,8 @@ async def create_people(
     people_data: PeopleCreate, session: AsyncSession = Depends(get_db_session)
 ):
     new_people = await PeopleManager.create_people(people_data, session)
-    # Ensure names are included in the response
-    names = [name.name for name in new_people.names] if new_people.names else []
-    return PeopleResponse(**new_people.__dict__, names=names)
+    # 新创建的人物对象还没有名称，直接使用空列表
+    return PeopleResponse(**new_people.__dict__, names=[])
 
 
 @router.get("/search", response_model=List[PeopleResponse])
@@ -41,19 +40,29 @@ async def search_people(name: str, session: AsyncSession = Depends(get_db_sessio
     if not people_ids:
         return []
 
-    # Step 3: Query People table with joinedload for names
-    result = await session.execute(
-        select(People)
-        .options(joinedload(People.names))
-        .where(People.id.in_(people_ids))
-    )
+    # Step 3: Query People table without joinedload
+    result = await session.execute(select(People).where(People.id.in_(people_ids)))
     people_results = result.scalars().all()
 
     # Step 4: Construct the response
     response = []
     for person in people_results:
-        names = [name.name for name in person.names] if person.names else []
-        response.append(PeopleResponse(**person.__dict__, names=names))
+        # 获取每个人物的名称记录
+        person_names_result = await session.execute(
+            select(PeopleName).where(PeopleName.people_id == person.id)
+        )
+        name_records = person_names_result.scalars().all()
+        names_list = []
+        for name_record in name_records:
+            names_list.append(
+                PeopleNameResponse(
+                    id=name_record.id,
+                    people_id=name_record.people_id,
+                    name=name_record.name,
+                )
+            )
+
+        response.append(PeopleResponse(**person.__dict__, names=names_list))
 
     return response
 
@@ -64,9 +73,18 @@ async def get_people(people_id: int, session: AsyncSession = Depends(get_db_sess
     if not people:
         raise HTTPException(status_code=404, detail="People not found")
 
-    # Ensure names are included in the response
-    names = [name.name for name in people.names] if people.names else []
-    return PeopleResponse(**people.__dict__, names=names)
+    # 单独查询名称以避免延迟加载错误
+    result = await session.execute(
+        select(PeopleName).where(PeopleName.people_id == people_id)
+    )
+    name_records = result.scalars().all()
+    names_list = []
+    for name in name_records:
+        names_list.append(
+            PeopleNameResponse(id=name.id, people_id=name.people_id, name=name.name)
+        )
+
+    return PeopleResponse(**people.__dict__, names=names_list)
 
 
 @router.put("/{people_id}", response_model=PeopleResponse)
@@ -78,10 +96,19 @@ async def update_people(
     updated_people = await PeopleManager.update_people(people_id, people_data, session)
     if not updated_people:
         raise HTTPException(status_code=404, detail="People not found")
-    
-    # Ensure names are included in the response
-    names = [name.name for name in updated_people.names] if updated_people.names else []
-    return PeopleResponse(**updated_people.__dict__, names=names)
+
+    # 单独查询名称以避免延迟加载错误
+    result = await session.execute(
+        select(PeopleName).where(PeopleName.people_id == people_id)
+    )
+    name_records = result.scalars().all()
+    names_list = []
+    for name in name_records:
+        names_list.append(
+            PeopleNameResponse(id=name.id, people_id=name.people_id, name=name.name)
+        )
+
+    return PeopleResponse(**updated_people.__dict__, names=names_list)
 
 
 @router.delete("/{people_id}", response_model=bool)

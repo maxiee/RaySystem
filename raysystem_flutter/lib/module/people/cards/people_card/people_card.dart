@@ -244,7 +244,7 @@ class PeopleCard extends StatelessWidget {
         avatar: const Icon(Icons.add, size: 16),
         label: const Text('添加'),
         onPressed: viewModel.isEditMode
-            ? () => viewModel.peopleId == null
+            ? () => (viewModel.peopleData?.id ?? viewModel.peopleId) == null
                 ? _showSaveFirstDialog(context, viewModel)
                 : _showAddNameDialog(context, viewModel)
             : null,
@@ -274,10 +274,11 @@ class PeopleCard extends StatelessWidget {
     );
     if (result == true) {
       // 使用带回调的保存方法，如果保存成功直接打开添加人名对话框
-      await viewModel.savePeople(onSuccess: () async {
+      final success = await viewModel.savePeople();
+      if (success) {
         // 保存成功后直接打开添加人名对话框
         await _showAddNameDialog(context, viewModel);
-      });
+      }
     }
   }
 

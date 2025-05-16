@@ -87,10 +87,11 @@ class PeopleCardViewModel extends ChangeNotifier {
   }
 
   Future<void> loadPeopleNames() async {
-    if (peopleId == null) return;
+    int? currentPeopleId = _peopleData?.id ?? peopleId;
+    if (currentPeopleId == null) return;
     try {
       final response = await peopleApi.getPeopleNamesPeoplePeopleIdNamesGet(
-          peopleId: peopleId!);
+          peopleId: currentPeopleId);
       _peopleNames = response.data?.toList() ?? [];
       notifyListeners();
     } catch (e) {
@@ -122,15 +123,6 @@ class PeopleCardViewModel extends ChangeNotifier {
           peopleCreate: peopleCreate,
         );
         _peopleData = response.data;
-        // 更新peopleId，使后续操作可以使用
-        if (_peopleData != null) {
-          // 更新当前对象的peopleId，使后续操作可以使用
-          int? newPeopleId = _peopleData!.id;
-          if (newPeopleId != null) {
-            // 反射更新私有字段peopleId (通过一个临时公共getter)
-            (this as dynamic)._peopleId = newPeopleId;
-          }
-        }
         successMessage = '人物创建成功';
       } else {
         final peopleUpdate = openapi.PeopleUpdate((b) => b
@@ -168,9 +160,6 @@ class PeopleCardViewModel extends ChangeNotifier {
     }
   }
 
-  // 添加一个getter，用于外部访问私有的peopleId值
-  int? get _peopleId => peopleId;
-
   void selectDate(DateTime? date) {
     if (date != null) {
       _birthDate = date;
@@ -180,14 +169,16 @@ class PeopleCardViewModel extends ChangeNotifier {
   }
 
   Future<void> createPeopleName(String name) async {
-    if (peopleId == null) {
+    // 使用 _peopleData?.id 而不是 peopleId，因为在创建新人物后，peopleId 仍然是 null，但 _peopleData.id 已更新
+    int? currentPeopleId = _peopleData?.id ?? peopleId;
+    if (currentPeopleId == null) {
       errorMessage = '请先保存人物基础信息，之后才能添加姓名。';
       notifyListeners();
       return;
     }
     try {
       await peopleApi.createPeopleNamePeoplePeopleIdNamesPost(
-        peopleId: peopleId!,
+        peopleId: currentPeopleId,
         peopleNameCreate: openapi.PeopleNameCreate((b) => b..name = name),
       );
       await loadPeopleNames(); // Reload names
