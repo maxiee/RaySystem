@@ -21,7 +21,10 @@ router = APIRouter(prefix="/people", tags=["people"])
 async def create_people(
     people_data: PeopleCreate, session: AsyncSession = Depends(get_db_session)
 ):
-    return await PeopleManager.create_people(people_data, session)
+    new_people = await PeopleManager.create_people(people_data, session)
+    # Ensure names are included in the response
+    names = [name.name for name in new_people.names] if new_people.names else []
+    return PeopleResponse(**new_people.__dict__, names=names)
 
 
 @router.get("/search", response_model=List[PeopleResponse])
@@ -75,7 +78,10 @@ async def update_people(
     updated_people = await PeopleManager.update_people(people_id, people_data, session)
     if not updated_people:
         raise HTTPException(status_code=404, detail="People not found")
-    return updated_people
+    
+    # Ensure names are included in the response
+    names = [name.name for name in updated_people.names] if updated_people.names else []
+    return PeopleResponse(**updated_people.__dict__, names=names)
 
 
 @router.delete("/{people_id}", response_model=bool)
