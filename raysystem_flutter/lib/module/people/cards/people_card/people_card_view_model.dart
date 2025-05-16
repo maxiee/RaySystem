@@ -100,8 +100,8 @@ class PeopleCardViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> savePeople() async {
-    if (!formKey.currentState!.validate()) return;
+  Future<bool> savePeople({Function? onSuccess}) async {
+    if (!formKey.currentState!.validate()) return false;
 
     _isSaving = true;
     notifyListeners();
@@ -122,8 +122,15 @@ class PeopleCardViewModel extends ChangeNotifier {
           peopleCreate: peopleCreate,
         );
         _peopleData = response.data;
-        // After creating, we might want to update the peopleId for subsequent operations if the UI stays on the same "card"
-        // For now, we assume the card might be replaced or re-initialized with the new ID.
+        // 更新peopleId，使后续操作可以使用
+        if (_peopleData != null) {
+          // 更新当前对象的peopleId，使后续操作可以使用
+          int? newPeopleId = _peopleData!.id;
+          if (newPeopleId != null) {
+            // 反射更新私有字段peopleId (通过一个临时公共getter)
+            (this as dynamic)._peopleId = newPeopleId;
+          }
+        }
         successMessage = '人物创建成功';
       } else {
         final peopleUpdate = openapi.PeopleUpdate((b) => b
@@ -146,12 +153,23 @@ class PeopleCardViewModel extends ChangeNotifier {
       _isSaving = false;
       _isEditMode = false;
       notifyListeners();
+
+      // 如果有回调，调用它
+      if (onSuccess != null) {
+        onSuccess();
+      }
+
+      return true;
     } catch (e) {
       _isSaving = false;
       errorMessage = '保存失败: ${e.toString()}';
       notifyListeners();
+      return false;
     }
   }
+
+  // 添加一个getter，用于外部访问私有的peopleId值
+  int? get _peopleId => peopleId;
 
   void selectDate(DateTime? date) {
     if (date != null) {

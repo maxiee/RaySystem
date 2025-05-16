@@ -244,10 +244,41 @@ class PeopleCard extends StatelessWidget {
         avatar: const Icon(Icons.add, size: 16),
         label: const Text('添加'),
         onPressed: viewModel.isEditMode
-            ? () => _showAddNameDialog(context, viewModel)
+            ? () => viewModel.peopleId == null
+                ? _showSaveFirstDialog(context, viewModel)
+                : _showAddNameDialog(context, viewModel)
             : null,
       ),
     );
+  }
+
+  // 提示先保存人物信息的对话框
+  Future<void> _showSaveFirstDialog(
+      BuildContext context, PeopleCardViewModel viewModel) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('需要先保存'),
+        content: const Text('添加人名前需要先保存人物基本信息，是否现在保存？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('保存', style: TextStyle(color: Colors.blue)),
+          ),
+        ],
+      ),
+    );
+    if (result == true) {
+      // 使用带回调的保存方法，如果保存成功直接打开添加人名对话框
+      await viewModel.savePeople(onSuccess: () async {
+        // 保存成功后直接打开添加人名对话框
+        await _showAddNameDialog(context, viewModel);
+      });
+    }
   }
 
   // 构建统一的表单和视图内容 (Replaces the old _buildEditForm content)
