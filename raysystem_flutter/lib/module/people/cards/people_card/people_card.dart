@@ -223,134 +223,30 @@ class _PeopleCardState extends State<PeopleCard> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return _isEditMode ? _buildEditForm() : _buildIdCardView();
-  }
-
-  // 构建身份证样式的视图
-  Widget _buildIdCardView() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 身份证顶部：头像和基本信息
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 头像部分
-              Container(
-                width: 120,
-                height: 150,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade400),
-                  borderRadius: BorderRadius.circular(4.0),
-                ),
-                child: _peopleData?.avatar != null &&
-                        _peopleData!.avatar!.isNotEmpty
-                    ? Image.network(
-                        _peopleData!.avatar!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Center(
-                          child:
-                              Icon(Icons.person, size: 80, color: Colors.grey),
-                        ),
-                      )
-                    : const Center(
-                        child: Icon(Icons.person, size: 80, color: Colors.grey),
-                      ),
-              ),
-              const SizedBox(width: 20),
-              // 基本信息部分
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 姓名部分（多名展示）
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(
-                            width: 80,
-                            child: Text('姓名',
-                                style: TextStyle(fontWeight: FontWeight.bold))),
-                        Expanded(
-                          child: _buildPeopleNamesTags(),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    // 出生日期部分
-                    Row(
-                      children: [
-                        const SizedBox(
-                            width: 80,
-                            child: Text('出生日期',
-                                style: TextStyle(fontWeight: FontWeight.bold))),
-                        Text(_peopleData?.birthDate ?? '未知',
-                            style: const TextStyle(fontSize: 16)),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    // ID 部分（如果有）
-                    if (_peopleData?.id != null)
-                      Row(
-                        children: [
-                          const SizedBox(
-                              width: 80,
-                              child: Text('ID',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold))),
-                          Text(_peopleData!.id.toString(),
-                              style: const TextStyle(fontSize: 16)),
-                        ],
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          // 描述部分
-          const Text('描述',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 8),
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12.0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(8.0),
-                color: Colors.grey.shade50,
-              ),
-              child: SingleChildScrollView(
-                child: Text(
-                  _peopleData?.description ?? '暂无描述',
-                  style: const TextStyle(fontSize: 14),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    return _buildEditForm(); // Always build the unified form
   }
 
   // 构建人名 Tag 组件
   Widget _buildPeopleNamesTags() {
     // 新建人物时只有加号
-    if (widget.peopleId == null) {
+    if (widget.peopleId == null && !_isEditMode) {
+      // If not in edit mode and new, show nothing or placeholder
+      return const Text("保存后可添加姓名",
+          style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey));
+    }
+    if (widget.peopleId == null && _isEditMode) {
+      // If in edit mode and new, show add tag
       return Row(
         children: [
           _buildAddNameTag(),
         ],
       );
     }
+
     if (_peopleNames.isEmpty) {
       return Row(
         children: [
-          _buildAddNameTag(),
+          _buildAddNameTag(), // Show add tag even if list is empty but person exists
         ],
       );
     }
@@ -365,8 +261,10 @@ class _PeopleCardState extends State<PeopleCard> {
         ));
       }
     }
-    // 加号
-    tags.add(_buildAddNameTag());
+    // 加号 (Only if in edit mode)
+    if (_isEditMode) {
+      tags.add(_buildAddNameTag());
+    }
     return Wrap(
       crossAxisAlignment: WrapCrossAlignment.center,
       children: tags,
@@ -377,11 +275,11 @@ class _PeopleCardState extends State<PeopleCard> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
       child: GestureDetector(
-        onTap: () => _showEditNameDialog(name),
+        onTap: _isEditMode ? () => _showEditNameDialog(name) : null,
         child: Chip(
           label: Text(name.name),
-          deleteIcon: const Icon(Icons.close, size: 16),
-          onDeleted: () => _confirmDeleteName(name),
+          deleteIcon: _isEditMode ? const Icon(Icons.close, size: 16) : null,
+          onDeleted: _isEditMode ? () => _confirmDeleteName(name) : null,
         ),
       ),
     );
@@ -393,7 +291,7 @@ class _PeopleCardState extends State<PeopleCard> {
       child: ActionChip(
         avatar: const Icon(Icons.add, size: 16),
         label: const Text('添加'),
-        onPressed: _showAddNameDialog,
+        onPressed: _isEditMode ? _showAddNameDialog : null,
       ),
     );
   }
@@ -457,8 +355,14 @@ class _PeopleCardState extends State<PeopleCard> {
         );
       },
     );
-    if (result != null && result.isNotEmpty && widget.peopleId != null) {
-      await _createPeopleName(result);
+    if (result != null && result.isNotEmpty) {
+      if (widget.peopleId != null) {
+        await _createPeopleName(result);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('请先保存人物基础信息，之后才能添加姓名。')),
+        );
+      }
     }
   }
 
@@ -531,96 +435,130 @@ class _PeopleCardState extends State<PeopleCard> {
     }
   }
 
-  // 构建编辑表单
+  // 构建统一的表单和视图内容 (Replaces the old _buildEditForm content)
   Widget _buildEditForm() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Form(
-        key: _formKey,
+        key: _formKey, // _formKey is used by _savePeople
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 姓名部分（暂时保持固定）
+              // 姓名
               const Text('姓名', style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              const Text('张三（姓名功能将在单独的模块中实现）',
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey)),
+              _buildPeopleNamesTags(), // Uses the existing name tags widget
               const SizedBox(height: 16),
 
               // 头像URL
-              TextFormField(
-                controller: _avatarController,
-                decoration: const InputDecoration(
-                  labelText: '头像URL',
-                  hintText: '输入图像的URL地址',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.image),
-                ),
-              ),
+              const Text('头像URL',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              _isEditMode
+                  ? TextFormField(
+                      controller: _avatarController,
+                      decoration: const InputDecoration(
+                        hintText: '输入图像的URL地址',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.image),
+                      ),
+                      // onChanged handled by ValueListenableBuilder for preview
+                    )
+                  : Text(_avatarController.text.isNotEmpty
+                      ? _avatarController.text
+                      : '未设置'),
               const SizedBox(height: 16),
 
               // 出生日期
-              GestureDetector(
-                onTap: () => _selectDate(context),
-                child: AbsorbPointer(
-                  child: TextFormField(
-                    controller: _birthDateController,
-                    decoration: const InputDecoration(
-                      labelText: '出生日期',
-                      hintText: 'YYYY-MM-DD',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.calendar_today),
-                    ),
-                  ),
-                ),
-              ),
+              const Text('出生日期', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              _isEditMode
+                  ? GestureDetector(
+                      onTap: () => _selectDate(context),
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          controller: _birthDateController,
+                          readOnly: true, // Controller updated by _selectDate
+                          decoration: const InputDecoration(
+                            hintText:
+                                'YYYY-MM-DD', // Displayed when controller is empty
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.calendar_today),
+                          ),
+                        ),
+                      ),
+                    )
+                  : Text(_birthDateController.text.isNotEmpty
+                      ? _birthDateController.text
+                      : '未设置'),
               const SizedBox(height: 16),
 
               // 描述
-              TextFormField(
-                controller: _descriptionController,
-                maxLines: 5,
-                decoration: const InputDecoration(
-                  labelText: '描述',
-                  hintText: '输入人物的描述信息',
-                  alignLabelWithHint: true,
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
+              const Text('描述', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              _isEditMode
+                  ? TextFormField(
+                      controller: _descriptionController,
+                      maxLines: 5,
+                      decoration: const InputDecoration(
+                        hintText: '输入人物的描述信息',
+                        alignLabelWithHint: true,
+                        border: OutlineInputBorder(),
+                      ),
+                    )
+                  : Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Text(_descriptionController.text.isNotEmpty
+                          ? _descriptionController.text
+                          : '暂无描述'),
+                    ),
               const SizedBox(height: 16),
 
-              // 预览头像（如果有URL）
-              if (_avatarController.text.isNotEmpty)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('头像预览',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
-                    Container(
-                      width: 120,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade400),
-                        borderRadius: BorderRadius.circular(4.0),
-                      ),
-                      child: Image.network(
-                        _avatarController.text,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Center(
-                          child: Icon(Icons.error_outline,
-                              color: Colors.red, size: 40),
+              // 预览头像
+              ValueListenableBuilder<TextEditingValue>(
+                valueListenable: _avatarController,
+                builder: (context, value, child) {
+                  if (value.text.isNotEmpty) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('头像预览',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        Container(
+                          width: 120,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade400),
+                            borderRadius: BorderRadius.circular(4.0),
+                          ),
+                          child: Image.network(
+                            value.text,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Center(
+                              child: Icon(Icons.error_outline,
+                                  color: Colors.red, size: 40),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
+                        const SizedBox(height: 16),
+                      ],
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+
+              // ID (Display only if not in edit mode and ID exists)
+              if (!_isEditMode && _peopleData?.id != null) ...[
+                const Text('ID', style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Text(_peopleData!.id.toString()),
+                const SizedBox(height: 16),
+              ],
             ],
           ),
         ),
