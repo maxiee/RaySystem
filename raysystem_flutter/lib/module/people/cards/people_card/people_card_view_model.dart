@@ -168,11 +168,19 @@ class PeopleCardViewModel extends ChangeNotifier {
       return;
     }
     try {
-      await peopleApi.createPeopleNamePeoplePeopleIdNamesPost(
+      final response = await peopleApi.createPeopleNamePeoplePeopleIdNamesPost(
         peopleId: currentPeopleId,
         peopleNameCreate: openapi.PeopleNameCreate((b) => b..name = name),
       );
-      await loadPeopleNames(); // Reload names
+
+      // 立即将新创建的人名添加到本地列表中，以提供即时反馈
+      if (response.data != null) {
+        _peopleNames.add(response.data!);
+        notifyListeners();
+      }
+
+      // 然后重新加载完整列表以确保数据一致性
+      await loadPeopleNames();
       successMessage = '添加人名成功';
       notifyListeners();
     } catch (e) {

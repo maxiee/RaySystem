@@ -166,8 +166,9 @@ class PeopleCard extends StatelessWidget {
   // 构建人名 Tag 组件
   Widget _buildPeopleNamesTags(
       BuildContext context, PeopleCardViewModel viewModel) {
-    // 新建人物时只显示添加按钮
-    if (viewModel.peopleId == null) {
+    // 如果还没有保存人物信息（既没有 peopleId 也没有 _peopleData.id），只显示添加按钮
+    final currentPeopleId = viewModel.peopleData?.id ?? viewModel.peopleId;
+    if (currentPeopleId == null) {
       return Row(
         children: [
           _buildAddNameTag(context, viewModel),
