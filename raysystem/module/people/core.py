@@ -22,7 +22,7 @@ class PeopleManager:
             .options(joinedload(People.names))
             .where(People.id == people_id)
         )
-        return result.scalar_one_or_none()
+        return result.unique().scalar_one_or_none()
 
     @staticmethod
     async def update_people(
