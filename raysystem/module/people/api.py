@@ -23,7 +23,9 @@ async def create_people(
 ):
     new_people = await PeopleManager.create_people(people_data, session)
     # 新创建的人物对象还没有名称，直接使用空列表
-    return PeopleResponse(**new_people.__dict__, names=[])
+    # 创建一个字典，排除names字段以避免重复参数
+    people_dict = {k: v for k, v in new_people.__dict__.items() if k != "names"}
+    return PeopleResponse(**people_dict, names=[])
 
 
 @router.get("/search", response_model=List[PeopleResponse])
@@ -62,7 +64,9 @@ async def search_people(name: str, session: AsyncSession = Depends(get_db_sessio
                 )
             )
 
-        response.append(PeopleResponse(**person.__dict__, names=names_list))
+        # 创建一个字典，排除names字段以避免重复参数
+        person_dict = {k: v for k, v in person.__dict__.items() if k != "names"}
+        response.append(PeopleResponse(**person_dict, names=names_list))
 
     return response
 
@@ -84,7 +88,9 @@ async def get_people(people_id: int, session: AsyncSession = Depends(get_db_sess
             PeopleNameResponse(id=name.id, people_id=name.people_id, name=name.name)
         )
 
-    return PeopleResponse(**people.__dict__, names=names_list)
+    # 创建一个字典，排除names字段以避免重复参数
+    people_dict = {k: v for k, v in people.__dict__.items() if k != "names"}
+    return PeopleResponse(**people_dict, names=names_list)
 
 
 @router.put("/{people_id}", response_model=PeopleResponse)
@@ -108,7 +114,9 @@ async def update_people(
             PeopleNameResponse(id=name.id, people_id=name.people_id, name=name.name)
         )
 
-    return PeopleResponse(**updated_people.__dict__, names=names_list)
+    # 创建一个字典，排除names字段以避免重复参数
+    people_dict = {k: v for k, v in updated_people.__dict__.items() if k != "names"}
+    return PeopleResponse(**people_dict, names=names_list)
 
 
 @router.delete("/{people_id}", response_model=bool)
