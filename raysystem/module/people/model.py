@@ -2,6 +2,7 @@ from typing import Optional
 from sqlalchemy import Integer, String, Date, ForeignKey
 from module.db.base import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from datetime import date
 
 
 class PeopleName(Base):
@@ -29,7 +30,7 @@ class People(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     description: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     avatar: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    birth_date: Mapped[Optional[Date]] = mapped_column(Date, nullable=True)
+    birth_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
 
     # Relationship with PeopleName
     names = relationship(

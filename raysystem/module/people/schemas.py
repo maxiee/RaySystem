@@ -1,5 +1,6 @@
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
+from datetime import date
 
 
 class PeopleNameBase(BaseModel):
@@ -15,13 +16,13 @@ class PeopleNameResponse(PeopleNameBase):
     people_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PeopleBase(BaseModel):
     description: Optional[str] = None
     avatar: Optional[str] = None
-    birth_date: Optional[str] = None
+    birth_date: Optional[date] = None
 
 
 class PeopleCreate(PeopleBase):
@@ -37,4 +38,4 @@ class PeopleResponse(PeopleBase):
     names: List[PeopleNameResponse] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
