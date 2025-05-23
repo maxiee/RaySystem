@@ -100,7 +100,11 @@ class PeopleCardViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      if (peopleId == null) {
+      // 优先检查是否已有人物数据，如果有则更新，否则创建
+      final currentPeopleId = _peopleData?.id ?? peopleId;
+
+      if (currentPeopleId == null) {
+        // 创建新人物
         final peopleCreate = openapi.PeopleCreate((b) => b
           ..description = descriptionController.text.isNotEmpty
               ? descriptionController.text
@@ -117,6 +121,7 @@ class PeopleCardViewModel extends ChangeNotifier {
         _peopleData = response.data;
         successMessage = '人物创建成功';
       } else {
+        // 更新现有人物
         final peopleUpdate = openapi.PeopleUpdate((b) => b
           ..description = descriptionController.text.isNotEmpty
               ? descriptionController.text
@@ -128,7 +133,7 @@ class PeopleCardViewModel extends ChangeNotifier {
               : null);
 
         final response = await peopleApi.updatePeoplePeoplePeopleIdPut(
-          peopleId: peopleId!,
+          peopleId: currentPeopleId,
           peopleUpdate: peopleUpdate,
         );
         _peopleData = response.data;
