@@ -3,6 +3,7 @@
 //
 
 // ignore_for_file: unused_element
+import 'package:openapi/src/model/date.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -24,7 +25,7 @@ abstract class PeopleUpdate
   String? get avatar;
 
   @BuiltValueField(wireName: r'birth_date')
-  String? get birthDate;
+  Date? get birthDate;
 
   PeopleUpdate._();
 
@@ -67,7 +68,7 @@ class _$PeopleUpdateSerializer implements PrimitiveSerializer<PeopleUpdate> {
       yield r'birth_date';
       yield serializers.serialize(
         object.birthDate,
-        specifiedType: const FullType.nullable(String),
+        specifiedType: const FullType.nullable(Date),
       );
     }
   }
@@ -114,8 +115,8 @@ class _$PeopleUpdateSerializer implements PrimitiveSerializer<PeopleUpdate> {
         case r'birth_date':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(String),
-          ) as String?;
+            specifiedType: const FullType.nullable(Date),
+          ) as Date?;
           if (valueDes == null) continue;
           result.birthDate = valueDes;
           break;

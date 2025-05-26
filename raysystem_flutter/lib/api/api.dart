@@ -1,4 +1,4 @@
-// Openapi Generator last run: : 2025-05-10T16:09:42.869715
+// Openapi Generator last run: : 2025-05-26T22:42:28.555135
 import 'dart:io';
 import 'dart:convert';
 import 'dart:async';

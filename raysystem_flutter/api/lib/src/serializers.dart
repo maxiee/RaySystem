@@ -40,6 +40,7 @@ import 'package:openapi/src/model/note_tree_response.dart';
 import 'package:openapi/src/model/note_update.dart';
 import 'package:openapi/src/model/notes_list_response.dart';
 import 'package:openapi/src/model/people_create.dart';
+import 'package:openapi/src/model/people_list_response.dart';
 import 'package:openapi/src/model/people_name_create.dart';
 import 'package:openapi/src/model/people_name_response.dart';
 import 'package:openapi/src/model/people_response.dart';
@@ -82,6 +83,7 @@ part 'serializers.g.dart';
   NoteUpdate,
   NotesListResponse,
   PeopleCreate,
+  PeopleListResponse,
   PeopleNameCreate,
   PeopleNameResponse,
   PeopleResponse,

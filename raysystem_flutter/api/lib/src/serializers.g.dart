@@ -33,6 +33,7 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..add(NoteUpdate.serializer)
       ..add(NotesListResponse.serializer)
       ..add(PeopleCreate.serializer)
+      ..add(PeopleListResponse.serializer)
       ..add(PeopleNameCreate.serializer)
       ..add(PeopleNameResponse.serializer)
       ..add(PeopleResponse.serializer)
@@ -76,6 +77,9 @@ Serializers _$serializers = (new Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(PeopleNameResponse)]),
           () => new ListBuilder<PeopleNameResponse>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(PeopleResponse)]),
+          () => new ListBuilder<PeopleResponse>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(ValidationError)]),
           () => new ListBuilder<ValidationError>())

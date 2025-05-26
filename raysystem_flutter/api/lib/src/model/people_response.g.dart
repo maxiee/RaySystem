@@ -12,7 +12,7 @@ class _$PeopleResponse extends PeopleResponse {
   @override
   final String? avatar;
   @override
-  final String? birthDate;
+  final Date? birthDate;
   @override
   final int id;
   @override
@@ -86,9 +86,9 @@ class PeopleResponseBuilder
   String? get avatar => _$this._avatar;
   set avatar(String? avatar) => _$this._avatar = avatar;
 
-  String? _birthDate;
-  String? get birthDate => _$this._birthDate;
-  set birthDate(String? birthDate) => _$this._birthDate = birthDate;
+  Date? _birthDate;
+  Date? get birthDate => _$this._birthDate;
+  set birthDate(Date? birthDate) => _$this._birthDate = birthDate;
 
   int? _id;
   int? get id => _$this._id;

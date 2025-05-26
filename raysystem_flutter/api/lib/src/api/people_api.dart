@@ -12,6 +12,7 @@ import 'package:built_collection/built_collection.dart';
 import 'package:openapi/src/api_util.dart';
 import 'package:openapi/src/model/http_validation_error.dart';
 import 'package:openapi/src/model/people_create.dart';
+import 'package:openapi/src/model/people_list_response.dart';
 import 'package:openapi/src/model/people_name_create.dart';
 import 'package:openapi/src/model/people_name_response.dart';
 import 'package:openapi/src/model/people_response.dart';
@@ -357,6 +358,93 @@ class PeopleApi {
     }
 
     return Response<bool>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// Get People List
+  /// 分页获取人物列表，按主键倒序排列（最新创建的在前面）
+  ///
+  /// Parameters:
+  /// * [page] - 页码，从1开始
+  /// * [pageSize] - 每页大小，最大100
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [PeopleListResponse] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<PeopleListResponse>> getPeopleListPeopleGet({
+    int? page = 1,
+    int? pageSize = 10,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/people/';
+    final _options = Options(
+      method: r'GET',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _queryParameters = <String, dynamic>{
+      if (page != null)
+        r'page': encodeQueryParameter(_serializers, page, const FullType(int)),
+      if (pageSize != null)
+        r'page_size':
+            encodeQueryParameter(_serializers, pageSize, const FullType(int)),
+    };
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      queryParameters: _queryParameters,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    PeopleListResponse? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null
+          ? null
+          : _serializers.deserialize(
+              rawResponse,
+              specifiedType: const FullType(PeopleListResponse),
+            ) as PeopleListResponse;
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<PeopleListResponse>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,

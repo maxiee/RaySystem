@@ -1,4 +1,4 @@
-# openapi.model.PeopleResponse
+# openapi.model.PeopleListResponse
 
 ## Load the model package
 ```dart
@@ -8,11 +8,11 @@ import 'package:openapi/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**description** | **String** |  | [optional] 
-**avatar** | **String** |  | [optional] 
-**birthDate** | [**Date**](Date.md) |  | [optional] 
-**id** | **int** |  | 
-**names** | [**BuiltList&lt;PeopleNameResponse&gt;**](PeopleNameResponse.md) |  | [optional] [default to ListBuilder()]
+**items** | [**BuiltList&lt;PeopleResponse&gt;**](PeopleResponse.md) |  | 
+**total** | **int** |  | 
+**page** | **int** |  | 
+**pageSize** | **int** |  | 
+**totalPages** | **int** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

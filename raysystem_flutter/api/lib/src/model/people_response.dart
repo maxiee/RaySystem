@@ -5,6 +5,7 @@
 // ignore_for_file: unused_element
 import 'package:built_collection/built_collection.dart';
 import 'package:openapi/src/model/people_name_response.dart';
+import 'package:openapi/src/model/date.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -28,7 +29,7 @@ abstract class PeopleResponse
   String? get avatar;
 
   @BuiltValueField(wireName: r'birth_date')
-  String? get birthDate;
+  Date? get birthDate;
 
   @BuiltValueField(wireName: r'id')
   int get id;
@@ -80,7 +81,7 @@ class _$PeopleResponseSerializer
       yield r'birth_date';
       yield serializers.serialize(
         object.birthDate,
-        specifiedType: const FullType.nullable(String),
+        specifiedType: const FullType.nullable(Date),
       );
     }
     yield r'id';
@@ -140,8 +141,8 @@ class _$PeopleResponseSerializer
         case r'birth_date':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType.nullable(String),
-          ) as String?;
+            specifiedType: const FullType.nullable(Date),
+          ) as Date?;
           if (valueDes == null) continue;
           result.birthDate = valueDes;
           break;

@@ -106,6 +106,7 @@ Class | Method | HTTP request | Description
 [*PeopleApi*](doc/PeopleApi.md) | [**createPeoplePeoplePost**](doc/PeopleApi.md#createpeoplepeoplepost) | **POST** /people/ | Create People
 [*PeopleApi*](doc/PeopleApi.md) | [**deletePeopleNamePeopleNamesNameIdDelete**](doc/PeopleApi.md#deletepeoplenamepeoplenamesnameiddelete) | **DELETE** /people/names/{name_id} | Delete People Name
 [*PeopleApi*](doc/PeopleApi.md) | [**deletePeoplePeoplePeopleIdDelete**](doc/PeopleApi.md#deletepeoplepeoplepeopleiddelete) | **DELETE** /people/{people_id} | Delete People
+[*PeopleApi*](doc/PeopleApi.md) | [**getPeopleListPeopleGet**](doc/PeopleApi.md#getpeoplelistpeopleget) | **GET** /people/ | Get People List
 [*PeopleApi*](doc/PeopleApi.md) | [**getPeopleNamesPeoplePeopleIdNamesGet**](doc/PeopleApi.md#getpeoplenamespeoplepeopleidnamesget) | **GET** /people/{people_id}/names | Get People Names
 [*PeopleApi*](doc/PeopleApi.md) | [**getPeoplePeoplePeopleIdGet**](doc/PeopleApi.md#getpeoplepeoplepeopleidget) | **GET** /people/{people_id} | Get People
 [*PeopleApi*](doc/PeopleApi.md) | [**searchPeoplePeopleSearchGet**](doc/PeopleApi.md#searchpeoplepeoplesearchget) | **GET** /people/search | Search People
@@ -141,6 +142,7 @@ Class | Method | HTTP request | Description
  - [NoteUpdate](doc/NoteUpdate.md)
  - [NotesListResponse](doc/NotesListResponse.md)
  - [PeopleCreate](doc/PeopleCreate.md)
+ - [PeopleListResponse](doc/PeopleListResponse.md)
  - [PeopleNameCreate](doc/PeopleNameCreate.md)
  - [PeopleNameResponse](doc/PeopleNameResponse.md)
  - [PeopleResponse](doc/PeopleResponse.md)

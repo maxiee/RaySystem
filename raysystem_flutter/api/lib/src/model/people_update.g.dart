@@ -12,7 +12,7 @@ class _$PeopleUpdate extends PeopleUpdate {
   @override
   final String? avatar;
   @override
-  final String? birthDate;
+  final Date? birthDate;
 
   factory _$PeopleUpdate([void Function(PeopleUpdateBuilder)? updates]) =>
       (new PeopleUpdateBuilder()..update(updates))._build();
@@ -67,9 +67,9 @@ class PeopleUpdateBuilder
   String? get avatar => _$this._avatar;
   set avatar(String? avatar) => _$this._avatar = avatar;
 
-  String? _birthDate;
-  String? get birthDate => _$this._birthDate;
-  set birthDate(String? birthDate) => _$this._birthDate = birthDate;
+  Date? _birthDate;
+  Date? get birthDate => _$this._birthDate;
+  set birthDate(Date? birthDate) => _$this._birthDate = birthDate;
 
   PeopleUpdateBuilder() {
     PeopleUpdate._defaults(this);

@@ -13,6 +13,7 @@ Method | HTTP request | Description
 [**createPeoplePeoplePost**](PeopleApi.md#createpeoplepeoplepost) | **POST** /people/ | Create People
 [**deletePeopleNamePeopleNamesNameIdDelete**](PeopleApi.md#deletepeoplenamepeoplenamesnameiddelete) | **DELETE** /people/names/{name_id} | Delete People Name
 [**deletePeoplePeoplePeopleIdDelete**](PeopleApi.md#deletepeoplepeoplepeopleiddelete) | **DELETE** /people/{people_id} | Delete People
+[**getPeopleListPeopleGet**](PeopleApi.md#getpeoplelistpeopleget) | **GET** /people/ | Get People List
 [**getPeopleNamesPeoplePeopleIdNamesGet**](PeopleApi.md#getpeoplenamespeoplepeopleidnamesget) | **GET** /people/{people_id}/names | Get People Names
 [**getPeoplePeoplePeopleIdGet**](PeopleApi.md#getpeoplepeoplepeopleidget) | **GET** /people/{people_id} | Get People
 [**searchPeoplePeopleSearchGet**](PeopleApi.md#searchpeoplepeoplesearchget) | **GET** /people/search | Search People
@@ -174,6 +175,51 @@ Name | Type | Description  | Notes
 ### Return type
 
 **bool**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getPeopleListPeopleGet**
+> PeopleListResponse getPeopleListPeopleGet(page, pageSize)
+
+Get People List
+
+分页获取人物列表，按主键倒序排列（最新创建的在前面）
+
+### Example
+```dart
+import 'package:openapi/api.dart';
+
+final api = Openapi().getPeopleApi();
+final int page = 56; // int | 页码，从1开始
+final int pageSize = 56; // int | 每页大小，最大100
+
+try {
+    final response = api.getPeopleListPeopleGet(page, pageSize);
+    print(response);
+} catch on DioException (e) {
+    print('Exception when calling PeopleApi->getPeopleListPeopleGet: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **page** | **int**| 页码，从1开始 | [optional] [default to 1]
+ **pageSize** | **int**| 每页大小，最大100 | [optional] [default to 10]
+
+### Return type
+
+[**PeopleListResponse**](PeopleListResponse.md)
 
 ### Authorization
 

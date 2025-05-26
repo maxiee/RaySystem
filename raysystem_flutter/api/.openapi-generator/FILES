@@ -33,6 +33,7 @@ doc/NotesApi.md
 doc/NotesListResponse.md
 doc/PeopleApi.md
 doc/PeopleCreate.md
+doc/PeopleListResponse.md
 doc/PeopleNameCreate.md
 doc/PeopleNameResponse.md
 doc/PeopleResponse.md
@@ -87,6 +88,7 @@ lib/src/model/note_tree_response.dart
 lib/src/model/note_update.dart
 lib/src/model/notes_list_response.dart
 lib/src/model/people_create.dart
+lib/src/model/people_list_response.dart
 lib/src/model/people_name_create.dart
 lib/src/model/people_name_response.dart
 lib/src/model/people_response.dart
@@ -101,3 +103,4 @@ lib/src/model/validation_error.dart
 lib/src/model/validation_error_loc_inner.dart
 lib/src/serializers.dart
 pubspec.yaml
+test/people_list_response_test.dart
