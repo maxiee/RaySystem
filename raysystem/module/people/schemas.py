@@ -39,3 +39,16 @@ class PeopleResponse(PeopleBase):
 
     class Config:
         from_attributes = True
+
+
+class PeopleListResponse(BaseModel):
+    """分页人物列表响应"""
+
+    items: List[PeopleResponse]
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
+
+    class Config:
+        from_attributes = True

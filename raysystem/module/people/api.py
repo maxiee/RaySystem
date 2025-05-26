@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
@@ -11,8 +11,10 @@ from module.people.schemas import (
     PeopleUpdate,
     PeopleNameCreate,
     PeopleNameResponse,
+    PeopleListResponse,
 )
 from module.people.model import People, PeopleName
+import math
 
 router = APIRouter(prefix="/people", tags=["people"])
 
@@ -26,6 +28,54 @@ async def create_people(
     # 创建一个字典，排除names字段以避免重复参数
     people_dict = {k: v for k, v in new_people.__dict__.items() if k != "names"}
     return PeopleResponse(**people_dict, names=[])
+
+
+@router.get("/", response_model=PeopleListResponse)
+async def get_people_list(
+    page: int = Query(1, ge=1, description="页码，从1开始"),
+    page_size: int = Query(10, ge=1, le=100, description="每页大小，最大100"),
+    session: AsyncSession = Depends(get_db_session),
+):
+    """
+    分页获取人物列表，按主键倒序排列（最新创建的在前面）
+    """
+    # 获取分页数据
+    people_list, total = await PeopleManager.get_people_paginated(
+        page, page_size, session
+    )
+
+    # 构建响应数据
+    response_items = []
+    for person in people_list:
+        # 查询每个人物的名称
+        names_result = await session.execute(
+            select(PeopleName).where(PeopleName.people_id == person.id)
+        )
+        name_records = names_result.scalars().all()
+        names_list = []
+        for name_record in name_records:
+            names_list.append(
+                PeopleNameResponse(
+                    id=name_record.id,
+                    people_id=name_record.people_id,
+                    name=name_record.name,
+                )
+            )
+
+        # 创建人物响应对象
+        person_dict = {k: v for k, v in person.__dict__.items() if k != "names"}
+        response_items.append(PeopleResponse(**person_dict, names=names_list))
+
+    # 计算总页数
+    total_pages = math.ceil(total / page_size) if total > 0 else 0
+
+    return PeopleListResponse(
+        items=response_items,
+        total=total,
+        page=page,
+        page_size=page_size,
+        total_pages=total_pages,
+    )
 
 
 @router.get("/search", response_model=List[PeopleResponse])
