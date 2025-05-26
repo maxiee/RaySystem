@@ -1,4 +1,3 @@
-import 'package:built_collection/built_collection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:openapi/openapi.dart';
@@ -13,7 +12,7 @@ class RecentPeopleViewModel extends ChangeNotifier {
   bool _isInitialLoading = false;
   bool _hasMore = true;
   String? _error;
-  int _currentPage = 0;
+  int _currentPage = 1;
 
   List<PeopleResponse> get people => _people;
   bool get isLoading => _isLoading;
@@ -44,7 +43,7 @@ class RecentPeopleViewModel extends ChangeNotifier {
     if (_isLoading) return;
 
     _error = null;
-    _currentPage = 0;
+    _currentPage = 1;
     _hasMore = true;
 
     await _loadPeopleData(isRefresh: true);
@@ -64,36 +63,29 @@ class RecentPeopleViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // 由于当前API没有专门的"最近添加"接口，我们使用搜索接口
-      // 这里用一个通用的搜索来模拟获取所有人物
-      // 在实际应用中，你可能需要后端提供专门的接口
-      final response = await _fetchRecentPeople();
+      if (isRefresh) {
+        _people = [];
+        _currentPage = 1; // 页码从1开始
+      } else {
+        _currentPage++; // 加载下一页
+      }
+
+      // 使用真正的分页接口获取最近添加的人物
+      // API 按主键倒序排列，最新创建的人物在前面
+      final response = await peopleApi.getPeopleListPeopleGet(
+        page: _currentPage,
+        pageSize: _pageSize,
+      );
 
       if (response.data != null) {
-        List<PeopleResponse> newPeople = response.data!.toList();
+        final peopleListResponse = response.data!;
 
-        // 按ID降序排列（假设ID越大越新）
-        newPeople.sort((a, b) => b.id.compareTo(a.id));
-
-        if (isRefresh) {
-          _people = [];
-          _currentPage = 0;
-        }
-
-        // 实现客户端分页
-        final startIndex = _currentPage * _pageSize;
-        final endIndex = (startIndex + _pageSize).clamp(0, newPeople.length);
-        final pageData = newPeople.sublist(startIndex, endIndex);
-
-        _people.addAll(pageData);
-        _currentPage++;
+        // 将新数据添加到现有列表
+        _people.addAll(peopleListResponse.items.toList());
 
         // 检查是否还有更多数据
-        _hasMore = endIndex < newPeople.length;
+        _hasMore = _currentPage < peopleListResponse.totalPages;
       } else {
-        if (isRefresh) {
-          _people = [];
-        }
         _hasMore = false;
       }
     } catch (e) {
@@ -101,83 +93,13 @@ class RecentPeopleViewModel extends ChangeNotifier {
       if (isRefresh) {
         _people = [];
       }
+      // 如果加载失败，回退页码
+      if (!isRefresh && _currentPage > 1) {
+        _currentPage--;
+      }
     } finally {
       _isLoading = false;
       notifyListeners();
-    }
-  }
-
-  /// 获取最近人物的API调用
-  /// 由于没有专门的最近人物接口，这里使用搜索接口来模拟
-  Future<Response<BuiltList<PeopleResponse>>> _fetchRecentPeople() async {
-    // 这里使用一个通用搜索，在实际应用中应该有专门的API
-    // 例如: GET /people/recent?page=0&size=20&sort=created_desc
-
-    try {
-      // 尝试用常见的中文姓氏来搜索，获取一些人物数据
-      // 在实际项目中，这应该是一个专门的API调用
-      final commonNames = [
-        '张',
-        '王',
-        '李',
-        '赵',
-        '刘',
-        '陈',
-        '杨',
-        '吴',
-        '周',
-        '郑',
-        '孙',
-        '马',
-        '朱',
-        '胡',
-        '林',
-        '郭',
-        '何',
-        '高',
-        '罗',
-        '郑'
-      ];
-
-      List<PeopleResponse> allPeople = [];
-
-      // 为了获取更多样的数据，我们搜索多个常见姓氏
-      for (String name in commonNames.take(5)) {
-        // 限制搜索次数以避免过多请求
-        try {
-          final response =
-              await peopleApi.searchPeoplePeopleSearchGet(name: name);
-          if (response.data != null) {
-            allPeople.addAll(response.data!.toList());
-          }
-        } catch (e) {
-          // 忽略单个搜索的错误，继续下一个
-          continue;
-        }
-      }
-
-      // 去重（基于ID）
-      final uniquePeople = <int, PeopleResponse>{};
-      for (var person in allPeople) {
-        uniquePeople[person.id] = person;
-      }
-
-      // 转换为列表并按ID排序（模拟按创建时间排序）
-      final sortedPeople = uniquePeople.values.toList()
-        ..sort((a, b) => b.id.compareTo(a.id));
-
-      final result = BuiltList<PeopleResponse>(sortedPeople);
-
-      return Response(
-        data: result,
-        requestOptions: RequestOptions(path: '/people/recent'),
-      );
-    } catch (e) {
-      // 如果所有搜索都失败，返回空结果
-      return Response(
-        data: BuiltList<PeopleResponse>([]),
-        requestOptions: RequestOptions(path: '/people/recent'),
-      );
     }
   }
 
