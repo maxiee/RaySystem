@@ -278,13 +278,13 @@ class _PersonDetailDialog extends StatelessWidget {
               Text(person.description!),
               const SizedBox(height: 16),
             ],
-            if (person.birthDate != null && person.birthDate!.isNotEmpty) ...[
+            if (person.birthDate != null) ...[
               const Text(
                 '出生日期',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 8),
-              Text(person.birthDate!),
+              Text(person.birthDate!.toString()),
               const SizedBox(height: 16),
             ],
             if (person.names != null && person.names!.isNotEmpty) ...[

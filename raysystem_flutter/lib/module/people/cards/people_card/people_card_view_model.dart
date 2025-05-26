@@ -63,11 +63,8 @@ class PeopleCardViewModel extends ChangeNotifier {
       avatarController.text = _peopleData?.avatar ?? '';
 
       if (_peopleData?.birthDate != null) {
-        _birthDate = DateTime.tryParse(_peopleData!.birthDate!);
-        if (_birthDate != null) {
-          birthDateController.text =
-              DateFormat('yyyy-MM-dd').format(_birthDate!);
-        }
+        _birthDate = _peopleData!.birthDate!.toDateTime();
+        birthDateController.text = DateFormat('yyyy-MM-dd').format(_birthDate!);
       }
       _isLoading = false;
       notifyListeners();
@@ -112,7 +109,7 @@ class PeopleCardViewModel extends ChangeNotifier {
           ..avatar =
               avatarController.text.isNotEmpty ? avatarController.text : null
           ..birthDate = birthDateController.text.isNotEmpty
-              ? birthDateController.text
+              ? _parseStringToDate(birthDateController.text)
               : null);
 
         final response = await peopleApi.createPeoplePeoplePost(
@@ -129,7 +126,7 @@ class PeopleCardViewModel extends ChangeNotifier {
           ..avatar =
               avatarController.text.isNotEmpty ? avatarController.text : null
           ..birthDate = birthDateController.text.isNotEmpty
-              ? birthDateController.text
+              ? _parseStringToDate(birthDateController.text)
               : null);
 
         final response = await peopleApi.updatePeoplePeoplePeopleIdPut(
@@ -218,6 +215,16 @@ class PeopleCardViewModel extends ChangeNotifier {
     } catch (e) {
       errorMessage = '删除人名失败: ${e.toString()}';
       notifyListeners();
+    }
+  }
+
+  // Helper method to parse string date to Date object
+  openapi.Date? _parseStringToDate(String dateString) {
+    try {
+      final dateTime = DateTime.parse(dateString);
+      return openapi.Date(dateTime.year, dateTime.month, dateTime.day);
+    } catch (e) {
+      return null;
     }
   }
 
